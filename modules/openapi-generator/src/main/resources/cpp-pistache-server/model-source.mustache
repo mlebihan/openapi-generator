@@ -181,6 +181,41 @@ void {{classname}}::setEnumValue({{{this}}}::e{{{this}}}  value)
     m_value.setValue(value);
 }{{/-first}}{{/anyOf}}{{/vendorExtensions.x-is-string-enum-container}}
 
+{{#isEnum}}
+/// <summary>
+/// From enumerated value eVideoPrivacySet to string value
+/// </summary>
+std::string {{classname}}::toStringValue(const {{classname}}::e{{classname}} &value)
+{
+    return "ukn";
+}
+
+std::string {{classname}}::toStringValue(const {{classname}} &value)
+{
+    return "ukn";
+}
+
+/// <summary>
+/// From string value to enumerated value e{{classname}}
+/// </summary>
+bool {{classname}}::fromStringValue(const std::string &inStr, {{classname}}::e{{classname}} &value)
+{
+    // TODO get value
+    {{classname}}::e{{classname}} dummy;
+    return true;
+    // TODO throw if invalid value
+}
+
+bool {{classname}}::fromStringValue(const std::string &inStr, {{classname}} &value)
+{
+    // TODO get value
+    {{classname}}::e{{classname}} dummy;
+    return true;
+    // TODO throw if invalid value
+}
+
+{{/isEnum}}
+
 } // namespace {{modelNamespace}}
 
 {{/model}}

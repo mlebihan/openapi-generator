@@ -79,6 +79,23 @@ public:
     friend {{declspec}} void from_json(const nlohmann::json& j, {{classname}}& o);{{#vendorExtensions.x-is-string-enum-container}}{{#anyOf}}{{#-first}}
     friend {{declspec}} void to_json(nlohmann::json& j, const {{{this}}}& o);
     friend {{declspec}} void from_json(const nlohmann::json& j, {{{this}}}& o);{{/-first}}{{/anyOf}}{{/vendorExtensions.x-is-string-enum-container}}
+
+    {{#isEnum}}
+    /// <summary>
+    /// From enumerated value e{{classname}} to string value
+    /// </summary>
+    static std::string toStringValue(const {{classname}}::e{{classname}} &value) const;
+    static std::string toStringValue(const {{classname}} &value) const;
+    {{/isEnum}}
+
+    {{#isEnum}}
+    /// <summary>
+    /// From string value to enumerated value e{{classname}}
+    /// </summary>
+    static bool fromStringValue(const std::string &inStr, {{classname}}::e{{classname}} &value);
+    static bool fromStringValue(const std::string &inStr, {{classname}} &value);
+    {{/isEnum}}
+
 protected:
     {{#vars}}
     {{{dataType}}} m_{{name}};
