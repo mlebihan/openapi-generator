@@ -1,0 +1,9 @@
+FROM alive/core
+ARG JDK_VERSION="17"
+
+# Preparing the tester
+# --------------------
+
+
+
+ENTRYPOINT ["/bin/bash"]

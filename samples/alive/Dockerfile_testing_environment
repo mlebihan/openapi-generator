@@ -1,0 +1,32 @@
+FROM alpine:3.19.1
+ARG JDK_VERSION="17"
+
+# Preparing the test environnement
+# --------------------------------
+
+# General tools
+RUN apk add --update --no-cache curl ca-certificates bash bash-completion curl git vim util-linux wget;
+
+# Java testing purpose
+RUN apk add openjdk${JDK_VERSION} maven;
+
+ENV JAVA_HOME /usr/lib/jvm/java-${JDK_VERSION}-openjdk/
+RUN export JAVA_HOME;
+
+### Languages
+
+# C, C++
+ARG GCC_VERSION="latest"
+ARG GPP_VERSION="latest"
+RUN apk add gcc g++; # TODO How to ask apk any version of C or C++?
+
+# Go
+ARG GO_VERSION=1.22.3
+
+RUN wget -c "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz" && \
+    rm -rf /usr/local/go && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz;
+
+ENV PATH=${PATH}:/usr/local/go/bin
+RUN export PATH;
+
+ENTRYPOINT ["/bin/bash"]
