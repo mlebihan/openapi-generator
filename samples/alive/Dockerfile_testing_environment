@@ -13,12 +13,13 @@ RUN apk add openjdk${JDK_VERSION} maven;
 ENV JAVA_HOME /usr/lib/jvm/java-${JDK_VERSION}-openjdk/
 RUN export JAVA_HOME;
 
-### Languages
+# Installing languages used for testing
+# -------------------------------------
 
 # C, C++
 ARG GCC_VERSION="latest"
 ARG GPP_VERSION="latest"
-RUN apk add gcc g++; # TODO How to ask apk any version of C or C++?
+RUN apk add gcc g++ cmake; # TODO How to ask apk a specific version of C or C++?
 
 # Go
 ARG GO_VERSION=1.22.3
@@ -28,5 +29,21 @@ RUN wget -c "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz" && \
 
 ENV PATH=${PATH}:/usr/local/go/bin
 RUN export PATH;
+
+# Installing main build tools and packages
+# ----------------------------------------
+RUN apk add maven
+
+# Install the openapi-generator.jar that has been prepared by the build_docker.sh script launching us
+# ---------------------------------------------------------------------------------------------------
+ADD openapi-generator.jar openapi-generator.jar
+
+# Do a checking that java installation allows a compilation of some tests with maven
+# ----------------------------------------------------------------------------------
+#
+# this will also cause downloading of dependencies from the Internet,
+# that we will not need to do in children containers
+ADD sub-projects/checkJavaMavenInstallation checkJavaMavenInstallation
+RUN (cd checkJavaMavenInstallation || exit 1; mvn clean install -Passemblage -Dtester.name=build-environement)
 
 ENTRYPOINT ["/bin/bash"]

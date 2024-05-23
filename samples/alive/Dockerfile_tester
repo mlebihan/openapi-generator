@@ -1,9 +1,11 @@
 FROM alive/core
-ARG JDK_VERSION="17"
+ARG TESTER
 
 # Preparing the tester
 # --------------------
 
+
+### 1) Get the test project
 
 
 ENTRYPOINT ["/bin/bash"]

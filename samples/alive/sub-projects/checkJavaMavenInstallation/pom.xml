@@ -1,0 +1,325 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.openapitools</groupId>
+	<artifactId>openapi-generator-environment-tester</artifactId>
+	<version>7.6.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>Test environment tester</name>
+	<description>Tests that the Docker environment allows a Java test to run</description>
+
+	<properties>
+		<java.version>17</java.version>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
+
+		<spring-boot.version>2.7.17</spring-boot.version>
+		<surefire-version>3.1.2</surefire-version>
+		<swagger-annotations.version>2.2.7</swagger-annotations.version>
+
+		<maven-wagon-ssh.version>3.5.2</maven-wagon-ssh.version>
+
+		<maven.test.compile.encoding>UTF-8</maven.test.compile.encoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<downloadSources>true</downloadSources>
+		<downloadJavadocs>true</downloadJavadocs>
+	</properties>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.7.17</version>
+		<relativePath />
+	</parent>
+
+	<dependencies>
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>${swagger-annotations.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-models</artifactId>
+			<version>${swagger-annotations.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>0.2.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JUnit 5 -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-parent</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<profiles>
+		<!-- Default building -->
+		<profile>
+			<id>default</id>
+
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+
+			<properties>
+				<!-- Unit tests activated by default, intergration tests desactivated -->
+				<skip.integration.tests>true</skip.integration.tests>
+				<skip.unit.tests>false</skip.unit.tests>
+
+				<argLine>
+					--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens java.base/sun.security.util=ALL-UNNAMED --add-opens java.base/sun.security.action=ALL-UNNAMED
+				</argLine>
+			</properties>
+		</profile>
+
+		<!-- Building with assembly (integration) tests -->
+		<profile>
+			<id>assemblage</id>
+
+			<properties>
+				<!-- Unit and integration tests activated -->
+				<skip.integration.tests>false</skip.integration.tests>
+				<skip.unit.tests>false</skip.unit.tests>
+
+				<argLine>
+					--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens java.base/sun.security.util=ALL-UNNAMED --add-opens java.base/sun.security.action=ALL-UNNAMED
+				</argLine>
+			</properties>
+
+			<build>
+				<plugins>
+					<!-- Plugin Failsafe : exécution de tests d'intégration -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+
+						<executions>
+							<execution>
+								<id>integration-test</id>
+
+								<configuration>
+									<argLine>
+										--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens java.base/sun.security.util=ALL-UNNAMED --add-opens java.base/sun.security.action=ALL-UNNAMED -Xmx20g
+									</argLine>
+								</configuration>
+							</execution>
+						</executions>
+
+						<configuration>
+							<skipTests>${skip.integration.tests}</skipTests>
+							<trimStackTrace>false</trimStackTrace>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<build>
+		<plugins>
+			<!-- Add the add-opens, add-exports to the MANIFEST.MF
+			     to avoid adding them to the java -jar command line at runtime -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>package</phase>
+
+						<goals>
+							<goal>jar</goal>
+						</goals>
+
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<Add-Exports>java.base/sun.nio.ch</Add-Exports>
+									<Add-Opens>java.base/java.util java.base/java.io java.base/java.nio java.base/java.lang java.base/java.lang.invoke java.base/sun.security.util java.base/sun.security.action</Add-Opens>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- Surefire plugin : unit tests -->
+			<!-- All the tests, except those starting with IT* -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${surefire-version}</version>
+
+				<configuration>
+					<skipTests>${skip.unit.tests}</skipTests>
+
+					<excludes>
+						<exclude>**/IT*.java</exclude>
+					</excludes>
+
+					<argLine>
+						--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens java.base/sun.security.util=ALL-UNNAMED --add-opens java.base/sun.security.action=ALL-UNNAMED -Xmx12g
+					</argLine>
+
+					<trimStackTrace>false</trimStackTrace>
+				</configuration>
+			</plugin>
+
+			<!-- Générer OpenAPI pour les services REST -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+
+				<executions>
+					<!-- Démarrer l'application en intégration -->
+					<execution>
+						<id>pre-integration-test</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+
+						<configuration>
+							<jvmArguments>--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens java.base/sun.security.util=ALL-UNNAMED --add-opens java.base/sun.security.action=ALL-UNNAMED</jvmArguments>
+						</configuration>
+					</execution>
+
+					<!-- Provoquer la génération yaml par OpenApi des services REST -->
+					<execution>
+						<id>post-integration-test</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+
+					<!-- Créer le fat jar exécutable de l'application -->
+					<execution>
+						<id>executable-jar</id>
+						<phase>install</phase>
+
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+
+						<configuration>
+							<executable>true</executable>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Javadoc plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+
+				<configuration>
+					<charset>UTF-8</charset>
+					<docencoding>UTF-8</docencoding>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+			<!-- Source plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+
+			<!-- Release -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+			</plugin>
+
+			<!-- Deploy plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+			</plugin>
+		</plugins>
+
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>${maven-wagon-ssh.version}</version>
+			</extension>
+		</extensions>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.openapitools</groupId>
+					<artifactId>openapi-generator-maven-plugin</artifactId>
+					<version>${openapi-generator-maven-plugin.version}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

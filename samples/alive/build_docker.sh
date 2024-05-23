@@ -55,8 +55,33 @@ write() {
   echo -e "$4 >> ${target_substep_file}"
 }
 
+# copy the openapi generator executable from anywhere to our current folder, before docker building
+# whole API_GENERATOR_EXECUTABLE for path where the wished openapi-generator jar to use can be found,
+# can be provided, or they will receive default values
+copy_openapi_generator_executable() {
+  if [ -z "$API_GENERATOR_EXECUTABLE" ]; then
+    API_GENERATOR_EXECUTABLE="../../modules/openapi-generator-cli/target/openapi-generator-cli.jar"
+  fi
+
+  if ! [ -f "${API_GENERATOR_EXECUTABLE}" ]; then
+    log "ERROR" "The file '${API_GENERATOR_EXECUTABLE}' doesn't exit"
+    exit 1
+  fi
+
+  cp "${API_GENERATOR_EXECUTABLE}" openapi-generator.jar
+}
+
+# --------------------------------------
+# Main
+# --------------------------------------
+
 volume=$(mktemp --directory)
 log "INFO" "Volume for gathering tests results is: ${volume}"
+
+# Copy the openapi generator executable: the docker container will use it
+if ! copy_openapi_generator_executable; then
+  exit $?
+fi
 
 # Build test environment, with languages
 if ! BUILD_ENV=$(sudo docker build . -t alive/core -f Dockerfile_testing_environment); then
