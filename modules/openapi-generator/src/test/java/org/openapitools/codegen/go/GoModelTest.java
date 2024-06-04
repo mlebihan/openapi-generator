@@ -25,7 +25,7 @@ import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.DefaultCodegen;
 import org.openapitools.codegen.TestUtils;
-import org.openapitools.codegen.languages.GoClientCodegen;
+import org.openapitools.codegen.languages.goclient.GoClientCodegen;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

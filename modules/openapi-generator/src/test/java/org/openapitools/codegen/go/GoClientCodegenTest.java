@@ -21,7 +21,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.config.CodegenConfigurator;
-import org.openapitools.codegen.languages.GoClientCodegen;
+import org.openapitools.codegen.languages.goclient.GoClientCodegen;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

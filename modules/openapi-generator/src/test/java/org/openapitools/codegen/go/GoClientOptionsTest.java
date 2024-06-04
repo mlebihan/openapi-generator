@@ -19,7 +19,7 @@ package org.openapitools.codegen.go;
 
 import org.openapitools.codegen.AbstractOptionsTest;
 import org.openapitools.codegen.CodegenConfig;
-import org.openapitools.codegen.languages.GoClientCodegen;
+import org.openapitools.codegen.languages.goclient.GoClientCodegen;
 import org.openapitools.codegen.options.GoClientOptionsProvider;
 
 import static org.mockito.Mockito.mock;
