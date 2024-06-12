@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
+import org.openapitools.codegen.languages.AbstractCodeSelector;
 
 
 public class GoClientCodeForModel extends AbstractCodeSelector<CodegenModel, String> {

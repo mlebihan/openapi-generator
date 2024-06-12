@@ -1,4 +1,4 @@
-package org.openapitools.codegen.languages.goclient;
+package org.openapitools.codegen.languages;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -7,8 +7,9 @@ import java.util.function.*;
 import org.slf4j.*;
 
 /**
- * @param <P> Usually Schema or CodegenParameter
- * @param <O> Kind of fragment returned. Usually String
+ * Select an appropriate code fragment for a given parameter
+ * @param <P> Usually Schema or CodegenParameter, CodeGenProperty, CodeGenModel
+ * @param <O> Kind of fragment returned. Usually a String
  */
 public abstract class AbstractCodeSelector<P,O> {
    /** Logger. */
