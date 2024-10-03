@@ -1,0 +1,143 @@
+openapi: 3.0.1
+info:
+  version: 1.0.0
+  title: requestBody of application/object-stream type, various cases, as suggested by #5391, #5387
+  license:
+    name: MIT
+servers:
+  - url: http://api.example.xyz/v1
+paths:
+  /arbitraryObjectRequiredBody:
+    post:
+      operationId: arbitraryObjectRequiredBody
+      description: test code generation for objects
+        Value must be a map of strings to values. It cannot be the 'null' value.
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: object
+
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: object
+
+          description: a required object
+
+  /arbitraryObjectOptionalBody:
+    post:
+      operationId: arbitraryObjectOptionalBody
+      description: test code generation for objects
+        Value must be a map of strings to values. It cannot be the 'null' value.
+      requestBody:
+        required: false
+        content:
+          application/octet-stream:
+            schema:
+              type: object
+
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: object
+
+          description: a required object
+
+  /arbitraryObjectNullableParameter:
+    post:
+      operationId: arbitraryObjectNullableParameter
+      description: test code generation for nullable objects.
+        Value must be a map of strings to values or the 'null' value.
+      parameters:
+        - name: candidate
+          in: path
+          schema:
+            type: object
+            nullable: true
+
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: object
+                nullable: true
+
+          description: a nullable object
+
+  /arbitraryTypeRequiredBody:
+    post:
+      operationId: arbitraryTypeRequiredBody
+      description: test code generation for any type
+        Value can be any type - string, number, boolean, array or object.
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: null
+
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: null
+
+          description: a required any type
+
+  /arbitraryTypeNullableParameter:
+    post:
+      operationId: arbitraryTypeNullableParameter
+      description: test code generation for any type
+        Value can be any type - string, number, boolean, array, object or
+        the 'null' value.
+      parameters:
+        - name: candidate
+          in: path
+          schema:
+           type: null
+           nullable: true
+
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: null
+                nullable: true
+
+          description: a nullable any type
+
+  /arbitraryTypeRequiredBodyByAnyTypeSchema:
+    post:
+      operationId: arbitraryTypeRequiredBodyByAnyTypeSchema
+      description: test code generation for any type
+        Value can be any type - string, number, boolean, array or object.
+        OA declaration through a component schema reference
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              $ref: "#/components/schemas/AnyValue"
+
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                $ref: "#/components/schemas/AnyValue"
+
+          description: a required any type given through a components/schemas
+
+components:
+  schemas:
+    AnyValue:
+      description: Can be any value - string, number, boolean, array or object.

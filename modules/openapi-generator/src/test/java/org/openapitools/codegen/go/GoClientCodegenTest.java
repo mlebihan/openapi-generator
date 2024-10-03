@@ -38,7 +38,7 @@ import java.util.Map;
 public class GoClientCodegenTest {
 
     @Test
-    public void testInitialConfigValues() throws Exception {
+    public void testInitialConfigValues() {
         final GoClientCodegen codegen = new GoClientCodegen();
         codegen.processOpts();
 
@@ -48,7 +48,7 @@ public class GoClientCodegenTest {
     }
 
     @Test
-    public void testSettersForConfigValues() throws Exception {
+    public void testSettersForConfigValues() {
         final GoClientCodegen codegen = new GoClientCodegen();
         codegen.setHideGenerationTimestamp(false);
         codegen.processOpts();
@@ -58,7 +58,7 @@ public class GoClientCodegenTest {
     }
 
     @Test
-    public void testAdditionalPropertiesPutForConfigValues() throws Exception {
+    public void testAdditionalPropertiesPutForConfigValues() {
         final GoClientCodegen codegen = new GoClientCodegen();
         codegen.additionalProperties().put(CodegenConstants.HIDE_GENERATION_TIMESTAMP, false);
         codegen.processOpts();
@@ -102,7 +102,7 @@ public class GoClientCodegenTest {
     }
 
     @Test
-    public void testFilenames() throws Exception {
+    public void testFilenames() {
         final GoClientCodegen codegen = new GoClientCodegen();
 
         // Model names are generated from schema / definition names
@@ -199,7 +199,7 @@ public class GoClientCodegenTest {
     }
 
     @Test
-    public void testAdditionalPropertiesModelFileFolder() throws Exception {
+    public void testAdditionalPropertiesModelFileFolder() {
         final GoClientCodegen codegen = new GoClientCodegen();
         codegen.additionalProperties().put(GoClientCodegen.MODEL_FILE_FOLDER, "model_dir");
         codegen.processOpts();
@@ -395,5 +395,87 @@ public class GoClientCodegenTest {
         TestUtils.assertFileNotExists(goModFile);
         Path goSumFile = Paths.get(output + "/go.sum");
         TestUtils.assertFileNotExists(goSumFile);
+    }
+
+    /**
+     * Tests that a request with a binary body is well handled.
+     * @throws IOException if the temp directory creation fails
+     */
+    @Test(description = "Handling binary body (application/octet-stream content)")
+    public void testPureBinaryBody() throws IOException {
+        final String OPENAPI_YAML_OBJECT = "src/test/resources/3_0/issue_19762-application_octet-stream-object.yaml";
+//        final String OPENAPI_YAML_ARRAY_STRING_BYTE = "src/test/resources/3_0/issue_19762-application_octet-stream-array_string_byte.yaml";
+
+        /* What line to refuse, in which file, depending on the generator being processed */
+        class GeneratorTest {
+            public final String caseName;
+            public final String openApiYaml;
+            public final String generatorName;
+            public final String targetFile;
+            public final String[] linesExpected;
+
+            public GeneratorTest(String caseName, String generatorName, String openApiYaml, String targetFile, String... linesExpected) {
+                this.caseName = caseName;
+                this.openApiYaml = openApiYaml;
+                this.generatorName = generatorName;
+                this.targetFile = targetFile;
+                this.linesExpected = linesExpected;
+            }
+        }
+
+        List<GeneratorTest> generatorTests = List.of(
+           new GeneratorTest("Go handling a free-form object or an any type", "go", OPENAPI_YAML_OBJECT, "/api_default.go",
+              // Body, type: object, required: true
+              "func (r ApiArbitraryObjectRequiredBodyRequest) Body(body map[string]interface{}) ApiArbitraryObjectRequiredBodyRequest {",
+
+              // Body, type: object, required: false
+              "func (r ApiArbitraryObjectOptionalBodyRequest) Body(body map[string]interface{}) ApiArbitraryObjectOptionalBodyRequest {",
+
+              // Body, any type => type: null, required: true
+              "func (r ApiArbitraryTypeRequiredBodyRequest) Body(body interface{}) ApiArbitraryTypeRequiredBodyRequest {",
+
+              // Parameter, type: object, nullable
+              "func (a *DefaultAPIService) ArbitraryObjectNullableParameterExecute(r ApiArbitraryObjectNullableParameterRequest) (map[string]interface{}, *http.Response, error) {",
+
+              // Parameter, any type => type: null, nullable
+              "func (a *DefaultAPIService) ArbitraryTypeNullableParameterExecute(r ApiArbitraryTypeNullableParameterRequest) (interface{}, *http.Response, error) {",
+
+              // Body, any type => #components/schemas/AnyValue : null, required: true
+              "func (r ApiArbitraryTypeRequiredBodyByAnyTypeSchemaRequest) Body(body interface{}) ApiArbitraryTypeRequiredBodyByAnyTypeSchemaRequest {")
+
+/*           new GeneratorTest("Go handling an array of bytes", "go", OPENAPI_YAML_ARRAY_STRING_BYTE, "/api_default.go",
+              "func (r ApiTest1PostRequest) Body(body []byte) ApiTest1PostRequest {") */
+        );
+
+        for(GeneratorTest candidate : generatorTests) {
+            File output = Files.createTempDirectory("test").toFile();
+            output.deleteOnExit();
+
+            final CodegenConfigurator configurator = new CodegenConfigurator()
+               .setGeneratorName(candidate.generatorName)
+               .setGitUserId("OpenAPITools")
+               .setGitRepoId("openapi-generator")
+               .setInputSpec(candidate.openApiYaml)
+               .setOutputDir(output.getAbsolutePath().replace("\\", "/"));
+
+            DefaultGenerator generator = new DefaultGenerator();
+            List<File> files = generator.opts(configurator.toClientOptInput()).generate();
+            files.forEach(File::deleteOnExit);
+
+            Path defaultApiFile = Paths.get(output + candidate.targetFile);
+            TestUtils.assertFileExists(defaultApiFile);
+
+            for(String lineExpected : candidate.linesExpected) {
+                try {
+                    TestUtils.assertFileContains(defaultApiFile, lineExpected);
+                }
+                catch(AssertionError e) {
+                    String message = String.format("%s (%s generator): for an application/octet-stream requestBody (type: ...), %s doesn't have the expected prototype for Body(): %s",
+                       candidate.caseName, candidate.generatorName, candidate.targetFile, lineExpected);
+
+                    throw new AssertionError(message, e);
+                }
+            }
+        }
     }
 }
