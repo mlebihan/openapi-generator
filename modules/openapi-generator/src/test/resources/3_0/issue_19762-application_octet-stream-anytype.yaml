@@ -1,0 +1,31 @@
+openapi: 3.0.1
+info:
+  version: 1.0.0
+  title: requestBody of application/object-stream type
+  license:
+    name: MIT
+servers:
+  - url: http://api.example.xyz/v1
+
+components:
+  schemas:
+    AnyValue: {}
+
+paths:
+  /test1:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              $ref: "#/components/schemas/AnyValue"
+
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnyValue"
+
+          description: successful
