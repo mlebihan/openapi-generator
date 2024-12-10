@@ -1564,6 +1564,7 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
             this.setMinimum(cm.getMinimum());
             this.setMaximum(cm.getMaximum());
             this.setPattern(cm.getPattern());
+            this.setOriginalPattern(cm.getOriginalPattern());
             this.setMultipleOf(cm.getMultipleOf());
             this.setItems(cm.getItems());
             this.setAdditionalProperties(cm.getAdditionalProperties());

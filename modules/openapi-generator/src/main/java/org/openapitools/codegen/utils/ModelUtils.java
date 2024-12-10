@@ -1838,6 +1838,8 @@ public class ModelUtils {
         String pattern = schema.getPattern();
         if (pattern != null) vSB.withPattern();
 
+        String originalPattern = pattern;
+
         BigDecimal multipleOf = schema.getMultipleOf();
         if (multipleOf != null) vSB.withMultipleOf();
 
@@ -1867,7 +1869,7 @@ public class ModelUtils {
             logWarnMessagesForIneffectiveValidations(new LinkedHashSet(setValidations), schema, SchemaValidations.OBJECT_VALIDATIONS);
         } else if (isStringSchema(schema)) {
             if (minLength != null || maxLength != null || pattern != null)
-                setStringValidations(minLength, maxLength, pattern, target);
+                setStringValidations(minLength, maxLength, pattern, originalPattern, target);
             if (isDecimalSchema(schema)) {
                 if (multipleOf != null || minimum != null || maximum != null || exclusiveMinimum != null || exclusiveMaximum != null)
                     setNumericValidations(schema, multipleOf, minimum, maximum, exclusiveMinimum, exclusiveMaximum, target);
@@ -1886,7 +1888,7 @@ public class ModelUtils {
             // anyType can have any validations set on it
             setArrayValidations(minItems, maxItems, uniqueItems, target);
             setObjectValidations(minProperties, maxProperties, target);
-            setStringValidations(minLength, maxLength, pattern, target);
+            setStringValidations(minLength, maxLength, pattern, originalPattern, target);
             setNumericValidations(schema, multipleOf, minimum, maximum, exclusiveMinimum, exclusiveMaximum, target);
         }
 
@@ -1906,10 +1908,11 @@ public class ModelUtils {
         if (maxProperties != null) target.setMaxProperties(maxProperties);
     }
 
-    private static void setStringValidations(Integer minLength, Integer maxLength, String pattern, IJsonSchemaValidationProperties target) {
+    private static void setStringValidations(Integer minLength, Integer maxLength, String pattern, String originalPattern, IJsonSchemaValidationProperties target) {
         if (minLength != null) target.setMinLength(minLength);
         if (maxLength != null) target.setMaxLength(maxLength);
         if (pattern != null) target.setPattern(pattern);
+        if (originalPattern != null) target.setOriginalPattern(originalPattern);
     }
 
     private static void setNumericValidations(Schema schema, BigDecimal multipleOf, BigDecimal minimum, BigDecimal maximum, Boolean exclusiveMinimum, Boolean exclusiveMaximum, IJsonSchemaValidationProperties target) {

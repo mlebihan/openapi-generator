@@ -98,6 +98,10 @@ public class CodegenProperty implements Cloneable, IJsonSchemaValidationProperti
      * pattern validation for strings, see http://json-schema.org/latest/json-schema-validation.html#rfc.section.5.2.3
      */
     public String pattern;
+
+    /** Original pattern validation for strings, kept unchanged from OpenAPI schema */
+    public String originalPattern;
+
     /**
      * A free-form property to include an example of an instance for this schema.
      */
@@ -380,6 +384,16 @@ public class CodegenProperty implements Cloneable, IJsonSchemaValidationProperti
     @Override
     public void setPattern(String pattern) {
         this.pattern = pattern;
+    }
+
+    @Override
+    public String getOriginalPattern() {
+        return originalPattern;
+    }
+
+    @Override
+    public void setOriginalPattern(String originalPattern) {
+        this.originalPattern = originalPattern;
     }
 
     @Override
@@ -986,6 +1000,7 @@ public class CodegenProperty implements Cloneable, IJsonSchemaValidationProperti
         sb.append(", maxLength=").append(maxLength);
         sb.append(", minLength=").append(minLength);
         sb.append(", pattern='").append(pattern).append('\'');
+        sb.append(", originalPattern='").append(originalPattern).append('\'');
         sb.append(", example='").append(example).append('\'');
         sb.append(", jsonSchema='").append(jsonSchema).append('\'');
         sb.append(", minimum='").append(minimum).append('\'');
@@ -1175,6 +1190,7 @@ public class CodegenProperty implements Cloneable, IJsonSchemaValidationProperti
                 Objects.equals(maxLength, that.maxLength) &&
                 Objects.equals(minLength, that.minLength) &&
                 Objects.equals(pattern, that.pattern) &&
+                Objects.equals(originalPattern, that.originalPattern) &&
                 Objects.equals(example, that.example) &&
                 Objects.equals(jsonSchema, that.jsonSchema) &&
                 Objects.equals(minimum, that.minimum) &&
@@ -1206,7 +1222,7 @@ public class CodegenProperty implements Cloneable, IJsonSchemaValidationProperti
         return Objects.hash(openApiType, baseName, complexType, getter, setter, description,
                 dataType, datatypeWithEnum, dataFormat, name, min, max, defaultValue,
                 defaultValueWithParam, baseType, containerType, containerTypeMapped, title, unescapedDescription,
-                maxLength, minLength, pattern, example, jsonSchema, minimum, maximum,
+                maxLength, minLength, pattern, originalPattern, example, jsonSchema, minimum, maximum,
                 exclusiveMinimum, exclusiveMaximum, required, deprecated,
                 hasMoreNonReadOnly, isPrimitiveType, isModel, isContainer, isString, isNumeric,
                 isInteger, isLong, isNumber, isFloat, isDouble, isDecimal, isByteArray, isBinary, isFile,

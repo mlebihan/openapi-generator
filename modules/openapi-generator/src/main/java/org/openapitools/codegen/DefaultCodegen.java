@@ -4893,6 +4893,7 @@ public class DefaultCodegen implements CodegenConfig {
         ModelUtils.syncValidationProperties(responseSchema, r);
         if (responseSchema.getPattern() != null) {
             r.setPattern(toRegularExpression(responseSchema.getPattern()));
+            r.setOriginalPattern(responseSchema.getPattern());
         }
 
         CodegenProperty cp = fromProperty("response", responseSchema, false);

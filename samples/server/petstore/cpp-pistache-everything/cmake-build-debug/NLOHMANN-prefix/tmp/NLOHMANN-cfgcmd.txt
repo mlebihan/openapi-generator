@@ -1,0 +1,1 @@
+cmd='/home/lebihan/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/bin/cmake;-DCMAKE_INSTALL_PREFIX=/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/external;-DJSON_BuildTests=OFF;-GNinja;-S;<SOURCE_DIR><SOURCE_SUBDIR>;-B;<BINARY_DIR>'

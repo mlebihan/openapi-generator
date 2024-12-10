@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/CMakeFiles/PISTACHE"
+		},
+		{
+			"file" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/CMakeFiles/PISTACHE.rule"
+		},
+		{
+			"file" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/CMakeFiles/PISTACHE-complete.rule"
+		},
+		{
+			"file" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-build.rule"
+		},
+		{
+			"file" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-configure.rule"
+		},
+		{
+			"file" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-download.rule"
+		},
+		{
+			"file" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-install.rule"
+		},
+		{
+			"file" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-mkdir.rule"
+		},
+		{
+			"file" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-patch.rule"
+		},
+		{
+			"file" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"PISTACHE"
+		],
+		"name" : "PISTACHE"
+	}
+}

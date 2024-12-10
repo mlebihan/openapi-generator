@@ -1,0 +1,13 @@
+# Target labels
+ PISTACHE
+# Source files and their labels
+/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/CMakeFiles/PISTACHE
+/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/CMakeFiles/PISTACHE.rule
+/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/CMakeFiles/PISTACHE-complete.rule
+/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-build.rule
+/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-configure.rule
+/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-download.rule
+/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-install.rule
+/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-mkdir.rule
+/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-patch.rule
+/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug/PISTACHE-prefix/src/PISTACHE-stamp/PISTACHE-update.rule

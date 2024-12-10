@@ -86,6 +86,7 @@ public class CodegenResponse implements IJsonSchemaValidationProperties {
     private String minimum;
     private String maximum;
     public String pattern;
+    public String originalPattern;
     public Number multipleOf;
     public CodegenProperty items;
     public CodegenProperty additionalProperties;
@@ -113,7 +114,7 @@ public class CodegenResponse implements IJsonSchemaValidationProperties {
                 isMap, isOptional, isArray, isBinary, isFile, schema, jsonSchema, vendorExtensions, items, additionalProperties,
                 vars, requiredVars, isNull, isVoid, hasValidation, isShort, isUnboundedInteger,
                 getMaxProperties(), getMinProperties(), uniqueItems, getMaxItems(), getMinItems(), getMaxLength(),
-                getMinLength(), exclusiveMinimum, exclusiveMaximum, getMinimum(), getMaximum(), getPattern(),
+                getMinLength(), exclusiveMinimum, exclusiveMaximum, getMinimum(), getMaximum(), getPattern(), getOriginalPattern(),
                 is1xx, is2xx, is3xx, is4xx, is5xx, additionalPropertiesIsAnyType, hasVars, hasRequired,
                 hasDiscriminatorWithNonEmptyMapping, composedSchemas, hasMultipleTypes, responseHeaders, content,
                 requiredVarsMap, ref, uniqueItemsBoolean, schemaIsFromAdditionalProperties);
@@ -200,6 +201,7 @@ public class CodegenResponse implements IJsonSchemaValidationProperties {
                 Objects.equals(getMinimum(), that.getMinimum()) &&
                 Objects.equals(getMaximum(), that.getMaximum()) &&
                 Objects.equals(getPattern(), that.getPattern()) &&
+                Objects.equals(getOriginalPattern(), that.getOriginalPattern()) &&
                 Objects.equals(getMultipleOf(), that.getMultipleOf());
 
     }
@@ -262,6 +264,16 @@ public class CodegenResponse implements IJsonSchemaValidationProperties {
     @Override
     public void setPattern(String pattern) {
         this.pattern = pattern;
+    }
+
+    @Override
+    public String getOriginalPattern() {
+        return originalPattern;
+    }
+
+    @Override
+    public void setOriginalPattern(String originalPattern) {
+        this.originalPattern = originalPattern;
     }
 
     @Override
@@ -616,6 +628,7 @@ public class CodegenResponse implements IJsonSchemaValidationProperties {
         sb.append(", minimum='").append(minimum).append('\'');
         sb.append(", maximum='").append(maximum).append('\'');
         sb.append(", pattern='").append(pattern).append('\'');
+        sb.append(", originalPattern='").append(originalPattern).append('\'');
         sb.append(", multipleOf='").append(multipleOf).append('\'');
         sb.append(", items='").append(items).append('\'');
         sb.append(", additionalProperties='").append(additionalProperties).append('\'');

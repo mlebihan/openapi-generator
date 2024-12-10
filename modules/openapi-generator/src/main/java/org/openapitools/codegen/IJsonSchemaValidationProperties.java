@@ -29,6 +29,10 @@ public interface IJsonSchemaValidationProperties {
 
     void setPattern(String pattern);
 
+    String getOriginalPattern();
+
+    void setOriginalPattern(String originalPattern);
+
     String getMaximum();
 
     void setMaximum(String maximum);

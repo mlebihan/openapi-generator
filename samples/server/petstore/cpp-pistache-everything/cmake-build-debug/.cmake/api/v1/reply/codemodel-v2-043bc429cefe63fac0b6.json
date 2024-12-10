@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.2"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "api-server",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "NLOHMANN::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-NLOHMANN-Debug-51fb0a1e043cb1759240.json",
+					"name" : "NLOHMANN",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "PISTACHE::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-PISTACHE-Debug-7cc1dca9d1093dd1fbe5.json",
+					"name" : "PISTACHE",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "api-server::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-api-server-Debug-f3f18d11d153b2e7aa7f.json",
+					"name" : "api-server",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything/cmake-build-debug",
+		"source" : "/home/lebihan/dev/Java/opensource/openapi-generator/samples/server/petstore/cpp-pistache-everything"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

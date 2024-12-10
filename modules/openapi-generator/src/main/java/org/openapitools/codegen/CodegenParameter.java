@@ -108,6 +108,10 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
      * See <a href="https://web.archive.org/web/20240502205731/https://json-schema.org/draft/2020-12/json-schema-validation#name-pattern">JSON Schema Validation Spec, Section 6.3.3</a>
      */
     public String pattern;
+
+    /** Original pattern validation for strings, kept unchanged from OpenAPI schema */
+    public String originalPattern;
+
     /**
      * See <a href="https://web.archive.org/web/20240502205731/https://json-schema.org/draft/2020-12/json-schema-validation#name-maxitems">JSON Schema Validation Spec, Section 6.4.1</a>
      */
@@ -173,6 +177,7 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
         output.maxLength = this.maxLength;
         output.minLength = this.minLength;
         output.pattern = this.pattern;
+        output.originalPattern = this.originalPattern;
         output.maxItems = this.maxItems;
         output.minItems = this.minItems;
         output.uniqueItems = this.uniqueItems;
@@ -291,7 +296,7 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
                 items, mostInnerItems, additionalProperties, vars, requiredVars, vendorExtensions, hasValidation,
                 getMaxProperties(), getMinProperties(), isNullable, isDeprecated, required, getMaximum(),
                 getExclusiveMaximum(), getMinimum(), getExclusiveMinimum(), getMaxLength(), getMinLength(),
-                getPattern(), getMaxItems(), getMinItems(), getUniqueItems(), contentType, multipleOf, isNull,isVoid,
+                getPattern(), getOriginalPattern(), getMaxItems(), getMinItems(), getUniqueItems(), contentType, multipleOf, isNull,isVoid,
                 additionalPropertiesIsAnyType, hasVars, hasRequired, isShort, isUnboundedInteger,
                 hasDiscriminatorWithNonEmptyMapping, composedSchemas, hasMultipleTypes, schema, content,
                 requiredVarsMap, ref, uniqueItemsBoolean, schemaIsFromAdditionalProperties,
@@ -398,6 +403,7 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
                 Objects.equals(getMaxLength(), that.getMaxLength()) &&
                 Objects.equals(getMinLength(), that.getMinLength()) &&
                 Objects.equals(getPattern(), that.getPattern()) &&
+                Objects.equals(getOriginalPattern(), that.getOriginalPattern()) &&
                 Objects.equals(getMaxItems(), that.getMaxItems()) &&
                 Objects.equals(getMinItems(), that.getMinItems()) &&
                 Objects.equals(contentType, that.contentType) &&
@@ -496,6 +502,7 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
         sb.append(", maxLength=").append(maxLength);
         sb.append(", minLength=").append(minLength);
         sb.append(", pattern='").append(pattern).append('\'');
+        sb.append(", originalPattern='").append(originalPattern).append('\'');
         sb.append(", maxItems=").append(maxItems);
         sb.append(", minItems=").append(minItems);
         sb.append(", uniqueItems=").append(uniqueItems);
@@ -582,6 +589,16 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
     @Override
     public void setPattern(String pattern) {
         this.pattern = pattern;
+    }
+
+    @Override
+    public String getOriginalPattern() {
+        return originalPattern;
+    }
+
+    @Override
+    public void setOriginalPattern(String originalPattern) {
+        this.originalPattern = originalPattern;
     }
 
     @Override
