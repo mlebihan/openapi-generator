@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
+import java.util.regex.Matcher;
 
 import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
@@ -38,6 +39,7 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
 
     private final Logger LOGGER = LoggerFactory.getLogger(AbstractGoCodegen.class);
     private static final String NUMERIC_ENUM_PREFIX = "_";
+    private static final String X_GO_CUSTOM_TAG = "x-go-custom-tag";
 
     @Setter
     protected boolean withGoCodegenComment = false;
@@ -785,9 +787,39 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
                 }
 
                 if (cp.pattern != null) {
-                    cp.vendorExtensions.put("x-go-custom-tag", "validate:\"regexp=" +
-                            cp.pattern.replace("\\", "\\\\").replaceAll("^/|/$", "") +
-                            "\"");
+                    // Pattern might be enclosed into /.../ that aren't wished. Remove them.
+                    String p = cp.pattern;
+
+                    if (cp.pattern.startsWith("/") && cp.pattern.endsWith("/")) {
+                        p = cp.pattern.substring(1, cp.pattern.length() - 1);
+                    }
+
+                    String regexp = String.format(Locale.getDefault(), "regexp=%s", p);
+                    String validate = String.format(Locale.getDefault(), "validate:\"%s\"", regexp);
+
+                    // Escape single backslash (First!)
+                    if (validate.contains("\\")) {
+                        /* We need to escape \ to \\
+                           except if it is currently present in the string for the quote itself. Regexp:
+                           \\[^"]
+                        */
+                        String BACKSLASH_THAT_ISNT_AN_ESCAPED_QUOTE="\\\\[^\"]";
+                        String ESCAPED_BACKSLASH_INTO_A_STRING_ITSELF = Matcher.quoteReplacement("\\\\");
+
+                        validate = validate.replaceAll(BACKSLASH_THAT_ISNT_AN_ESCAPED_QUOTE, ESCAPED_BACKSLASH_INTO_A_STRING_ITSELF);
+                    }
+
+                    // Replace backtick by \\x60, if found
+                    if (validate.contains("`")) {
+                        validate = validate.replace("`", "\\x60");
+                    }
+
+                    // Escape comma
+                    if (validate.contains(",")) {
+                        validate = validate.replace(",", "\\\\,");
+                    }
+
+                    cp.vendorExtensions.put(X_GO_CUSTOM_TAG, validate);
                 }
 
                 // construct data tag in the template: x-go-datatag
@@ -813,8 +845,8 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
                 }
 
                 // {{#vendorExtensions.x-go-custom-tag}} {{{.}}}{{/vendorExtensions.x-go-custom-tag}}
-                if (StringUtils.isNotEmpty(String.valueOf(cp.vendorExtensions.getOrDefault("x-go-custom-tag", "")))) {
-                    goDataTag += " " + cp.vendorExtensions.get("x-go-custom-tag");
+                if (StringUtils.isNotEmpty(String.valueOf(cp.vendorExtensions.getOrDefault(X_GO_CUSTOM_TAG, "")))) {
+                    goDataTag += " " + cp.vendorExtensions.get(X_GO_CUSTOM_TAG);
                 }
 
                 // if it contains backtick, wrap with " instead

@@ -1,0 +1,31 @@
+openapi: '3.0.3'
+info:
+  title: API Test
+  version: '1.0'
+paths:
+  /foo:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    oneOf:
+                      - $ref: "#/components/schemas/importCode"
+
+components:
+  schemas:
+    importCode:
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: "^[0-9]{2,}$"
+
+        name:
+          type: string
+          pattern: "^[&#x9;!'&\"()*+,-./0-9:;<=>;?A-Z_a-z[]{}|^@#~]+`$"
