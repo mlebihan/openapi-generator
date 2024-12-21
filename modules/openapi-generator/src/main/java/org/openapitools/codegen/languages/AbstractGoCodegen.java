@@ -788,6 +788,7 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
 
                 if (cp.pattern != null) {
                     String regexp = String.format(Locale.getDefault(), "regexp=%s", cp.originalPattern);
+                    regexp = regexp.replace("\\", "\\\\");
 
                     // Replace backtick by \\x60, if found
                     if (regexp.contains("`")) {
