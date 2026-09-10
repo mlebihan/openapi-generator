@@ -51,6 +51,49 @@ generate() {
   echo "If the generation has succeeded, it's in ${TARGET} directory."
 }
 
+generate_and_compile() {
+  if [ -z "${inputspec}" ]; then
+    echo "inputspec missing"
+    exit 1
+  fi
+
+  if [ "${inputspec}" != "all" ]; then
+    if [ ! -f "${inputspec}" ]; then
+        echo "$inputspec spec not found"
+        exit 1
+    fi
+  fi
+
+  if [ -z "${target_dir}" ]; then
+    echo "target_dir isn't set"
+    exit 1
+  fi
+
+  name=$(basename "${inputspec}" | cut -d. -f1)
+  export TARGET=$target_dir/$generator/$name
+  rm -rf "$TARGET"
+
+  config_options "${generator}" "${inputspec}"
+  candidates=$((candidates+1))
+
+  if ! generating=$(generate "${generator}" "$inputspec_dir/${inputspec}" "${target_dir}"); then
+    log "ERROR" "OpenAPI generator cannot generate ${inputspec} : $generating"
+    failed_generation=$((failed_generation+1))
+    return $?
+  fi
+
+  if ! compiling=$(compile "${generator}" "$TARGET"); then
+    log "ERROR" "Generated code with ${generator} generator on ${inputspec} doesn't compile."
+       last_error=$?
+       failed_compilation=$((failed_compilation+1))
+       echo "${compiling}" > "${TARGET}/compilation_failed.log"
+       echo "Look compilation result in ${TARGET}/compilation_failed.log"
+    return ${last_error}
+  fi
+
+  succeeded=$((succeeded+1))
+}
+
 # Main procedure
 # $1: generator
 # $2: Input spec
@@ -73,9 +116,11 @@ if [ -z "${inputspec}" ]; then
   exit 1
 fi
 
-if [ ! -f "$2" ]; then
-    echo "$2 spec not found"
-    exit 1
+if [ "${inputspec}" != "all" ]; then
+  if [ ! -f "${inputspec}" ]; then
+      echo "$inputspec spec not found"
+      exit 1
+  fi
 fi
 
 # Default to /tmp dir if target dir isn't specified
@@ -83,21 +128,22 @@ if [ -z "${target_dir}" ]; then
   target_dir=$(dirname "$(mktemp -u)")
 fi
 
-name=$(basename "${inputspec}" | cut -d. -f1)
-export TARGET=$target_dir/$generator/$name
+candidates=0
+succeeded=0
+failed_generation=0
+failed_compilation=0
 
-rm -rf "$TARGET"
-
-config_options "$1" "$2"
-
-if ! generating=$(generate "$1" "$inputspec_dir/$2" "$3"); then
-  log "ERROR" "OpenAPI generator cannot generate $2 : $generating"
-  exit $?
+if [[ "${inputspec}" == "all" ]]; then
+  for spec in TMF*.yaml
+    do inputspec="$spec"; generate_and_compile
+  done
+else
+  generate_and_compile
 fi
 
-if ! compiling=$(compile "$1" "$TARGET"); then
-  log "ERROR" "Generated code with $1 generator on $2 doesn't compile : $compiling"
-  exit $?
-fi
+echo -e "${candidates} TM Forum specifications have been processed"
+echo -e "   ${succeeded} have succeeded in generating their code and compiling it"
+echo -e "   ${failed_generation} failed in generating it through OpenAPI generator"
+echo -e "   ${failed_compilation} failed in compiling generated code"
 
 # generate $1 $inputspec_dir/TMF632-Party_Management-v5.0.0.oas.yaml $3
