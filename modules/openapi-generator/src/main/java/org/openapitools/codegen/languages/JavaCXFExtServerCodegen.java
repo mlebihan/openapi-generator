@@ -154,28 +154,28 @@ public class JavaCXFExtServerCodegen extends JavaCXFServerCodegen implements CXF
         private CodegenVariable(CodegenVariable parent, CodegenProperty prop, String testDataPath,
                                 Map<String, CodegenModel> models) {
 
-            name = prop.name;
-            dataFormat = prop.dataFormat;
-            dataType = prop.dataType;
-            enumName = prop.enumName;
-            allowableValues = prop.allowableValues;
-            isContainer = prop.isContainer;
-            isListContainer = prop.isArray;
-            isMap = prop.isMap;
-            isPrimitiveType = prop.isPrimitiveType;
-            minItems = prop.minItems;
-            minimum = prop.minimum;
-            maximum = prop.maximum;
-            exclusiveMinimum = prop.exclusiveMinimum;
-            exclusiveMaximum = prop.exclusiveMaximum;
-            minLength = prop.minLength;
-            maxLength = prop.maxLength;
-            pattern = prop.pattern;
+            name = prop.getName();
+            dataFormat = prop.getDataFormat();
+            dataType = prop.getDataType();
+            enumName = prop.getEnumName();
+            allowableValues = prop.getAllowableValues();
+            isContainer = prop.isContainer();
+            isListContainer = prop.getIsArray();
+            isMap = prop.getIsMap();
+            isPrimitiveType = prop.getIsPrimitiveType();
+            minItems = prop.getMinItems();
+            minimum = prop.getMinimum();
+            maximum = prop.getMaximum();
+            exclusiveMinimum = prop.getExclusiveMinimum();
+            exclusiveMaximum = prop.getExclusiveMaximum();
+            minLength = prop.getMinLength();
+            maxLength = prop.getMaxLength();
+            pattern = prop.getPattern();
             setter = prop.getSetter();
-            varVendorExtensions = prop.vendorExtensions;
+            varVendorExtensions = prop.getExts();
             init(parent, testDataPath, models);
 
-            items = prop.items == null ? null : new CodegenVariable(this, prop.items, null, models);
+            items = prop.getItems() == null ? null : new CodegenVariable(this, prop.getItems(), null, models);
         }
 
         void addTestData(Object value) {
@@ -1132,22 +1132,22 @@ public class JavaCXFExtServerCodegen extends JavaCXFServerCodegen implements CXF
     private void postProcessModel(CodegenModel cm) {
         // NOTE: if supportsInheritance is false, cm.vars == cm.allVars so we only have to update one list.
         for (CodegenProperty var : cm.vars) {
-            var.vendorExtensions.put("x-defining-class", cm.classname);
+            var.getExts().put("x-defining-class", cm.classname);
         }
         if (supportsInheritance) {
             if (cm.allVars != cm.vars) {
                 for (CodegenProperty var : cm.allVars) {
                     String definingClass = cm.classname;
-                    if (cm.vars.stream().noneMatch(v -> v.name.equals(var.name))) {
+                    if (cm.vars.stream().noneMatch(v -> v.getName().equals(var.getName()))) {
                         CodegenModel ancestor = cm;
                         while ((ancestor = ancestor.parentModel) != null) {
-                            if (ancestor.vars.stream().anyMatch(v -> v.name.equals(var.name))) {
+                            if (ancestor.vars.stream().anyMatch(v -> v.getName().equals(var.getName()))) {
                                 definingClass = ancestor.classname;
                                 break;
                             }
                         }
                     }
-                    var.vendorExtensions.put("x-defining-class", definingClass);
+                    var.getExts().put("x-defining-class", definingClass);
                 }
             }
             if (cm.parentModel != null)

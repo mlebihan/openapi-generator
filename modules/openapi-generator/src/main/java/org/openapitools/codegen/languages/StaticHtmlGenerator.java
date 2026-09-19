@@ -231,9 +231,9 @@ public class StaticHtmlGenerator extends DefaultCodegen implements CodegenConfig
     @Override
     public void postProcessModelProperty(CodegenModel model,
                                          CodegenProperty property) {
-        property.description = toHtml(property.description);
-        property.unescapedDescription = toHtml(
-                property.unescapedDescription);
+        property.setDescription(toHtml(property.getDescription()));
+        property.setUnescapedDescription(toHtml(
+           property.getUnescapedDescription()));
     }
 
     @Override

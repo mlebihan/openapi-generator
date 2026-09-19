@@ -708,8 +708,8 @@ public class RubyNextgenClientCodegen extends AbstractRubyCodegen {
             // Zeitwerk inflections for acronym names (e.g. http_config.rb -> HTTPConfig).
             modelFileToClass.put(cm.classFilename, cm.classname);
             for (CodegenProperty prop : cm.vars) {
-                boolean validated = prop.isEnum || prop.hasValidation || prop.required;
-                prop.vendorExtensions.put("x-rb-validated", validated);
+                boolean validated = prop.getIsEnum() || prop.getHasValidation() || prop.getRequired();
+                prop.getExts().put("x-rb-validated", validated);
                 // Schema `default` is deliberately NOT materialized into the constructor.
                 // from_hash bypasses initialize (allocate), so materializing would only ever
                 // fire on client-built request objects: on optional fields it force-sends the

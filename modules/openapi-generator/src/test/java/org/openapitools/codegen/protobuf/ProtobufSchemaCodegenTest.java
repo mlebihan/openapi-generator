@@ -184,20 +184,20 @@ public class ProtobufSchemaCodegenTest {
         Assert.assertEquals(fruitModel.vars.size(), 3, "fruit model should have 3 vars (one for each oneOf item)");
 
         for (CodegenProperty var : fruitModel.vars) {
-            Assert.assertNotNull(var.name, "var name should not be null");
-            Assert.assertNotNull(var.dataType, "var dataType should not be null");
-            Assert.assertTrue(var.isModel, "var " + var.name + " should be a model type (isModel=" + var.isModel + ")");
-            Assert.assertFalse(var.isContainer, "var should not be a container (it references a model)");
+            Assert.assertNotNull(var.getName(), "var name should not be null");
+            Assert.assertNotNull(var.getDataType(), "var dataType should not be null");
+            Assert.assertTrue(var.getIsModel(), "var " + var.getName() + " should be a model type (isModel=" + var.getIsModel() + ")");
+            Assert.assertFalse(var.isContainer(), "var should not be a container (it references a model)");
 
             // Check expected properties based on discriminator title
-            if (var.name.equals("apple_list")) {
-                Assert.assertEquals(var.dataType, "StringArray", "apple_list should reference StringArray");
-            } else if (var.name.equals("banana_map")) {
-                Assert.assertEquals(var.dataType, "FloatMap", "banana_map should reference FloatMap");
-            } else if (var.name.equals("orange_choice")) {
-                Assert.assertEquals(var.dataType, "Orange", "orange_choice should reference Orange");
+            if (var.getName().equals("apple_list")) {
+                Assert.assertEquals(var.getDataType(), "StringArray", "apple_list should reference StringArray");
+            } else if (var.getName().equals("banana_map")) {
+                Assert.assertEquals(var.getDataType(), "FloatMap", "banana_map should reference FloatMap");
+            } else if (var.getName().equals("orange_choice")) {
+                Assert.assertEquals(var.getDataType(), "Orange", "orange_choice should reference Orange");
             } else {
-                Assert.fail("Unexpected var name: " + var.name + ". Expected one of: apple_list, banana_map, orange_choice");
+                Assert.fail("Unexpected var name: " + var.getName() + ". Expected one of: apple_list, banana_map, orange_choice");
             }
         }
 
@@ -240,15 +240,15 @@ public class ProtobufSchemaCodegenTest {
         codegen.postProcessModels(createCodegenModelWrapper(cm));
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "testStringEnum");
-        Assert.assertEquals(property1.dataType, "string");
-        Assert.assertEquals(property1.baseType, "string");
-        Assert.assertEquals(property1.datatypeWithEnum, "Test_string_enum");
-        Assert.assertEquals(property1.name, "test_string_enum");
-        Assert.assertTrue(property1.isEnum);
-        Assert.assertEquals(property1.allowableValues.size(), 2);
-        Assert.assertEquals(((List<String>) property1.allowableValues.get("values")).size(), 2);
-        List<Map<String, Object>> enumVars1 = (List<Map<String, Object>>) property1.allowableValues.get("enumVars");
+        Assert.assertEquals(property1.getBaseName(), "testStringEnum");
+        Assert.assertEquals(property1.getDataType(), "string");
+        Assert.assertEquals(property1.getBaseType(), "string");
+        Assert.assertEquals(property1.getDatatypeWithEnum(), "Test_string_enum");
+        Assert.assertEquals(property1.getName(), "test_string_enum");
+        Assert.assertTrue(property1.getIsEnum());
+        Assert.assertEquals(property1.getAllowableValues().size(), 2);
+        Assert.assertEquals(((List<String>) property1.getAllowableValues().get("values")).size(), 2);
+        List<Map<String, Object>> enumVars1 = (List<Map<String, Object>>) property1.getAllowableValues().get("enumVars");
         Assert.assertEquals(enumVars1.size(), 2);
 
         Assert.assertEquals(enumVars1.get(0).get("name"), simpleEnumValue ? "FOO" : "TEST_STRING_ENUM_FOO");
@@ -260,15 +260,15 @@ public class ProtobufSchemaCodegenTest {
         Assert.assertEquals(enumVars1.get(1).get("isString"), false);
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "testIntEnum");
-        Assert.assertEquals(property2.dataType, "int32");
-        Assert.assertEquals(property2.baseType, "int32");
-        Assert.assertEquals(property2.datatypeWithEnum, "Test_int_enum");
-        Assert.assertEquals(property2.name, "test_int_enum");
-        Assert.assertTrue(property2.isEnum);
-        Assert.assertEquals(property2.allowableValues.size(), 2);
-        Assert.assertEquals(((List<String>) property2.allowableValues.get("values")).size(), 2);
-        List<Map<String, Object>> enumVars2 = (List<Map<String, Object>>) property2.allowableValues.get("enumVars");
+        Assert.assertEquals(property2.getBaseName(), "testIntEnum");
+        Assert.assertEquals(property2.getDataType(), "int32");
+        Assert.assertEquals(property2.getBaseType(), "int32");
+        Assert.assertEquals(property2.getDatatypeWithEnum(), "Test_int_enum");
+        Assert.assertEquals(property2.getName(), "test_int_enum");
+        Assert.assertTrue(property2.getIsEnum());
+        Assert.assertEquals(property2.getAllowableValues().size(), 2);
+        Assert.assertEquals(((List<String>) property2.getAllowableValues().get("values")).size(), 2);
+        List<Map<String, Object>> enumVars2 = (List<Map<String, Object>>) property2.getAllowableValues().get("enumVars");
         Assert.assertEquals(enumVars2.size(), 2);
 
         Assert.assertEquals(enumVars2.get(0).get("name"), simpleEnumValue ? "_1" : "TEST_INT_ENUM__1");
@@ -300,14 +300,14 @@ public class ProtobufSchemaCodegenTest {
         codegen.postProcessModels(createCodegenModelWrapper(cm));
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, enumKey);
-        Assert.assertEquals(property1.dataType, "string");
-        Assert.assertEquals(property1.baseType, "string");
-        Assert.assertEquals(property1.datatypeWithEnum, "A_valid_enum_without_unspecified_values");
-        Assert.assertEquals(property1.name, "a_valid_enum_without_unspecified_values");
-        Assert.assertTrue(property1.isEnum);
-        Assert.assertEquals(property1.allowableValues.size(), 2);
-        List<Map<String, Object>> enumVars1 = (List<Map<String, Object>>) property1.allowableValues.get("enumVars");
+        Assert.assertEquals(property1.getBaseName(), enumKey);
+        Assert.assertEquals(property1.getDataType(), "string");
+        Assert.assertEquals(property1.getBaseType(), "string");
+        Assert.assertEquals(property1.getDatatypeWithEnum(), "A_valid_enum_without_unspecified_values");
+        Assert.assertEquals(property1.getName(), "a_valid_enum_without_unspecified_values");
+        Assert.assertTrue(property1.getIsEnum());
+        Assert.assertEquals(property1.getAllowableValues().size(), 2);
+        List<Map<String, Object>> enumVars1 = (List<Map<String, Object>>) property1.getAllowableValues().get("enumVars");
         Assert.assertEquals(enumVars1.size(), 3);
 
         Assert.assertEquals(enumVars1.get(0).get("name"), "UNSPECIFIED");
@@ -343,14 +343,14 @@ public class ProtobufSchemaCodegenTest {
         codegen.postProcessModels(createCodegenModelWrapper(cm));
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, enumKey);
-        Assert.assertEquals(property1.dataType, "string");
-        Assert.assertEquals(property1.baseType, "string");
-        Assert.assertEquals(property1.datatypeWithEnum, "A_valid_enum_with_unspecified_values");
-        Assert.assertEquals(property1.name, "a_valid_enum_with_unspecified_values");
-        Assert.assertTrue(property1.isEnum);
-        Assert.assertEquals(property1.allowableValues.size(), 2);
-        List<Map<String, Object>> enumVars1 = (List<Map<String, Object>>) property1.allowableValues.get("enumVars");
+        Assert.assertEquals(property1.getBaseName(), enumKey);
+        Assert.assertEquals(property1.getDataType(), "string");
+        Assert.assertEquals(property1.getBaseType(), "string");
+        Assert.assertEquals(property1.getDatatypeWithEnum(), "A_valid_enum_with_unspecified_values");
+        Assert.assertEquals(property1.getName(), "a_valid_enum_with_unspecified_values");
+        Assert.assertTrue(property1.getIsEnum());
+        Assert.assertEquals(property1.getAllowableValues().size(), 2);
+        List<Map<String, Object>> enumVars1 = (List<Map<String, Object>>) property1.getAllowableValues().get("enumVars");
         Assert.assertEquals(enumVars1.size(), 2);
 
         Assert.assertEquals(enumVars1.get(0).get("name"), "UNSPECIFIED");
@@ -449,7 +449,7 @@ public class ProtobufSchemaCodegenTest {
         codegen.postProcessModels(createCodegenModelWrapper(cm));
 
         final CodegenProperty property = cm.vars.get(0);
-        Assert.assertEquals(property.baseName, "fruitList");
+        Assert.assertEquals(property.getBaseName(), "fruitList");
     }
 
     @SuppressWarnings("unchecked")
@@ -472,7 +472,7 @@ public class ProtobufSchemaCodegenTest {
         codegen.postProcessModels(createCodegenModelWrapper(cm));
 
         final CodegenProperty property = cm.vars.get(0);
-        Assert.assertEquals(property.baseName, "colorMap");
+        Assert.assertEquals(property.getBaseName(), "colorMap");
     }
 
     @Test(description = "Validate that a model referenced multiple times is imported only once in generated protobuf files")

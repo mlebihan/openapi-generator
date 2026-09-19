@@ -493,7 +493,7 @@ public class ScalaSttp4JsoniterClientCodegen extends AbstractScalaCodegen implem
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        String identifier = formatIdentifier(property.baseName, true);
+        String identifier = formatIdentifier(property.getBaseName(), true);
 
         if (identifier.startsWith("`") && identifier.endsWith("`")) {
             // is it numeric?
@@ -548,18 +548,18 @@ public class ScalaSttp4JsoniterClientCodegen extends AbstractScalaCodegen implem
      */
     @Override
     protected void updateDataTypeWithEnumForArray(CodegenProperty property) {
-        CodegenProperty baseItem = property.items;
-        while (baseItem != null && (Boolean.TRUE.equals(baseItem.isMap)
-                || Boolean.TRUE.equals(baseItem.isArray))) {
-            baseItem = baseItem.items;
+        CodegenProperty baseItem = property.getItems();
+        while (baseItem != null && (Boolean.TRUE.equals(baseItem.getIsMap())
+                || Boolean.TRUE.equals(baseItem.getIsArray()))) {
+            baseItem = baseItem.getItems();
         }
         if (baseItem != null) {
             // set datetypeWithEnum as only the inner type is enum
-            property.datatypeWithEnum = toEnumName(baseItem);
+            property.setDatatypeWithEnum(toEnumName(baseItem));
             // naming the enum with respect to the language enum naming convention
             // e.g. remove [], {} from array/map of enum
-            property.enumName = toEnumName(property);
-            property._enum = baseItem._enum;
+            property.setEnumName(toEnumName(property));
+            property.set_enum(baseItem.get_enum());
 
             updateCodegenPropertyEnum(property);
         }

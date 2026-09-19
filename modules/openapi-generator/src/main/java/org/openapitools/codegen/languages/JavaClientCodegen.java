@@ -1158,10 +1158,10 @@ public class JavaClientCodegen extends AbstractJavaCodegen
             }
         }
 
-        if ("set".equals(property.containerType) && !JACKSON.equals(serializationLibrary)) {
+        if ("set".equals(property.getContainerType()) && !JACKSON.equals(serializationLibrary)) {
             // clean-up
             model.imports.remove("JsonDeserialize");
-            property.vendorExtensions.remove("x-setter-extra-annotation");
+            property.getExts().remove("x-setter-extra-annotation");
         }
     }
 
@@ -1234,14 +1234,14 @@ public class JavaClientCodegen extends AbstractJavaCodegen
                     addNullableImports = isAddNullableImports(cm, addNullableImports, var);
                     if (Boolean.TRUE.equals(var.getVendorExtensions().get("x-enum-as-string"))) {
                         // treat enum string as just string
-                        var.datatypeWithEnum = var.dataType;
+                        var.setDatatypeWithEnum(var.getDataType());
 
-                        if (StringUtils.isNotEmpty(var.defaultValue)) { // has default value
-                            String defaultValue = var.defaultValue.substring(var.defaultValue.lastIndexOf('.') + 1);
-                            for (EnumVarMap enumVars : EnumUtils.getEnumVars(var.allowableValues)) {
+                        if (StringUtils.isNotEmpty(var.getDefaultValue())) { // has default value
+                            String defaultValue = var.getDefaultValue().substring(var.getDefaultValue().lastIndexOf('.') + 1);
+                            for (EnumVarMap enumVars : EnumUtils.getEnumVars(var.getAllowableValues())) {
                                 if (defaultValue.equals(enumVars.getEnumName())) {
                                     // update default to use the string directly instead of enum string
-                                    var.defaultValue = (String) enumVars.getEnumValue();
+                                    var.setDefaultValue((String) enumVars.getEnumValue());
                                 }
                             }
                         }

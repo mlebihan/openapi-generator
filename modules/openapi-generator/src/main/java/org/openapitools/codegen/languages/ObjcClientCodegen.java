@@ -499,9 +499,9 @@ public class ObjcClientCodegen extends DefaultCodegen implements CodegenConfig {
     protected void setNonArrayMapProperty(CodegenProperty schema, String type) {
         super.setNonArrayMapProperty(schema, type);
         if ("NSDictionary".equals(type)) {
-            schema.setter = "initWithDictionary";
+            schema.setSetter("initWithDictionary");
         } else {
-            schema.setter = "initWithValues";
+            schema.setSetter("initWithValues");
         }
     }
 
@@ -648,7 +648,7 @@ public class ObjcClientCodegen extends DefaultCodegen implements CodegenConfig {
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty schema) {
         super.postProcessModelProperty(model, schema);
-        schema.vendorExtensions.put("x-uppercase-name", camelize(schema.name));
+        schema.getExts().put("x-uppercase-name", camelize(schema.getName()));
     }
 
     /**

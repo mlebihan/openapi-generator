@@ -351,11 +351,11 @@ public class HaskellServantCodegen extends DefaultCodegen implements CodegenConf
      */
     private void setGenerateToSchema(CodegenModel model) {
         for (CodegenProperty var : model.vars) {
-            if (var.dataType.contentEquals("Value") || var.dataType.contains(" Value")) {
+            if (var.getDataType().contentEquals("Value") || var.getDataType().contains(" Value")) {
                 additionalProperties.put("generateToSchema", false);
             }
-            if (var.items != null) {
-                if (var.items.dataType.contentEquals("Value") || var.dataType.contains(" Value")) {
+            if (var.getItems() != null) {
+                if (var.getItems().getDataType().contentEquals("Value") || var.getDataType().contains(" Value")) {
                     additionalProperties.put("generateToSchema", false);
                 }
             }
@@ -601,8 +601,8 @@ public class HaskellServantCodegen extends DefaultCodegen implements CodegenConf
                 // Because headers is a Map multiple Set-Cookie headers are currently not possible. If someone
                 // uses the workaround with null bytes, remove them and add add each header to the list:
                 // https://github.com/OAI/OpenAPI-Specification/issues/1237#issuecomment-906603675
-                String headerName = h.baseName.replaceAll("\0", "");
-                String headerType = h.dataType;
+                String headerName = h.getBaseName().replaceAll("\0", "");
+                String headerType = h.getDataType();
                 headerContents.add("Header \"" + headerName + "\" " + headerType);
             }
             String headerContent = String.join(", ", headerContents);
@@ -670,8 +670,8 @@ public class HaskellServantCodegen extends DefaultCodegen implements CodegenConf
         // From the model name, compute the prefix for the fields.
         String prefix = camelize(model.classname, LOWERCASE_FIRST_LETTER);
         for (CodegenProperty prop : model.vars) {
-            prop.name = toVarName(prefix + camelize(prop.name));
-            prop.vendorExtensions.put("x-base-name-string-literal", "\"" + escapeText(prop.getBaseName()) + "\"");
+            prop.setName(toVarName(prefix + camelize(prop.getName())));
+            prop.getExts().put("x-base-name-string-literal", "\"" + escapeText(prop.getBaseName()) + "\"");
         }
 
         // Create newtypes for things with non-object types

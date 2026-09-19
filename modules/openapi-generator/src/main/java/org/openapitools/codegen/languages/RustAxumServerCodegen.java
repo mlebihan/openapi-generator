@@ -644,11 +644,11 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
             }
 
             for (CodegenProperty header : rsp.headers) {
-                if (uuidType.equals(header.dataType)) {
+                if (uuidType.equals(header.getDataType())) {
                     additionalProperties.put("apiUsesUuid", true);
                 }
-                header.nameInPascalCase = toModelName(header.baseName);
-                header.nameInLowerCase = header.baseName.toLowerCase(Locale.ROOT);
+                header.setNameInPascalCase(toModelName(header.getBaseName()));
+                header.setNameInLowerCase(header.getBaseName().toLowerCase(Locale.ROOT));
             }
         }
 
@@ -657,11 +657,11 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
         }
 
         for (CodegenProperty header : op.responseHeaders) {
-            if (uuidType.equals(header.dataType)) {
+            if (uuidType.equals(header.getDataType())) {
                 additionalProperties.put("apiUsesUuid", true);
             }
-            header.nameInPascalCase = toModelName(header.baseName);
-            header.nameInLowerCase = header.baseName.toLowerCase(Locale.ROOT);
+            header.setNameInPascalCase(toModelName(header.getBaseName()));
+            header.setNameInLowerCase(header.getBaseName().toLowerCase(Locale.ROOT));
         }
 
         // Include renderUuidConversionImpl exactly once in the vendorExtensions map when
@@ -727,36 +727,36 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
 
                     // Static attributes
                     // Only strings are supported by serde for tag field types, so it's the only one we'll deal with
-                    property.openApiType = "string";
-                    property.complexType = "string";
-                    property.dataType = "String";
-                    property.datatypeWithEnum = "String";
-                    property.baseType = "string";
-                    property.required = true;
-                    property.isPrimitiveType = true;
-                    property.isString = true;
-                    property.isDiscriminator = true;
+                    property.setOpenApiType("string");
+                    property.setComplexType("string");
+                    property.setDatatype("String");
+                    property.setDatatypeWithEnum("String");
+                    property.setBaseType("string");
+                    property.setRequired(true);
+                    property.setIsPrimitiveType(true);
+                    property.setIsString(true);
+                    property.setIsDiscriminator(true);
 
                     // Attributes based on the discriminator value
-                    property.baseName = discriminator.getPropertyBaseName();
-                    property.name = discriminator.getPropertyName();
-                    property.nameInCamelCase = camelize(discriminator.getPropertyName());
-                    property.nameInPascalCase = property.nameInCamelCase.substring(0, 1).toUpperCase(Locale.ROOT) + property.nameInCamelCase.substring(1);
-                    property.nameInSnakeCase = underscore(discriminator.getPropertyName()).toUpperCase(Locale.ROOT);
-                    property.getter = String.format(Locale.ROOT, "get%s", property.nameInPascalCase);
-                    property.setter = String.format(Locale.ROOT, "set%s", property.nameInPascalCase);
-                    property.defaultValueWithParam = String.format(Locale.ROOT, " = data.%s;", property.name);
+                    property.setBaseName(discriminator.getPropertyBaseName());
+                    property.setName(discriminator.getPropertyName());
+                    property.setNameInCamelCase(camelize(discriminator.getPropertyName()));
+                    property.setNameInPascalCase(property.getNameInCamelCase().substring(0, 1).toUpperCase(Locale.ROOT) + property.getNameInCamelCase().substring(1));
+                    property.setNameInSnakeCase(underscore(discriminator.getPropertyName()).toUpperCase(Locale.ROOT));
+                    property.setGetter(String.format(Locale.ROOT, "get%s", property.getNameInPascalCase()));
+                    property.setSetter(String.format(Locale.ROOT, "set%s", property.getNameInPascalCase()));
+                    property.setDefaultValueWithParam(String.format(Locale.ROOT, " = data.%s;", property.getName()));
 
                     // Attributes based on the model name
-                    property.defaultValue = String.format(Locale.ROOT, "r#\"%s\"#.to_string()", cm.getSchemaName());
-                    property.discriminatorValue = getDiscriminatorValue(cm.getClassname(), discriminator);
-                    property.jsonSchema = String.format(Locale.ROOT, "{ \"default\":\"%s\"; \"type\":\"string\" }", cm.getSchemaName());
+                    property.setDefaultValue(String.format(Locale.ROOT, "r#\"%s\"#.to_string()", cm.getSchemaName()));
+                    property.setDiscriminatorValue(getDiscriminatorValue(cm.getClassname(), discriminator));
+                    property.setJsonSchema(String.format(Locale.ROOT, "{ \"default\":\"%s\"; \"type\":\"string\" }", cm.getSchemaName()));
 
                     cm.vars.add(property);
                 }
             }
 
-            if (cm.vars.stream().noneMatch(v -> v.isDiscriminator)) {
+            if (cm.vars.stream().noneMatch(v -> v.getIsDiscriminator())) {
                 blocking.add(cm.getSchemaName());
             }
         }
@@ -792,9 +792,9 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
         int countString = 0;
         int countNonString = 0;
         for (final CodegenProperty var : cm.vars) {
-            if (discriminatorsForModel.stream().anyMatch(discriminator -> var.baseName.equals(discriminator.getPropertyBaseName()) || var.name.equals(discriminator.getPropertyName()))) {
-                if (var.isString) {
-                    var.isDiscriminator = true;
+            if (discriminatorsForModel.stream().anyMatch(discriminator -> var.getBaseName().equals(discriminator.getPropertyBaseName()) || var.getName().equals(discriminator.getPropertyName()))) {
+                if (var.getIsString()) {
+                    var.setIsDiscriminator(true);
                     ++countString;
                 } else
                     ++countNonString;
@@ -811,7 +811,7 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
 
     private static void resetDiscriminatorProperty(final CodegenModel cm) {
         for (final CodegenProperty var : cm.vars) {
-            var.isDiscriminator = false;
+            var.setIsDiscriminator(false);
         }
     }
 
@@ -823,23 +823,23 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
         for (CodegenProperty model : cp) {
             // Generate a valid name for the enum variant.
             // Mainly needed for primitive types.
-            model.datatypeWithEnum = camelize(model.dataType.replaceAll("(?:\\w+::)+(\\w+)", "$1")
-                    .replace("<", "Of").replace(">", "")).replace(" ", "").replace(",", "");
-            model.discriminatorValue = getDiscriminatorValue(model.datatypeWithEnum, discriminator);
-            if (!dedupDataTypeWithEnum.add(model.datatypeWithEnum)) {
-                model.datatypeWithEnum += ++idx;
+            model.setDatatypeWithEnum(camelize(model.getDataType().replaceAll("(?:\\w+::)+(\\w+)", "$1")
+               .replace("<", "Of").replace(">", "")).replace(" ", "").replace(",", ""));
+            model.setDiscriminatorValue(getDiscriminatorValue(model.getDatatypeWithEnum(), discriminator));
+            if (!dedupDataTypeWithEnum.add(model.getDatatypeWithEnum())) {
+                model.setDatatypeWithEnum(model.getDatatypeWithEnum() + ++idx);
             }
 
             dedupDataType.put(model.getDataType(), dedupDataType.getOrDefault(model.getDataType(), 0) + 1);
 
             if (!model.getDataType().matches(String.format(Locale.ROOT, ".*::%s", model.getDatatypeWithEnum()))) {
-                model.isPrimitiveType = true;
+                model.setIsPrimitiveType(true);
             }
         }
 
         for (CodegenProperty model : cp) {
             if (dedupDataType.get(model.getDataType()) == 1) {
-                model.vendorExtensions.put("x-from-trait", true);
+                model.getExts().put("x-from-trait", true);
             }
         }
     }
@@ -1144,19 +1144,19 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
     }
 
     private void ensureArrayComplexType(CodegenProperty property) {
-        if (property == null || !property.isArray || StringUtils.isNotBlank(property.complexType) || property.items == null) {
+        if (property == null || !property.getIsArray() || StringUtils.isNotBlank(property.getComplexType()) || property.getItems() == null) {
             return;
         }
 
-        String candidate = StringUtils.defaultIfBlank(property.items.complexType, property.items.baseType);
+        String candidate = StringUtils.defaultIfBlank(property.getItems().getComplexType(), property.getItems().getBaseType());
         if (StringUtils.isBlank(candidate)) {
-            candidate = property.items.dataType;
+            candidate = property.getItems().getDataType();
         }
         if (StringUtils.isBlank(candidate)) {
             return;
         }
 
-        property.complexType = reverseTypeMapping(candidate);
+        property.setComplexType(reverseTypeMapping(candidate));
     }
 
     private String reverseTypeMapping(String rustType) {
@@ -1231,55 +1231,55 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         super.postProcessModelProperty(model, property);
 
-        if (!languageSpecificPrimitives.contains(property.dataType)) {
-            final int position = property.dataType.lastIndexOf(":");
+        if (!languageSpecificPrimitives.contains(property.getDataType())) {
+            final int position = property.getDataType().lastIndexOf(":");
             if (position != -1) {
-                property.dataType = property.dataType.substring(0, position) + camelize(property.dataType.substring(position));
+                property.setDatatype(property.getDataType().substring(0, position) + camelize(property.getDataType().substring(position)));
             } else {
-                property.dataType = camelize(property.dataType);
+                property.setDatatype(camelize(property.getDataType()));
             }
-            property.isPrimitiveType = property.isContainer && languageSpecificPrimitives.contains(typeMapping.get(property.complexType));
+            property.setIsPrimitiveType(property.isContainer() && languageSpecificPrimitives.contains(typeMapping.get(property.getComplexType())));
         } else {
-            property.isPrimitiveType = true;
+            property.setIsPrimitiveType(true);
         }
 
         // Integer type fitting
-        if (property.isInteger || property.isLong || Objects.equals(property.baseType, "UnsignedInteger") || Objects.equals(property.baseType, "UnsignedLong")) {
+        if (property.getIsInteger() || property.getIsLong() || Objects.equals(property.getBaseType(), "UnsignedInteger") || Objects.equals(property.getBaseType(), "UnsignedLong")) {
             final BigInteger minimum = Optional.ofNullable(property.getMinimum()).map(BigInteger::new).orElse(null);
             final BigInteger maximum = Optional.ofNullable(property.getMaximum()).map(BigInteger::new).orElse(null);
-            property.dataType = getIntegerDataType(
-                    property.dataFormat,
-                    minimum,
-                    property.getExclusiveMinimum(),
-                    maximum,
-                    property.getExclusiveMaximum());
+            property.setDatatype(getIntegerDataType(
+               property.getDataFormat(),
+               minimum,
+               property.getExclusiveMinimum(),
+               maximum,
+               property.getExclusiveMaximum()));
         }
 
-        property.name = underscore(property.name);
+        property.setName(underscore(property.getName()));
 
-        if (!property.required) {
-            property.defaultValue = (property.defaultValue != null) ? "Some(" + property.defaultValue + ")" : "None";
+        if (!property.getRequired()) {
+            property.setDefaultValue((property.getDefaultValue() != null) ? "Some(" + property.getDefaultValue() + ")" : "None");
         }
 
-        if (isObjectType(property.baseType)) {
-            property.dataType = objectType;
-            property.isNullable = false;
+        if (isObjectType(property.getBaseType())) {
+            property.setDatatype(objectType);
+            property.isNullable(false);
         }
 
-        if (property.dataType.startsWith(vecType + "<String")) {
-            property.vendorExtensions.put("is-vec-string", true);
-        } else if (property.dataType.startsWith(vecType + "<models::")) {
-            property.vendorExtensions.put("is-vec-nested", true);
-        } else if (property.dataType.startsWith(mapType + "<String, String")) {
-            property.vendorExtensions.put("is-map-string", true);
-        } else if (property.dataType.startsWith(mapType + "<String, models::")) {
-            property.vendorExtensions.put("is-map-nested", true);
-        } else if (property.dataType.startsWith(mapType + "<String")) {
-            property.vendorExtensions.put("is-map", true);
-        } else if (property.dataType.startsWith("models::")) {
-            property.vendorExtensions.put("is-nested", true);
-        } else if (stringType.equals(property.dataType)) {
-            property.vendorExtensions.put("is-string", true);
+        if (property.getDataType().startsWith(vecType + "<String")) {
+            property.getExts().put("is-vec-string", true);
+        } else if (property.getDataType().startsWith(vecType + "<models::")) {
+            property.getExts().put("is-vec-nested", true);
+        } else if (property.getDataType().startsWith(mapType + "<String, String")) {
+            property.getExts().put("is-map-string", true);
+        } else if (property.getDataType().startsWith(mapType + "<String, models::")) {
+            property.getExts().put("is-map-nested", true);
+        } else if (property.getDataType().startsWith(mapType + "<String")) {
+            property.getExts().put("is-map", true);
+        } else if (property.getDataType().startsWith("models::")) {
+            property.getExts().put("is-nested", true);
+        } else if (stringType.equals(property.getDataType())) {
+            property.getExts().put("is-string", true);
         }
     }
 
@@ -1379,8 +1379,8 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
         if (Boolean.FALSE.equals(p.getNullable())) {
             LOGGER.warn("Schema '{}' is any type, which includes the 'null' value. 'nullable' cannot be set to 'false'", p.getName());
         }
-        if (languageSpecificPrimitives.contains(property.dataType)) {
-            property.isPrimitiveType = true;
+        if (languageSpecificPrimitives.contains(property.getDataType())) {
+            property.setIsPrimitiveType(true);
         }
         if (ModelUtils.isMapSchema(p)) {
             // an object or anyType composed schema that has additionalProperties set

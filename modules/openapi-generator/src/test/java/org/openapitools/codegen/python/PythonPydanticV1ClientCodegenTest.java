@@ -191,30 +191,30 @@ public class PythonPydanticV1ClientCodegenTest {
         Assert.assertEquals(cm.vars.size(), 3);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "int");
-        Assert.assertEquals(property1.name, "id");
-        Assert.assertNull(property1.defaultValue);
-        Assert.assertEquals(property1.baseType, "int");
-        Assert.assertTrue(property1.required);
-        Assert.assertTrue(property1.isPrimitiveType);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "int");
+        Assert.assertEquals(property1.getName(), "id");
+        Assert.assertNull(property1.getDefaultValue());
+        Assert.assertEquals(property1.getBaseType(), "int");
+        Assert.assertTrue(property1.getRequired());
+        Assert.assertTrue(property1.getIsPrimitiveType());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "name");
-        Assert.assertEquals(property2.dataType, "str");
-        Assert.assertEquals(property2.name, "name");
-        Assert.assertNull(property2.defaultValue);
-        Assert.assertEquals(property2.baseType, "str");
-        Assert.assertTrue(property2.required);
-        Assert.assertTrue(property2.isPrimitiveType);
+        Assert.assertEquals(property2.getBaseName(), "name");
+        Assert.assertEquals(property2.getDataType(), "str");
+        Assert.assertEquals(property2.getName(), "name");
+        Assert.assertNull(property2.getDefaultValue());
+        Assert.assertEquals(property2.getBaseType(), "str");
+        Assert.assertTrue(property2.getRequired());
+        Assert.assertTrue(property2.getIsPrimitiveType());
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.dataType, "datetime");
-        Assert.assertEquals(property3.name, "created_at");
-        Assert.assertNull(property3.defaultValue);
-        Assert.assertEquals(property3.baseType, "datetime");
-        Assert.assertFalse(property3.required);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getDataType(), "datetime");
+        Assert.assertEquals(property3.getName(), "created_at");
+        Assert.assertNull(property3.getDefaultValue());
+        Assert.assertEquals(property3.getBaseType(), "datetime");
+        Assert.assertFalse(property3.getRequired());
     }
 
     @Test(description = "convert a model with list property")
@@ -236,24 +236,24 @@ public class PythonPydanticV1ClientCodegenTest {
         Assert.assertEquals(cm.vars.size(), 2);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "int");
-        Assert.assertEquals(property1.name, "id");
-        Assert.assertNull(property1.defaultValue);
-        Assert.assertEquals(property1.baseType, "int");
-        Assert.assertTrue(property1.required);
-        Assert.assertTrue(property1.isPrimitiveType);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "int");
+        Assert.assertEquals(property1.getName(), "id");
+        Assert.assertNull(property1.getDefaultValue());
+        Assert.assertEquals(property1.getBaseType(), "int");
+        Assert.assertTrue(property1.getRequired());
+        Assert.assertTrue(property1.getIsPrimitiveType());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "urls");
-        Assert.assertEquals(property2.dataType, "List[str]");
-        Assert.assertEquals(property2.name, "urls");
-        Assert.assertNull(property2.defaultValue);
-        Assert.assertEquals(property2.baseType, "List");
-        Assert.assertEquals(property2.containerType, "array");
-        Assert.assertFalse(property2.required);
-        Assert.assertTrue(property2.isPrimitiveType);
-        Assert.assertTrue(property2.isContainer);
+        Assert.assertEquals(property2.getBaseName(), "urls");
+        Assert.assertEquals(property2.getDataType(), "List[str]");
+        Assert.assertEquals(property2.getName(), "urls");
+        Assert.assertNull(property2.getDefaultValue());
+        Assert.assertEquals(property2.getBaseType(), "List");
+        Assert.assertEquals(property2.getContainerType(), "array");
+        Assert.assertFalse(property2.getRequired());
+        Assert.assertTrue(property2.getIsPrimitiveType());
+        Assert.assertTrue(property2.isContainer());
     }
 
     @Test(description = "convert a model with a map property")
@@ -274,14 +274,14 @@ public class PythonPydanticV1ClientCodegenTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "translations");
-        Assert.assertEquals(property1.dataType, "Dict[str, str]");
-        Assert.assertEquals(property1.name, "translations");
-        Assert.assertEquals(property1.baseType, "Dict");
-        Assert.assertEquals(property1.containerType, "map");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
-        Assert.assertTrue(property1.isPrimitiveType);
+        Assert.assertEquals(property1.getBaseName(), "translations");
+        Assert.assertEquals(property1.getDataType(), "Dict[str, str]");
+        Assert.assertEquals(property1.getName(), "translations");
+        Assert.assertEquals(property1.getBaseType(), "Dict");
+        Assert.assertEquals(property1.getContainerType(), "map");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
+        Assert.assertTrue(property1.getIsPrimitiveType());
     }
 
     @Test(description = "convert a model with complex property")
@@ -300,12 +300,12 @@ public class PythonPydanticV1ClientCodegenTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.dataType, "Children");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.baseType, "Children");
-        Assert.assertFalse(property1.required);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getDataType(), "Children");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getBaseType(), "Children");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertFalse(property1.isContainer());
     }
 
     @Test(description = "convert a model with complex list property")
@@ -325,14 +325,14 @@ public class PythonPydanticV1ClientCodegenTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.complexType, "Children");
-        Assert.assertEquals(property1.dataType, "List[Children]");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.baseType, "List");
-        Assert.assertEquals(property1.containerType, "array");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getComplexType(), "Children");
+        Assert.assertEquals(property1.getDataType(), "List[Children]");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getBaseType(), "List");
+        Assert.assertEquals(property1.getContainerType(), "array");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert a model with complex map property")
@@ -353,14 +353,14 @@ public class PythonPydanticV1ClientCodegenTest {
         Assert.assertEquals(Sets.intersection(cm.imports, Sets.newHashSet("Children")).size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.complexType, "Children");
-        Assert.assertEquals(property1.dataType, "Dict[str, Children]");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.baseType, "Dict");
-        Assert.assertEquals(property1.containerType, "map");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getComplexType(), "Children");
+        Assert.assertEquals(property1.getDataType(), "Dict[str, Children]");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getBaseType(), "Dict");
+        Assert.assertEquals(property1.getContainerType(), "map");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
 
@@ -501,7 +501,7 @@ public class PythonPydanticV1ClientCodegenTest {
         List<CodegenProperty> vars = simpleName.getVars();
         Assert.assertEquals(vars.size(), 1);
         CodegenProperty property = vars.get(0);
-        Assert.assertEquals(property.name, "dollar_value");
+        Assert.assertEquals(property.getName(), "dollar_value");
     }
 
     @Test(description = "outputs __init__.py with imports for exports")

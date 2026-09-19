@@ -54,42 +54,42 @@ public class TypeScriptNestjsModelTest {
         Assert.assertEquals(cm.vars.size(), 4);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "number");
-        Assert.assertEquals(property1.name, "id");
-        Assert.assertEquals(property1.defaultValue, "undefined");
-        Assert.assertEquals(property1.baseType, "number");
-        Assert.assertTrue(property1.required);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "number");
+        Assert.assertEquals(property1.getName(), "id");
+        Assert.assertEquals(property1.getDefaultValue(), "undefined");
+        Assert.assertEquals(property1.getBaseType(), "number");
+        Assert.assertTrue(property1.getRequired());
+        Assert.assertFalse(property1.isContainer());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "name");
-        Assert.assertEquals(property2.dataType, "string");
-        Assert.assertEquals(property2.name, "name");
-        Assert.assertEquals(property2.defaultValue, "undefined");
-        Assert.assertEquals(property2.baseType, "string");
-        Assert.assertTrue(property2.required);
-        Assert.assertFalse(property2.isContainer);
+        Assert.assertEquals(property2.getBaseName(), "name");
+        Assert.assertEquals(property2.getDataType(), "string");
+        Assert.assertEquals(property2.getName(), "name");
+        Assert.assertEquals(property2.getDefaultValue(), "undefined");
+        Assert.assertEquals(property2.getBaseType(), "string");
+        Assert.assertTrue(property2.getRequired());
+        Assert.assertFalse(property2.isContainer());
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.complexType, null);
-        Assert.assertEquals(property3.dataType, "string");
-        Assert.assertEquals(property3.name, "createdAt");
-        Assert.assertEquals(property3.baseType, "string");
-        Assert.assertEquals(property3.defaultValue, "undefined");
-        Assert.assertFalse(property3.required);
-        Assert.assertFalse(property3.isContainer);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getComplexType(), null);
+        Assert.assertEquals(property3.getDataType(), "string");
+        Assert.assertEquals(property3.getName(), "createdAt");
+        Assert.assertEquals(property3.getBaseType(), "string");
+        Assert.assertEquals(property3.getDefaultValue(), "undefined");
+        Assert.assertFalse(property3.getRequired());
+        Assert.assertFalse(property3.isContainer());
 
         final CodegenProperty property4 = cm.vars.get(3);
-        Assert.assertEquals(property4.baseName, "birthDate");
-        Assert.assertEquals(property4.complexType, null);
-        Assert.assertEquals(property4.dataType, "string");
-        Assert.assertEquals(property4.name, "birthDate");
-        Assert.assertEquals(property4.baseType, "string");
-        Assert.assertEquals(property4.defaultValue, "undefined");
-        Assert.assertFalse(property4.required);
-        Assert.assertFalse(property4.isContainer);
+        Assert.assertEquals(property4.getBaseName(), "birthDate");
+        Assert.assertEquals(property4.getComplexType(), null);
+        Assert.assertEquals(property4.getDataType(), "string");
+        Assert.assertEquals(property4.getName(), "birthDate");
+        Assert.assertEquals(property4.getBaseType(), "string");
+        Assert.assertEquals(property4.getDefaultValue(), "undefined");
+        Assert.assertFalse(property4.getRequired());
+        Assert.assertFalse(property4.isContainer());
     }
 
     @Test(description = "convert a model with list property")
@@ -110,20 +110,20 @@ public class TypeScriptNestjsModelTest {
         Assert.assertEquals(cm.vars.size(), 2);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "number");
-        Assert.assertEquals(property1.name, "id");
-        Assert.assertEquals(property1.defaultValue, "undefined");
-        Assert.assertEquals(property1.baseType, "number");
-        Assert.assertTrue(property1.required);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "number");
+        Assert.assertEquals(property1.getName(), "id");
+        Assert.assertEquals(property1.getDefaultValue(), "undefined");
+        Assert.assertEquals(property1.getBaseType(), "number");
+        Assert.assertTrue(property1.getRequired());
+        Assert.assertFalse(property1.isContainer());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "urls");
-        Assert.assertEquals(property2.dataType, "Array<string>");
-        Assert.assertEquals(property2.name, "urls");
-        Assert.assertEquals(property2.baseType, "Array");
-        Assert.assertFalse(property2.required);
+        Assert.assertEquals(property2.getBaseName(), "urls");
+        Assert.assertEquals(property2.getDataType(), "Array<string>");
+        Assert.assertEquals(property2.getName(), "urls");
+        Assert.assertEquals(property2.getBaseType(), "Array");
+        Assert.assertFalse(property2.getRequired());
     }
 
     @Test(description = "convert a model with complex property")
@@ -142,12 +142,12 @@ public class TypeScriptNestjsModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.dataType, "Children");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.defaultValue, "undefined");
-        Assert.assertEquals(property1.baseType, "Children");
-        Assert.assertFalse(property1.required);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getDataType(), "Children");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getDefaultValue(), "undefined");
+        Assert.assertEquals(property1.getBaseType(), "Children");
+        Assert.assertFalse(property1.getRequired());
     }
 
     @Test(description = "convert a model with complex list property")
@@ -167,12 +167,12 @@ public class TypeScriptNestjsModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.complexType, "Children");
-        Assert.assertEquals(property1.dataType, "Array<Children>");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.baseType, "Array");
-        Assert.assertFalse(property1.required);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getComplexType(), "Children");
+        Assert.assertEquals(property1.getDataType(), "Array<Children>");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getBaseType(), "Array");
+        Assert.assertFalse(property1.getRequired());
     }
 
     @Test(description = "convert an array model")
@@ -226,13 +226,13 @@ public class TypeScriptNestjsModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property = cm.vars.get(0);
-        Assert.assertEquals(property.baseName, "1list");
-        Assert.assertEquals(property.dataType, "string");
-        Assert.assertEquals(property.name, "_1list");
-        Assert.assertEquals(property.defaultValue, "undefined");
-        Assert.assertEquals(property.baseType, "string");
-        Assert.assertTrue(property.required);
-        Assert.assertFalse(property.isContainer);
+        Assert.assertEquals(property.getBaseName(), "1list");
+        Assert.assertEquals(property.getDataType(), "string");
+        Assert.assertEquals(property.getName(), "_1list");
+        Assert.assertEquals(property.getDefaultValue(), "undefined");
+        Assert.assertEquals(property.getBaseType(), "string");
+        Assert.assertTrue(property.getRequired());
+        Assert.assertFalse(property.isContainer());
     }
 
 }

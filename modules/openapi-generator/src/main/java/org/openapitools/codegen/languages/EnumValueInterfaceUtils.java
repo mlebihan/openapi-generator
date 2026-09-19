@@ -114,10 +114,10 @@ public final class EnumValueInterfaceUtils {
             }
 
             for (CodegenProperty var : cm.vars) {
-                if (var.isEnum && !var.isContainer) {
+                if (var.getIsEnum() && !var.isContainer()) {
                     List<String> xVarImpl = new ArrayList<>(
                             DefaultCodegen.getObjectAsStringList(var.getVendorExtensions().get(xImplementsExtensionKey)));
-                    xVarImpl.add(valuedEnumClassName + "<" + var.dataType + ">");
+                    xVarImpl.add(valuedEnumClassName + "<" + var.getDataType() + ">");
                     var.getVendorExtensions().put(xImplementsExtensionKey, xVarImpl);
                     needsImport = true;
                 }

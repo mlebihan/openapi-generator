@@ -45,7 +45,7 @@ public class KtormSchemaCodegenTest {
 
     private Map<String, Object> getExtension(CodegenProperty property) {
         return (Map<String, Object>)
-                property.vendorExtensions.get(KtormSchemaCodegen.VENDOR_EXTENSION_SCHEMA);
+                property.getExts().get(KtormSchemaCodegen.VENDOR_EXTENSION_SCHEMA);
     }
 
     private Map<String, Object> getColumnDefinition(Map<String, Object> schema) {

@@ -553,7 +553,7 @@ public abstract class JavaMicronautAbstractCodegen extends AbstractJavaCodegen i
                 model.vendorExtensions.put("requiredParentVars", model.getParentModel().requiredVars);
             }
 
-            List<CodegenProperty> requiredVars = model.vars.stream().filter(v -> v.required).collect(Collectors.toList());
+            List<CodegenProperty> requiredVars = model.vars.stream().filter(v -> v.getRequired()).collect(Collectors.toList());
             model.vendorExtensions.put("requiredVars", requiredVars);
         }
 
@@ -570,17 +570,17 @@ public abstract class JavaMicronautAbstractCodegen extends AbstractJavaCodegen i
         List<Object> allowableValues = p.allowableValues == null ? null : getEnumValues(p.allowableValues);
 
         return getExampleValue(p.defaultValue, p.example, p.dataType, p.isModel, allowableValues,
-                p.items == null ? null : p.items.dataType,
-                p.items == null ? null : p.items.defaultValue,
+                p.items == null ? null : p.items.getDataType(),
+                p.items == null ? null : p.items.getDefaultValue(),
                 p.requiredVars, groovy, false);
     }
 
     protected String getPropertyExampleValue(CodegenProperty p, boolean groovy) {
-        List<Object> allowableValues = p.allowableValues == null ? null : getEnumValues(p.allowableValues);
+        List<Object> allowableValues = p.getAllowableValues() == null ? null : getEnumValues(p.getAllowableValues());
 
-        return getExampleValue(p.defaultValue, p.example, p.dataType, p.isModel, allowableValues,
-                p.items == null ? null : p.items.dataType,
-                p.items == null ? null : p.items.defaultValue,
+        return getExampleValue(p.getDefaultValue(), p.getExample(), p.getDataType(), p.getIsModel(), allowableValues,
+                p.getItems() == null ? null : p.getItems().getDataType(),
+                p.getItems() == null ? null : p.getItems().getDefaultValue(),
                 null, groovy, true);
     }
 

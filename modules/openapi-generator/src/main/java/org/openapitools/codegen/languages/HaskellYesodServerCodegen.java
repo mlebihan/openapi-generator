@@ -537,8 +537,8 @@ public class HaskellYesodServerCodegen extends DefaultCodegen implements Codegen
         // From the model name, compute the prefix for the fields.
         String prefix = camelize(model.classname, LOWERCASE_FIRST_LETTER);
         for (CodegenProperty prop : model.vars) {
-            prop.name = toVarName(prefix + camelize(prop.name));
-            prop.vendorExtensions.put("x-base-name-string-literal", "\"" + escapeText(prop.getBaseName()) + "\"");
+            prop.setName(toVarName(prefix + camelize(prop.getName())));
+            prop.getExts().put("x-base-name-string-literal", "\"" + escapeText(prop.getBaseName()) + "\"");
         }
 
         // Create newtypes for things with non-object types

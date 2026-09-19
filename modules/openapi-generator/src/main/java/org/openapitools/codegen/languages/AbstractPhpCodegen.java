@@ -926,11 +926,11 @@ public abstract class AbstractPhpCodegen extends DefaultCodegen implements Codeg
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        if (enumNameMapping.containsKey(property.name)) {
-            return enumNameMapping.get(property.name);
+        if (enumNameMapping.containsKey(property.getName())) {
+            return enumNameMapping.get(property.getName());
         }
 
-        String enumName = underscore(toGenericName(property.name)).toUpperCase(Locale.ROOT);
+        String enumName = underscore(toGenericName(property.getName())).toUpperCase(Locale.ROOT);
 
         // remove [] for array or map of enum
         enumName = enumName.replace("[]", "");

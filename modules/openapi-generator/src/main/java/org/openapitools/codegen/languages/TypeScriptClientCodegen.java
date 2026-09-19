@@ -393,15 +393,15 @@ public class TypeScriptClientCodegen extends AbstractTypeScriptClientCodegen imp
             cm.imports = new TreeSet<>(cm.imports);
             // name enum with model name, e.g. StatusEnum => Pet.StatusEnum
             for (CodegenProperty var : cm.vars) {
-                if (Boolean.TRUE.equals(var.isEnum)) {
-                    var.datatypeWithEnum = var.datatypeWithEnum.replace(var.enumName, cm.classname + var.enumName);
+                if (Boolean.TRUE.equals(var.getIsEnum())) {
+                    var.setDatatypeWithEnum(var.getDatatypeWithEnum().replace(var.getEnumName(), cm.classname + var.getEnumName()));
                 }
             }
             if (cm.parent != null) {
                 for (CodegenProperty var : cm.allVars) {
-                    if (Boolean.TRUE.equals(var.isEnum)) {
-                        var.datatypeWithEnum = var.datatypeWithEnum
-                                .replace(var.enumName, cm.classname + var.enumName);
+                    if (Boolean.TRUE.equals(var.getIsEnum())) {
+                        var.setDatatypeWithEnum(var.getDatatypeWithEnum()
+                           .replace(var.getEnumName(), cm.classname + var.getEnumName()));
                     }
                 }
             }
@@ -942,9 +942,9 @@ public class TypeScriptClientCodegen extends AbstractTypeScriptClientCodegen imp
             propName = toVarName(propName);
             String propModelName = null;
             Object propExample = null;
-            if (discProp != null && propName.equals(discProp.name)) {
+            if (discProp != null && propName.equals(discProp.getName())) {
                 propModelName = null;
-                propExample = discProp.example;
+                propExample = discProp.getExample();
             } else {
                 propModelName = getModelName(propSchema);
                 propExample = exampleFromStringOrArraySchema(propSchema, null, propName);
@@ -989,53 +989,53 @@ public class TypeScriptClientCodegen extends AbstractTypeScriptClientCodegen imp
             return "null";
         }
 
-        if (p.defaultValue == null) {
-            example = p.example;
+        if (p.getDefaultValue() == null) {
+            example = p.getExample();
         } else {
-            example = p.defaultValue;
+            example = p.getDefaultValue();
         }
 
-        String type = p.baseType;
+        String type = p.getBaseType();
         if (type == null) {
-            type = p.dataType;
+            type = p.getDataType();
         }
 
-        if (Boolean.TRUE.equals(p.isInteger)) {
+        if (Boolean.TRUE.equals(p.getIsInteger())) {
             if (example == null) {
                 example = "56";
             }
-        } else if (Boolean.TRUE.equals(p.isLong)) {
+        } else if (Boolean.TRUE.equals(p.getIsLong())) {
             if (example == null) {
                 example = "789";
             }
-        } else if (Boolean.TRUE.equals(p.isDouble)
-                || Boolean.TRUE.equals(p.isFloat)
-                || Boolean.TRUE.equals(p.isNumber)) {
+        } else if (Boolean.TRUE.equals(p.getIsDouble())
+                || Boolean.TRUE.equals(p.getIsFloat())
+                || Boolean.TRUE.equals(p.getIsNumber())) {
             if (example == null) {
                 example = "3.4";
             }
-        } else if (Boolean.TRUE.equals(p.isBoolean)) {
+        } else if (Boolean.TRUE.equals(p.getIsBoolean())) {
             if (example == null) {
                 example = "true";
             }
-        } else if (Boolean.TRUE.equals(p.isFile) || Boolean.TRUE.equals(p.isBinary)) {
+        } else if (Boolean.TRUE.equals(p.isFile()) || Boolean.TRUE.equals(p.getIsBinary())) {
             if (example == null) {
                 example = "/path/to/file";
             }
             example = "\"" + escapeText(example) + "\"";
-        } else if (Boolean.TRUE.equals(p.isDate)) {
+        } else if (Boolean.TRUE.equals(p.getIsDate())) {
             if (example == null) {
                 example = "2013-10-20";
             }
             example = "new Date(\"" + escapeText(example) + "\")";
-        } else if (Boolean.TRUE.equals(p.isDateTime)) {
+        } else if (Boolean.TRUE.equals(p.getIsDateTime())) {
             if (example == null) {
                 example = "2013-10-20T19:20:30+01:00";
             }
             example = "new Date(\"" + escapeText(example) + "\")";
-        } else if (Boolean.TRUE.equals(p.isString)) {
+        } else if (Boolean.TRUE.equals(p.getIsString())) {
             if (example == null) {
-                example = p.name + "_example";
+                example = p.getName() + "_example";
             }
             example = "\"" + escapeText(example) + "\"";
         } else if (!languageSpecificPrimitives.contains(type)) {

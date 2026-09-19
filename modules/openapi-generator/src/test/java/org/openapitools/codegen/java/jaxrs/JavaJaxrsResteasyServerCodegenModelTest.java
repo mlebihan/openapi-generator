@@ -41,7 +41,7 @@ public class JavaJaxrsResteasyServerCodegenModelTest extends JavaJaxrsBaseTest {
         codegen.setOpenAPI(openAPI);
         final CodegenModel cm = codegen.fromModel("sample", model);
 
-        assertEquals(cm.vars.get(0).baseType, "Map");
+        assertEquals(cm.vars.get(0).getBaseType(), "Map");
         assertTrue(cm.imports.contains("HashMap"));
     }
 

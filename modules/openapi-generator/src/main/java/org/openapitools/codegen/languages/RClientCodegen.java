@@ -611,17 +611,17 @@ public class RClientCodegen extends DefaultCodegen implements CodegenConfig {
             boolean needsExtractSimpleType = false;
             for (CodegenProperty var : cm.vars) {
                 // check to see if base name is an empty string
-                if ("".equals(var.baseName)) {
+                if ("".equals(var.getBaseName())) {
                     LOGGER.debug("Empty baseName `` (empty string) in the model `{}` has been renamed to `empty_string` to avoid compilation errors.", cm.classname);
-                    var.baseName = "empty_string";
+                    var.setBaseName("empty_string");
                 }
 
-                if (!var.isPrimitiveType) {
+                if (!var.getIsPrimitiveType()) {
                     needsExtractSimpleType = true;
                 }
 
                 // create extension x-r-doc-type to store the data type in r doc format
-                var.vendorExtensions.put("x-r-doc-type", constructRdocType(var));
+                var.getExts().put("x-r-doc-type", constructRdocType(var));
             }
 
             // create extension x-r-has-non-primitive-field to indicate whether generated models need special handling for complex types
@@ -630,13 +630,13 @@ public class RClientCodegen extends DefaultCodegen implements CodegenConfig {
             // apply the same fix, enhancement for allVars
             for (CodegenProperty var : cm.allVars) {
                 // check to see if base name is an empty string
-                if ("".equals(var.baseName)) {
+                if ("".equals(var.getBaseName())) {
                     LOGGER.debug("Empty baseName `` (empty string) in the model `{}` has been renamed to `empty_string` to avoid compilation errors.", cm.classname);
-                    var.baseName = "empty_string";
+                    var.setBaseName("empty_string");
                 }
 
                 // create extension x-r-doc-type to store the data type in r doc format
-                var.vendorExtensions.put("x-r-doc-type", constructRdocType(var));
+                var.getExts().put("x-r-doc-type", constructRdocType(var));
             }
         }
         return postProcessModelsEnum(objs);
@@ -742,7 +742,7 @@ public class RClientCodegen extends DefaultCodegen implements CodegenConfig {
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        String enumName = underscore(toModelName(property.name)).toUpperCase(Locale.ROOT);
+        String enumName = underscore(toModelName(property.getName())).toUpperCase(Locale.ROOT);
 
         // remove [] for array or map of enum
         enumName = enumName.replace("[]", "");
@@ -920,15 +920,15 @@ public class RClientCodegen extends DefaultCodegen implements CodegenConfig {
      * @return R doc type
      */
     public String constructRdocType(CodegenProperty codegenProperty) {
-        if (codegenProperty.isArray) {
-            return "list(" + constructRdocType(codegenProperty.items) + ")";
-        } else if (codegenProperty.isMap) {
-            return "named list(" + constructRdocType(codegenProperty.items) + ")";
-        } else if (languageSpecificPrimitives.contains(codegenProperty.dataType)) {
+        if (codegenProperty.getIsArray()) {
+            return "list(" + constructRdocType(codegenProperty.getItems()) + ")";
+        } else if (codegenProperty.getIsMap()) {
+            return "named list(" + constructRdocType(codegenProperty.getItems()) + ")";
+        } else if (languageSpecificPrimitives.contains(codegenProperty.getDataType())) {
             // primitive type
-            return codegenProperty.dataType;
+            return codegenProperty.getDataType();
         } else { // model
-            return "\\link{" + codegenProperty.dataType + "}";
+            return "\\link{" + codegenProperty.getDataType() + "}";
         }
     }
 
@@ -958,34 +958,34 @@ public class RClientCodegen extends DefaultCodegen implements CodegenConfig {
 
         if (codegenProperty == null) {
             return "TODO";
-        } else if (codegenProperty.isArray) { // array
-            return "c(" + constructExampleCode(codegenProperty.items, modelMaps, depth) + ")";
-        } else if (codegenProperty.isMap) { // map
-            return "c(key = " + constructExampleCode(codegenProperty.items, modelMaps, depth) + ")";
-        } else if (languageSpecificPrimitives.contains(codegenProperty.dataType)) { // primitive type
-            if ("character".equals(codegenProperty.dataType)) {
-                if (StringUtils.isEmpty(codegenProperty.example)) {
-                    return "\"" + codegenProperty.example + "\"";
+        } else if (codegenProperty.getIsArray()) { // array
+            return "c(" + constructExampleCode(codegenProperty.getItems(), modelMaps, depth) + ")";
+        } else if (codegenProperty.getIsMap()) { // map
+            return "c(key = " + constructExampleCode(codegenProperty.getItems(), modelMaps, depth) + ")";
+        } else if (languageSpecificPrimitives.contains(codegenProperty.getDataType())) { // primitive type
+            if ("character".equals(codegenProperty.getDataType())) {
+                if (StringUtils.isEmpty(codegenProperty.getExample())) {
+                    return "\"" + codegenProperty.getExample() + "\"";
                 } else {
-                    if (Boolean.TRUE.equals(codegenProperty.isEnum)) { // enum
-                        return "\"" + (getEnumValues(codegenProperty.allowableValues)).get(0) + "\"";
+                    if (Boolean.TRUE.equals(codegenProperty.getIsEnum())) { // enum
+                        return "\"" + (getEnumValues(codegenProperty.getAllowableValues())).get(0) + "\"";
                     } else {
-                        return "\"" + codegenProperty.name + "_example\"";
+                        return "\"" + codegenProperty.getName() + "_example\"";
                     }
                 }
             } else { // numeric
-                if (StringUtils.isEmpty(codegenProperty.example)) {
-                    return codegenProperty.example;
+                if (StringUtils.isEmpty(codegenProperty.getExample())) {
+                    return codegenProperty.getExample();
                 } else {
                     return "123";
                 }
             }
         } else {
             // look up the model
-            if (modelMaps.containsKey(codegenProperty.dataType)) {
-                return constructExampleCode(modelMaps.get(codegenProperty.dataType), modelMaps, depth);
+            if (modelMaps.containsKey(codegenProperty.getDataType())) {
+                return constructExampleCode(modelMaps.get(codegenProperty.getDataType()), modelMaps, depth);
             } else {
-                LOGGER.error("Error in constructing examples. Failed to look up the model {}", codegenProperty.dataType);
+                LOGGER.error("Error in constructing examples. Failed to look up the model {}", codegenProperty.getDataType());
                 return "TODO";
             }
         }

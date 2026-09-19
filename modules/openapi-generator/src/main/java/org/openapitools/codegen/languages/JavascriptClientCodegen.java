@@ -750,53 +750,53 @@ public class JavascriptClientCodegen extends DefaultCodegen implements CodegenCo
             return "null";
         }
 
-        if (p.defaultValue == null) {
-            example = p.example;
+        if (p.getDefaultValue() == null) {
+            example = p.getExample();
         } else {
-            example = p.defaultValue;
+            example = p.getDefaultValue();
         }
 
-        String type = p.baseType;
+        String type = p.getBaseType();
         if (type == null) {
-            type = p.dataType;
+            type = p.getDataType();
         }
 
-        if (Boolean.TRUE.equals(p.isInteger)) {
+        if (Boolean.TRUE.equals(p.getIsInteger())) {
             if (example == null) {
                 example = "56";
             }
-        } else if (Boolean.TRUE.equals(p.isLong)) {
+        } else if (Boolean.TRUE.equals(p.getIsLong())) {
             if (example == null) {
                 example = "789";
             }
-        } else if (Boolean.TRUE.equals(p.isDouble)
-                || Boolean.TRUE.equals(p.isFloat)
-                || Boolean.TRUE.equals(p.isNumber)) {
+        } else if (Boolean.TRUE.equals(p.getIsDouble())
+                || Boolean.TRUE.equals(p.getIsFloat())
+                || Boolean.TRUE.equals(p.getIsNumber())) {
             if (example == null) {
                 example = "3.4";
             }
-        } else if (Boolean.TRUE.equals(p.isBoolean)) {
+        } else if (Boolean.TRUE.equals(p.getIsBoolean())) {
             if (example == null) {
                 example = "true";
             }
-        } else if (Boolean.TRUE.equals(p.isFile) || Boolean.TRUE.equals(p.isBinary)) {
+        } else if (Boolean.TRUE.equals(p.isFile()) || Boolean.TRUE.equals(p.getIsBinary())) {
             if (example == null) {
                 example = "/path/to/file";
             }
             example = "\"" + escapeText(example) + "\"";
-        } else if (Boolean.TRUE.equals(p.isDate)) {
+        } else if (Boolean.TRUE.equals(p.getIsDate())) {
             if (example == null) {
                 example = "2013-10-20";
             }
             example = "new Date(\"" + escapeText(example) + "\")";
-        } else if (Boolean.TRUE.equals(p.isDateTime)) {
+        } else if (Boolean.TRUE.equals(p.getIsDateTime())) {
             if (example == null) {
                 example = "2013-10-20T19:20:30+01:00";
             }
             example = "new Date(\"" + escapeText(example) + "\")";
-        } else if (Boolean.TRUE.equals(p.isString)) {
+        } else if (Boolean.TRUE.equals(p.getIsString())) {
             if (example == null) {
-                example = p.name + "_example";
+                example = p.getName() + "_example";
             }
             example = "\"" + escapeText(example) + "\"";
 
@@ -920,14 +920,14 @@ public class JavascriptClientCodegen extends DefaultCodegen implements CodegenCo
     }
 
     private String getJSDocType(CodegenModel cm, CodegenProperty cp) {
-        if (Boolean.TRUE.equals(cp.isContainer)) {
-            if (cp.containerType.equals("array") || cp.containerType.equals("set"))
-                return "Array.<" + getJSDocType(cm, cp.items) + ">";
-            else if (cp.containerType.equals("map"))
-                return "Object.<String, " + getJSDocType(cm, cp.items) + ">";
+        if (Boolean.TRUE.equals(cp.isContainer())) {
+            if (cp.getContainerType().equals("array") || cp.getContainerType().equals("set"))
+                return "Array.<" + getJSDocType(cm, cp.getItems()) + ">";
+            else if (cp.getContainerType().equals("map"))
+                return "Object.<String, " + getJSDocType(cm, cp.getItems()) + ">";
         }
-        String dataType = trimBrackets(cp.datatypeWithEnum);
-        if (cp.isEnum) {
+        String dataType = trimBrackets(cp.getDatatypeWithEnum());
+        if (cp.getIsEnum()) {
             dataType = cm.classname + '.' + dataType;
         }
         if (isModelledType(cp))
@@ -937,7 +937,7 @@ public class JavascriptClientCodegen extends DefaultCodegen implements CodegenCo
 
     private boolean isModelledType(CodegenProperty cp) {
         // N.B. enums count as modelled types, file is not modelled (SuperAgent uses some 3rd party library).
-        return cp.isEnum || !languageSpecificPrimitives.contains(cp.baseType == null ? cp.dataType : cp.baseType);
+        return cp.getIsEnum() || !languageSpecificPrimitives.contains(cp.getBaseType() == null ? cp.getDataType() : cp.getBaseType());
     }
 
     private String getJSDocType(CodegenParameter cp) {
@@ -1056,9 +1056,9 @@ public class JavascriptClientCodegen extends DefaultCodegen implements CodegenCo
             for (CodegenProperty var : cm.vars) {
                 // Add JSDoc @type value for this property.
                 String jsDocType = getJSDocType(cm, var);
-                var.vendorExtensions.put("x-jsdoc-type", jsDocType);
+                var.getExts().put("x-jsdoc-type", jsDocType);
 
-                if (Boolean.TRUE.equals(var.required)) {
+                if (Boolean.TRUE.equals(var.getRequired())) {
                     required.add(var);
                 }
             }
@@ -1066,16 +1066,16 @@ public class JavascriptClientCodegen extends DefaultCodegen implements CodegenCo
             for (CodegenProperty var : cm.allVars) {
                 // Add JSDoc @type value for this property.
                 String jsDocType = getJSDocType(cm, var);
-                var.vendorExtensions.put("x-jsdoc-type", jsDocType);
+                var.getExts().put("x-jsdoc-type", jsDocType);
 
-                if (Boolean.TRUE.equals(var.required)) {
+                if (Boolean.TRUE.equals(var.getRequired())) {
                     required.add(var);
                 }
             }
 
             if (supportsInheritance || supportsMixins) {
                 for (CodegenProperty var : cm.allVars) {
-                    if (Boolean.TRUE.equals(var.required)) {
+                    if (Boolean.TRUE.equals(var.getRequired())) {
                         allRequired.add(var);
                     }
                 }
@@ -1084,16 +1084,16 @@ public class JavascriptClientCodegen extends DefaultCodegen implements CodegenCo
             // set vendor-extension: x-codegen-hasMoreRequired
             CodegenProperty lastRequired = null;
             for (CodegenProperty var : cm.vars) {
-                if (var.required) {
+                if (var.getRequired()) {
                     lastRequired = var;
                 }
             }
             for (CodegenProperty var : cm.vars) {
                 Optional.ofNullable(lastRequired).ifPresent(_lastRequired -> {
                     if (var == _lastRequired) {
-                        var.vendorExtensions.put("x-codegen-has-more-required", false);
-                    } else if (var.required) {
-                        var.vendorExtensions.put("x-codegen-has-more-required", true);
+                        var.getExts().put("x-codegen-has-more-required", false);
+                    } else if (var.getRequired()) {
+                        var.getExts().put("x-codegen-has-more-required", true);
                     }
                 });
             }
@@ -1125,13 +1125,13 @@ public class JavascriptClientCodegen extends DefaultCodegen implements CodegenCo
             boolean removedChildEnum = false;
             for (CodegenProperty parentModelCodegenProperty : parentModelCodegenProperties) {
                 // Look for enums
-                if (parentModelCodegenProperty.isEnum) {
+                if (parentModelCodegenProperty.getIsEnum()) {
                     // Now that we have found an enum in the parent class,
                     // and search the child class for the same enum.
                     Iterator<CodegenProperty> iterator = codegenProperties.iterator();
                     while (iterator.hasNext()) {
                         CodegenProperty codegenProperty = iterator.next();
-                        if (codegenProperty.isEnum && codegenProperty.equals(parentModelCodegenProperty)) {
+                        if (codegenProperty.getIsEnum() && codegenProperty.equals(parentModelCodegenProperty)) {
                             // We found an enum in the child class that is
                             // a duplicate of the one in the parent, so remove it.
                             iterator.remove();
@@ -1151,7 +1151,7 @@ public class JavascriptClientCodegen extends DefaultCodegen implements CodegenCo
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return sanitizeName(camelize(property.name)) + "Enum";
+        return sanitizeName(camelize(property.getName())) + "Enum";
     }
 
     @Override

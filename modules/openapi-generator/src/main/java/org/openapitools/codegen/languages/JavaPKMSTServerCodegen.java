@@ -359,8 +359,8 @@ public class JavaPKMSTServerCodegen extends AbstractJavaCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         super.postProcessModelProperty(model, property);
 
-        if ("null".equals(property.example)) {
-            property.example = null;
+        if ("null".equals(property.getExample())) {
+            property.setExample(null);
         }
 
         // Add imports for Jackson

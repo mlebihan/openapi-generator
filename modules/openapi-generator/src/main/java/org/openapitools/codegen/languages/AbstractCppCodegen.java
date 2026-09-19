@@ -273,7 +273,7 @@ abstract public class AbstractCppCodegen extends DefaultCodegen implements Codeg
     @Override
     public CodegenProperty fromProperty(String name, Schema p, boolean required) {
         CodegenProperty property = super.fromProperty(name, p, required);
-        String nameInCamelCase = property.nameInPascalCase;
+        String nameInCamelCase = property.getNameInPascalCase();
         if (nameInCamelCase.length() > 1) {
             nameInCamelCase = sanitizeName(Character.toLowerCase(nameInCamelCase.charAt(0)) + nameInCamelCase.substring(1));
         } else {
@@ -282,7 +282,7 @@ abstract public class AbstractCppCodegen extends DefaultCodegen implements Codeg
         if (isReservedWord(nameInCamelCase) || nameInCamelCase.matches("^\\d.*")) {
             nameInCamelCase = escapeReservedWord(nameInCamelCase);
         }
-        property.nameInCamelCase = nameInCamelCase;
+        property.setNameInCamelCase(nameInCamelCase);
         return property;
     }
 
@@ -417,10 +417,10 @@ abstract public class AbstractCppCodegen extends DefaultCodegen implements Codeg
             return;
         }
         for (CodegenProperty property : parentModel.vars) {
-            if (!((property.isContainer && property.mostInnerItems.isModel) || (property.isModel))) {
+            if (!((property.isContainer() && property.getMostInnerItems().getIsModel()) || (property.getIsModel()))) {
                 continue;
             }
-            String childPropertyType = property.isContainer ? property.mostInnerItems.baseType : property.baseType;
+            String childPropertyType = property.isContainer() ? property.getMostInnerItems().getBaseType() : property.getBaseType();
             for (final String key : objs.keySet()) {
                 CodegenModel childModel = ModelUtils.getModelByName(key, objs);
                 if (!childPropertyType.equals(childModel.classname) || childPropertyType.equals(parentModel.classname) || !childModel.hasVars) {

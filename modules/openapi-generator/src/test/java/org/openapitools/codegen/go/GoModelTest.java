@@ -56,31 +56,31 @@ public class GoModelTest {
         Assert.assertEquals(cm.imports.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "int64");
-        Assert.assertEquals(property1.name, "Id");
-        Assert.assertNull(property1.defaultValue);
-        Assert.assertEquals(property1.baseType, "int64");
-        Assert.assertTrue(property1.required);
-        Assert.assertTrue(property1.isPrimitiveType);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "int64");
+        Assert.assertEquals(property1.getName(), "Id");
+        Assert.assertNull(property1.getDefaultValue());
+        Assert.assertEquals(property1.getBaseType(), "int64");
+        Assert.assertTrue(property1.getRequired());
+        Assert.assertTrue(property1.getIsPrimitiveType());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "name");
-        Assert.assertEquals(property2.dataType, "string");
-        Assert.assertEquals(property2.name, "Name");
-        Assert.assertNull(property2.defaultValue);
-        Assert.assertEquals(property2.baseType, "string");
-        Assert.assertTrue(property2.required);
-        Assert.assertTrue(property2.isPrimitiveType);
+        Assert.assertEquals(property2.getBaseName(), "name");
+        Assert.assertEquals(property2.getDataType(), "string");
+        Assert.assertEquals(property2.getName(), "Name");
+        Assert.assertNull(property2.getDefaultValue());
+        Assert.assertEquals(property2.getBaseType(), "string");
+        Assert.assertTrue(property2.getRequired());
+        Assert.assertTrue(property2.getIsPrimitiveType());
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.complexType, "time.Time");
-        Assert.assertEquals(property3.dataType, "time.Time");
-        Assert.assertEquals(property3.name, "CreatedAt");
-        Assert.assertNull(property3.defaultValue);
-        Assert.assertEquals(property3.baseType, "time.Time");
-        Assert.assertFalse(property3.required);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getComplexType(), "time.Time");
+        Assert.assertEquals(property3.getDataType(), "time.Time");
+        Assert.assertEquals(property3.getName(), "CreatedAt");
+        Assert.assertNull(property3.getDefaultValue());
+        Assert.assertEquals(property3.getBaseType(), "time.Time");
+        Assert.assertFalse(property3.getRequired());
     }
 
     @Test(description = "convert a model with list property")
@@ -102,22 +102,22 @@ public class GoModelTest {
         Assert.assertEquals(cm.vars.size(), 2);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "int64");
-        Assert.assertEquals(property1.name, "Id");
-        Assert.assertNull(property1.defaultValue);
-        Assert.assertEquals(property1.baseType, "int64");
-        Assert.assertTrue(property1.required);
-        Assert.assertTrue(property1.isPrimitiveType);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "int64");
+        Assert.assertEquals(property1.getName(), "Id");
+        Assert.assertNull(property1.getDefaultValue());
+        Assert.assertEquals(property1.getBaseType(), "int64");
+        Assert.assertTrue(property1.getRequired());
+        Assert.assertTrue(property1.getIsPrimitiveType());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "urls");
-        Assert.assertEquals(property2.dataType, "[]string");
-        Assert.assertEquals(property2.name, "Urls");
-        Assert.assertEquals(property2.baseType, "array");
-        Assert.assertEquals(property2.containerType, "array");
-        Assert.assertFalse(property2.required);
-        Assert.assertTrue(property2.isPrimitiveType);
+        Assert.assertEquals(property2.getBaseName(), "urls");
+        Assert.assertEquals(property2.getDataType(), "[]string");
+        Assert.assertEquals(property2.getName(), "Urls");
+        Assert.assertEquals(property2.getBaseType(), "array");
+        Assert.assertEquals(property2.getContainerType(), "array");
+        Assert.assertFalse(property2.getRequired());
+        Assert.assertTrue(property2.getIsPrimitiveType());
     }
 
     @Test(description = "convert a model with a map property")
@@ -138,14 +138,14 @@ public class GoModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "translations");
-        Assert.assertEquals(property1.dataType, "map[string]string");
-        Assert.assertEquals(property1.name, "Translations");
-        Assert.assertEquals(property1.baseType, "map");
-        Assert.assertEquals(property1.containerType, "map");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
-        Assert.assertTrue(property1.isPrimitiveType);
+        Assert.assertEquals(property1.getBaseName(), "translations");
+        Assert.assertEquals(property1.getDataType(), "map[string]string");
+        Assert.assertEquals(property1.getName(), "Translations");
+        Assert.assertEquals(property1.getBaseType(), "map");
+        Assert.assertEquals(property1.getContainerType(), "map");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
+        Assert.assertTrue(property1.getIsPrimitiveType());
     }
 
     @Test(description = "convert a model with complex property")
@@ -164,11 +164,11 @@ public class GoModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.dataType, "Children");
-        Assert.assertEquals(property1.name, "Children");
-        Assert.assertEquals(property1.baseType, "Children");
-        Assert.assertFalse(property1.required);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getDataType(), "Children");
+        Assert.assertEquals(property1.getName(), "Children");
+        Assert.assertEquals(property1.getBaseType(), "Children");
+        Assert.assertFalse(property1.getRequired());
     }
 
     @Test(description = "convert a model with complex list property")
@@ -188,13 +188,13 @@ public class GoModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.dataType, "[]Children");
-        Assert.assertEquals(property1.name, "Children");
-        Assert.assertEquals(property1.baseType, "array");
-        Assert.assertEquals(property1.containerType, "array");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getDataType(), "[]Children");
+        Assert.assertEquals(property1.getName(), "Children");
+        Assert.assertEquals(property1.getBaseType(), "array");
+        Assert.assertEquals(property1.getContainerType(), "array");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert a model with complex map property")
@@ -215,14 +215,14 @@ public class GoModelTest {
         Assert.assertEquals(Sets.intersection(cm.imports, Sets.newHashSet("Children")).size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.complexType, "Children");
-        Assert.assertEquals(property1.dataType, "map[string]Children");
-        Assert.assertEquals(property1.name, "Children");
-        Assert.assertEquals(property1.baseType, "map");
-        Assert.assertEquals(property1.containerType, "map");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getComplexType(), "Children");
+        Assert.assertEquals(property1.getDataType(), "map[string]Children");
+        Assert.assertEquals(property1.getName(), "Children");
+        Assert.assertEquals(property1.getBaseType(), "map");
+        Assert.assertEquals(property1.getContainerType(), "map");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert an array model")

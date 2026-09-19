@@ -647,7 +647,7 @@ public class AbstractJavaCodegenTest {
         CodegenProperty cp = codegen.fromProperty("test", composed);
         String rendered = codegen.toDefaultValue(cp, composed);
 
-        Assert.assertEquals(rendered, "new " + cp.datatypeWithEnum + "().one(\"one\").two(\"two\")");
+        Assert.assertEquals(rendered, "new " + cp.getDatatypeWithEnum() + "().one(\"one\").two(\"two\")");
     }
 
     @Test
@@ -668,8 +668,8 @@ public class AbstractJavaCodegenTest {
         CodegenProperty cp = codegen.fromProperty("format", new Schema<>().$ref("#/components/schemas/OutputFormat"));
         String rendered = codegen.toDefaultValue(cp, outputFormat);
 
-        Assert.assertEquals(rendered, "new " + cp.datatypeWithEnum + "().order("
-                + cp.datatypeWithEnum + ".OrderEnum.SIMILARITY).limit(10)");
+        Assert.assertEquals(rendered, "new " + cp.getDatatypeWithEnum() + "().order("
+                + cp.getDatatypeWithEnum() + ".OrderEnum.SIMILARITY).limit(10)");
     }
 
     @Test
@@ -707,7 +707,7 @@ public class AbstractJavaCodegenTest {
         Assert.assertEquals(imports.iterator().next(), "Date");
 
         Assert.assertNotNull(parameter.getSchema());
-        Assert.assertEquals(parameter.getSchema().baseType, "Date");
+        Assert.assertEquals(parameter.getSchema().getBaseType(), "Date");
     }
 
     @Test
@@ -725,7 +725,7 @@ public class AbstractJavaCodegenTest {
         Assert.assertEquals(imports.iterator().next(), "Date");
 
         Assert.assertNotNull(parameter.getSchema());
-        Assert.assertEquals(parameter.getSchema().baseType, "Date");
+        Assert.assertEquals(parameter.getSchema().getBaseType(), "Date");
     }
 
     @Test
@@ -846,7 +846,7 @@ public class AbstractJavaCodegenTest {
         Schema<?> schema = openAPI.getComponents().getSchemas().get("ModelWithAdditionalProperties");
         CodegenModel cm = codegen.fromModel("ModelWithAdditionalProperties", schema);
         Assert.assertEquals(cm.vars.size(), 1, "Expected single declared var");
-        Assert.assertEquals(cm.vars.get(0).name, "id");
+        Assert.assertEquals(cm.vars.get(0).getName(), "id");
         Assert.assertNull(cm.defaultValue, "Expected no defined default value in spec");
 
         String defaultValue = codegen.toDefaultValue(schema);

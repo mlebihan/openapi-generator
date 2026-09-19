@@ -112,7 +112,7 @@ public class TypeScriptAngularClientCodegenTest {
 
     private CodegenProperty makeEnumProperty(String name) {
         CodegenProperty enumProperty = new CodegenProperty();
-        enumProperty.name = name;
+        enumProperty.setName(name);
         return enumProperty;
     }
 

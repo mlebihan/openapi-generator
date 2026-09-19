@@ -245,7 +245,7 @@ public class ScalaPlayFrameworkServerCodegen extends AbstractScalaCodegen implem
                 postProcessModelsEnum(outer);
                 cm.classVarName = camelize(cm.classVarName, LOWERCASE_FIRST_LETTER);
                 modelsByClassName.put(cm.classname, cm);
-                boolean hasFiles = cm.vars.stream().anyMatch(var -> var.isFile);
+                boolean hasFiles = cm.vars.stream().anyMatch(var -> var.isFile());
                 cm.vendorExtensions.put("x-has-files", hasFiles);
             }
         }
@@ -359,7 +359,7 @@ public class ScalaPlayFrameworkServerCodegen extends AbstractScalaCodegen implem
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return camelizeStripReservedEscape(property.name);
+        return camelizeStripReservedEscape(property.getName());
     }
 
     public String camelizeStripReservedEscape(String str) {
@@ -398,16 +398,16 @@ public class ScalaPlayFrameworkServerCodegen extends AbstractScalaCodegen implem
 
         for (int i = 0; i < cm.vars.size(); i++) {
             CodegenProperty var = cm.vars.get(i);
-            if (!var.required) {
+            if (!var.getRequired()) {
                 defaultValue.append("None");
-            } else if (models.containsKey(var.dataType)) {
-                defaultValue.append(generateModelDefaultValue(models.get(var.dataType), models));
-            } else if (var.defaultValue != null) {
-                defaultValue.append(var.defaultValue);
-            } else if (var.isEnum) {
-                defaultValue.append(cm.classname).append('.').append(var.enumName).append(".values.head");
+            } else if (models.containsKey(var.getDataType())) {
+                defaultValue.append(generateModelDefaultValue(models.get(var.getDataType()), models));
+            } else if (var.getDefaultValue() != null) {
+                defaultValue.append(var.getDefaultValue());
+            } else if (var.getIsEnum()) {
+                defaultValue.append(cm.classname).append('.').append(var.getEnumName()).append(".values.head");
             } else {
-                LOGGER.warn("Unknown default value for var {0} in class {1}", var.name, cm.classname);
+                LOGGER.warn("Unknown default value for var {0} in class {1}", var.getName(), cm.classname);
                 defaultValue.append("null");
             }
 

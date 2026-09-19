@@ -851,8 +851,8 @@ public class JavaClientCodegenTest {
 
         Assertions.assertEquals(response.headers.size(), 1);
         CodegenProperty header = response.headers.get(0);
-        Assertions.assertEquals(header.dataType, "UUID");
-        Assertions.assertEquals(header.baseName, "Request");
+        Assertions.assertEquals(header.getDataType(), "UUID");
+        Assertions.assertEquals(header.getBaseName(), "Request");
     }
 
     @Test
@@ -1105,10 +1105,10 @@ public class JavaClientCodegenTest {
         CodegenProperty array = new CodegenProperty();
         final CodegenProperty items = new CodegenProperty();
         items.setAllowableValues(new HashMap<>(Map.of("values", Collections.singletonList(1))));
-        items.dataType = "Integer";
+        items.setDatatype("Integer");
         array.setItems(items);
-        array.dataType = "Array";
-        array.mostInnerItems = items;
+        array.setDatatype("Array");
+        array.setMostInnerItems(items);
         return array;
     }
 
@@ -1152,30 +1152,30 @@ public class JavaClientCodegenTest {
         Assertions.assertEquals(cm1.getClassname(), "AnyValueModel");
 
         final CodegenProperty property1 = cm1.allVars.get(0);
-        Assertions.assertEquals(property1.baseName, "any_value");
-        Assertions.assertEquals(property1.dataType, "Object");
-        Assertions.assertTrue(property1.isPrimitiveType);
-        Assertions.assertFalse(property1.isContainer);
-        Assertions.assertFalse(property1.isFreeFormObject);
-        Assertions.assertTrue(property1.isAnyType);
+        Assertions.assertEquals(property1.getBaseName(), "any_value");
+        Assertions.assertEquals(property1.getDataType(), "Object");
+        Assertions.assertTrue(property1.getIsPrimitiveType());
+        Assertions.assertFalse(property1.isContainer());
+        Assertions.assertFalse(property1.getIsFreeFormObject());
+        Assertions.assertTrue(property1.getIsAnyType());
 
         final CodegenProperty property2 = cm1.allVars.get(1);
-        Assertions.assertEquals(property2.baseName, "any_value_with_desc");
-        Assertions.assertEquals(property2.dataType, "Object");
-        Assertions.assertFalse(property2.required);
-        Assertions.assertTrue(property2.isPrimitiveType);
-        Assertions.assertFalse(property2.isContainer);
-        Assertions.assertFalse(property2.isFreeFormObject);
-        Assertions.assertTrue(property2.isAnyType);
+        Assertions.assertEquals(property2.getBaseName(), "any_value_with_desc");
+        Assertions.assertEquals(property2.getDataType(), "Object");
+        Assertions.assertFalse(property2.getRequired());
+        Assertions.assertTrue(property2.getIsPrimitiveType());
+        Assertions.assertFalse(property2.isContainer());
+        Assertions.assertFalse(property2.getIsFreeFormObject());
+        Assertions.assertTrue(property2.getIsAnyType());
 
         final CodegenProperty property3 = cm1.allVars.get(2);
-        Assertions.assertEquals(property3.baseName, "any_value_nullable");
-        Assertions.assertEquals(property3.dataType, "Object");
-        Assertions.assertFalse(property3.required);
-        Assertions.assertTrue(property3.isPrimitiveType);
-        Assertions.assertFalse(property3.isContainer);
-        Assertions.assertFalse(property3.isFreeFormObject);
-        Assertions.assertTrue(property3.isAnyType);
+        Assertions.assertEquals(property3.getBaseName(), "any_value_nullable");
+        Assertions.assertEquals(property3.getDataType(), "Object");
+        Assertions.assertFalse(property3.getRequired());
+        Assertions.assertTrue(property3.getIsPrimitiveType());
+        Assertions.assertFalse(property3.isContainer());
+        Assertions.assertFalse(property3.getIsFreeFormObject());
+        Assertions.assertTrue(property3.getIsAnyType());
 
         Schema<?> test2 = openAPI.getComponents().getSchemas().get("AnyValueModelInline");
         codegen.setOpenAPI(openAPI);
@@ -1183,101 +1183,101 @@ public class JavaClientCodegenTest {
         Assertions.assertEquals(cm2.getClassname(), "AnyValueModelInline");
 
         final CodegenProperty cp1 = cm2.vars.get(0);
-        Assertions.assertEquals(cp1.baseName, "any_value");
-        Assertions.assertEquals(cp1.dataType, "Object");
-        Assertions.assertFalse(cp1.required);
-        Assertions.assertTrue(cp1.isPrimitiveType);
-        Assertions.assertFalse(cp1.isContainer);
-        Assertions.assertFalse(cp1.isFreeFormObject);
-        Assertions.assertTrue(cp1.isAnyType);
+        Assertions.assertEquals(cp1.getBaseName(), "any_value");
+        Assertions.assertEquals(cp1.getDataType(), "Object");
+        Assertions.assertFalse(cp1.getRequired());
+        Assertions.assertTrue(cp1.getIsPrimitiveType());
+        Assertions.assertFalse(cp1.isContainer());
+        Assertions.assertFalse(cp1.getIsFreeFormObject());
+        Assertions.assertTrue(cp1.getIsAnyType());
 
         final CodegenProperty cp2 = cm2.vars.get(1);
-        Assertions.assertEquals(cp2.baseName, "any_value_with_desc");
-        Assertions.assertEquals(cp2.dataType, "Object");
-        Assertions.assertFalse(cp2.required);
-        Assertions.assertTrue(cp2.isPrimitiveType);
-        Assertions.assertFalse(cp2.isContainer);
-        Assertions.assertFalse(cp2.isFreeFormObject);
-        Assertions.assertTrue(cp2.isAnyType);
+        Assertions.assertEquals(cp2.getBaseName(), "any_value_with_desc");
+        Assertions.assertEquals(cp2.getDataType(), "Object");
+        Assertions.assertFalse(cp2.getRequired());
+        Assertions.assertTrue(cp2.getIsPrimitiveType());
+        Assertions.assertFalse(cp2.isContainer());
+        Assertions.assertFalse(cp2.getIsFreeFormObject());
+        Assertions.assertTrue(cp2.getIsAnyType());
 
         final CodegenProperty cp3 = cm2.vars.get(2);
-        Assertions.assertEquals(cp3.baseName, "any_value_nullable");
-        Assertions.assertEquals(cp3.dataType, "Object");
-        Assertions.assertFalse(cp3.required);
-        Assertions.assertTrue(cp3.isPrimitiveType);
-        Assertions.assertFalse(cp3.isContainer);
-        Assertions.assertFalse(cp3.isFreeFormObject);
-        Assertions.assertTrue(cp3.isAnyType);
+        Assertions.assertEquals(cp3.getBaseName(), "any_value_nullable");
+        Assertions.assertEquals(cp3.getDataType(), "Object");
+        Assertions.assertFalse(cp3.getRequired());
+        Assertions.assertTrue(cp3.getIsPrimitiveType());
+        Assertions.assertFalse(cp3.isContainer());
+        Assertions.assertFalse(cp3.getIsFreeFormObject());
+        Assertions.assertTrue(cp3.getIsAnyType());
 
         // map
         // Should allow in any type including map, https://github.com/swagger-api/swagger-parser/issues/1603
         final CodegenProperty cp4 = cm2.vars.get(3);
-        Assertions.assertEquals(cp4.baseName, "map_free_form_object");
-        Assertions.assertEquals(cp4.dataType, "Map<String, Object>");
-        Assertions.assertFalse(cp4.required);
-        Assertions.assertTrue(cp4.isPrimitiveType);
-        Assertions.assertTrue(cp4.isContainer);
-        Assertions.assertTrue(cp4.isMap);
-        Assertions.assertTrue(cp4.isFreeFormObject);
-        Assertions.assertFalse(cp4.isAnyType);
-        Assertions.assertFalse(cp4.isModel);
+        Assertions.assertEquals(cp4.getBaseName(), "map_free_form_object");
+        Assertions.assertEquals(cp4.getDataType(), "Map<String, Object>");
+        Assertions.assertFalse(cp4.getRequired());
+        Assertions.assertTrue(cp4.getIsPrimitiveType());
+        Assertions.assertTrue(cp4.isContainer());
+        Assertions.assertTrue(cp4.getIsMap());
+        Assertions.assertTrue(cp4.getIsFreeFormObject());
+        Assertions.assertFalse(cp4.getIsAnyType());
+        Assertions.assertFalse(cp4.getIsModel());
 
         // Should allow in any type including map, https://github.com/swagger-api/swagger-parser/issues/1603
         final CodegenProperty cp5 = cm2.vars.get(4);
-        Assertions.assertEquals(cp5.baseName, "map_any_value_with_desc");
-        Assertions.assertEquals(cp5.dataType, "Map<String, Object>");
-        Assertions.assertFalse(cp5.required);
-        Assertions.assertTrue(cp5.isPrimitiveType);
-        Assertions.assertTrue(cp5.isContainer);
-        Assertions.assertTrue(cp5.isMap);
-        Assertions.assertTrue(cp5.isFreeFormObject);
-        Assertions.assertFalse(cp5.isAnyType);
-        Assertions.assertFalse(cp5.isModel);
+        Assertions.assertEquals(cp5.getBaseName(), "map_any_value_with_desc");
+        Assertions.assertEquals(cp5.getDataType(), "Map<String, Object>");
+        Assertions.assertFalse(cp5.getRequired());
+        Assertions.assertTrue(cp5.getIsPrimitiveType());
+        Assertions.assertTrue(cp5.isContainer());
+        Assertions.assertTrue(cp5.getIsMap());
+        Assertions.assertTrue(cp5.getIsFreeFormObject());
+        Assertions.assertFalse(cp5.getIsAnyType());
+        Assertions.assertFalse(cp5.getIsModel());
 
         // Should allow in any type including map, https://github.com/swagger-api/swagger-parser/issues/1603
         final CodegenProperty cp6 = cm2.vars.get(5);
-        Assertions.assertEquals(cp6.baseName, "map_any_value_nullable");
-        Assertions.assertEquals(cp6.dataType, "Map<String, Object>");
-        Assertions.assertFalse(cp6.required);
-        Assertions.assertTrue(cp6.isPrimitiveType);
-        Assertions.assertTrue(cp6.isContainer);
-        Assertions.assertTrue(cp6.isMap);
-        Assertions.assertTrue(cp6.isFreeFormObject);
-        Assertions.assertFalse(cp6.isAnyType);
+        Assertions.assertEquals(cp6.getBaseName(), "map_any_value_nullable");
+        Assertions.assertEquals(cp6.getDataType(), "Map<String, Object>");
+        Assertions.assertFalse(cp6.getRequired());
+        Assertions.assertTrue(cp6.getIsPrimitiveType());
+        Assertions.assertTrue(cp6.isContainer());
+        Assertions.assertTrue(cp6.getIsMap());
+        Assertions.assertTrue(cp6.getIsFreeFormObject());
+        Assertions.assertFalse(cp6.getIsAnyType());
 
         // array
         // Should allow in any type including array, https://github.com/swagger-api/swagger-parser/issues/1603
         final CodegenProperty cp7 = cm2.vars.get(6);
-        Assertions.assertEquals(cp7.baseName, "array_any_value");
-        Assertions.assertEquals(cp7.dataType, "List<Object>");
-        Assertions.assertFalse(cp7.required);
-        Assertions.assertTrue(cp7.isPrimitiveType);
-        Assertions.assertTrue(cp7.isContainer);
-        Assertions.assertTrue(cp7.isArray);
-        Assertions.assertFalse(cp7.isFreeFormObject);
-        Assertions.assertFalse(cp7.isAnyType);
+        Assertions.assertEquals(cp7.getBaseName(), "array_any_value");
+        Assertions.assertEquals(cp7.getDataType(), "List<Object>");
+        Assertions.assertFalse(cp7.getRequired());
+        Assertions.assertTrue(cp7.getIsPrimitiveType());
+        Assertions.assertTrue(cp7.isContainer());
+        Assertions.assertTrue(cp7.getIsArray());
+        Assertions.assertFalse(cp7.getIsFreeFormObject());
+        Assertions.assertFalse(cp7.getIsAnyType());
 
         // Should allow in any type including array, https://github.com/swagger-api/swagger-parser/issues/1603
         final CodegenProperty cp8 = cm2.vars.get(7);
-        Assertions.assertEquals(cp8.baseName, "array_any_value_with_desc");
-        Assertions.assertEquals(cp8.dataType, "List<Object>");
-        Assertions.assertFalse(cp8.required);
-        Assertions.assertTrue(cp8.isPrimitiveType);
-        Assertions.assertTrue(cp8.isContainer);
-        Assertions.assertTrue(cp8.isArray);
-        Assertions.assertFalse(cp8.isFreeFormObject);
-        Assertions.assertFalse(cp8.isAnyType);
+        Assertions.assertEquals(cp8.getBaseName(), "array_any_value_with_desc");
+        Assertions.assertEquals(cp8.getDataType(), "List<Object>");
+        Assertions.assertFalse(cp8.getRequired());
+        Assertions.assertTrue(cp8.getIsPrimitiveType());
+        Assertions.assertTrue(cp8.isContainer());
+        Assertions.assertTrue(cp8.getIsArray());
+        Assertions.assertFalse(cp8.getIsFreeFormObject());
+        Assertions.assertFalse(cp8.getIsAnyType());
 
         // Should allow in any type including array, https://github.com/swagger-api/swagger-parser/issues/1603
         final CodegenProperty cp9 = cm2.vars.get(8);
-        Assertions.assertEquals(cp9.baseName, "array_any_value_nullable");
-        Assertions.assertEquals(cp9.dataType, "List<Object>");
-        Assertions.assertFalse(cp9.required);
-        Assertions.assertTrue(cp9.isPrimitiveType);
-        Assertions.assertTrue(cp9.isContainer);
-        Assertions.assertTrue(cp9.isArray);
-        Assertions.assertFalse(cp9.isFreeFormObject);
-        Assertions.assertFalse(cp9.isAnyType);
+        Assertions.assertEquals(cp9.getBaseName(), "array_any_value_nullable");
+        Assertions.assertEquals(cp9.getDataType(), "List<Object>");
+        Assertions.assertFalse(cp9.getRequired());
+        Assertions.assertTrue(cp9.getIsPrimitiveType());
+        Assertions.assertTrue(cp9.isContainer());
+        Assertions.assertTrue(cp9.getIsArray());
+        Assertions.assertFalse(cp9.getIsFreeFormObject());
+        Assertions.assertFalse(cp9.getIsAnyType());
     }
 
     /**
@@ -2355,11 +2355,11 @@ public class JavaClientCodegenTest {
 
         CodegenProperty cp0 = cm1.getAllVars().get(0);
         Assertions.assertEquals(cp0.getName(), "petType");
-        Assertions.assertEquals(cp0.isOverridden, true);
+        Assertions.assertEquals(cp0.isOverridden(), true);
 
         CodegenProperty cp1 = cm1.getAllVars().get(1);
         Assertions.assertEquals(cp1.getName(), "name");
-        Assertions.assertEquals(cp1.isOverridden, false);
+        Assertions.assertEquals(cp1.isOverridden(), false);
     }
 
     @Test
@@ -4558,7 +4558,7 @@ public class JavaClientCodegenTest {
         // make sure that RandomAnimalsResponseInner has the property species
         boolean speciesSeen = false;
         for (CodegenProperty cp : randomAnimalsResponseInner.vars) {
-            if ("species".equals(cp.name)) {
+            if ("species".equals(cp.getName())) {
                 speciesSeen = true;
                 break;
             }

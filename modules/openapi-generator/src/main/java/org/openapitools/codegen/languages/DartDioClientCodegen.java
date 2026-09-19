@@ -413,13 +413,13 @@ public class DartDioClientCodegen extends AbstractDartCodegen {
 
         for (CodegenProperty prop : allVars) {
             //check if type exists in parent map
-            String type = prop.openApiType;
+            String type = prop.getOpenApiType();
             if (objs.containsKey(type)) {
                 //get the type
                 CodegenModel relatedModel = objs.get(type);
                 //fill the property's VendorExtensions with the type's VendorExtensions
                 prop.getVendorExtensions().put(kIsParent, relatedModel.getVendorExtensions().get(kIsParent));
-                prop.isEnum = relatedModel.isEnum;
+                prop.setIsEnum(relatedModel.isEnum);
 
             }
         }
@@ -560,8 +560,8 @@ public class DartDioClientCodegen extends AbstractDartCodegen {
                 }
             }
             for (CodegenProperty p : cm.getVars()) {
-                p.isInherited = ancestorOnlyProperties.containsKey(p.getName());
-                if (!p.isInherited && !compositeProperties.contains(p.getName())) {
+                p.isInherited(ancestorOnlyProperties.containsKey(p.getName()));
+                if (!p.isInherited() && !compositeProperties.contains(p.getName())) {
                     selfOnlyProperties.put(p.getName(), p);
                 }
             }
@@ -643,22 +643,22 @@ public class DartDioClientCodegen extends AbstractDartCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         super.postProcessModelProperty(model, property);
         if (SERIALIZATION_LIBRARY_BUILT_VALUE.equals(library)) {
-            if (property.isEnum && property.getComposedSchemas() == null) {
+            if (property.getIsEnum() && property.getComposedSchemas() == null) {
                 // enums are generated with built_value and make use of BuiltSet
                 model.imports.add("BuiltSet");
             }
 
-            if (property.isContainer) {
+            if (property.isContainer()) {
                 // Figure out if there are any container type additionalProperties
                 // that need a custom serializer builder factory added.
-                final CodegenProperty items = property.items;
+                final CodegenProperty items = property.getItems();
                 if (items.getAdditionalProperties() != null) {
                     addBuiltValueSerializer(new BuiltValueSerializer(
-                            items.isArray,
+                       items.getIsArray(),
                             items.getUniqueItems(),
-                            items.isMap,
-                            items.items.isNullable,
-                            items.getAdditionalProperties().dataType
+                       items.getIsMap(),
+                       items.getItems().isNullable(),
+                       items.getAdditionalProperties().getDataType()
                     ));
                 }
 
@@ -681,13 +681,13 @@ public class DartDioClientCodegen extends AbstractDartCodegen {
      * {@code List<Map<String, X>>}, {@code List<List<X>>}, etc.
      */
     private void registerNestedBuilderFactories(CodegenProperty prop) {
-        if (prop == null || !prop.isContainer || prop.items == null) {
+        if (prop == null || !prop.isContainer() || prop.getItems() == null) {
             return;
         }
         // Recurse first so deeper containers are registered too.
-        registerNestedBuilderFactories(prop.items);
+        registerNestedBuilderFactories(prop.getItems());
 
-        if (prop.items.isContainer) {
+        if (prop.getItems().isContainer()) {
             // Truly nested container (e.g. Map<String, List<X>>):
             // must use composite form because the simple constructor
             // cannot express the nested FullType.
@@ -702,11 +702,11 @@ public class DartDioClientCodegen extends AbstractDartCodegen {
             // same simple constructor the rest of the codegen uses so
             // the Set deduplicates correctly.
             addBuiltValueSerializer(new BuiltValueSerializer(
-                    prop.isArray,
+               prop.getIsArray(),
                     prop.getUniqueItems(),
-                    prop.isMap,
-                    prop.items.isNullable,
-                    prop.items.dataType));
+               prop.getIsMap(),
+               prop.getItems().isNullable(),
+               prop.getItems().getDataType()));
         }
     }
 
@@ -717,20 +717,20 @@ public class DartDioClientCodegen extends AbstractDartCodegen {
      * @return null if {@code prop} is not a container we can render.
      */
     private BuilderFactoryExpr renderBuilderFactory(CodegenProperty prop) {
-        if (prop == null || !prop.isContainer || prop.items == null) {
+        if (prop == null || !prop.isContainer() || prop.getItems() == null) {
             return null;
         }
-        String innerFullType = renderInnerFullType(prop.items);
-        String innerDart = renderDartType(prop.items);
+        String innerFullType = renderInnerFullType(prop.getItems());
+        String innerDart = renderDartType(prop.getItems());
 
-        if (prop.isArray) {
+        if (prop.getIsArray()) {
             String collection = prop.getUniqueItems() ? "BuiltSet" : "BuiltList";
             String builder = prop.getUniqueItems() ? "SetBuilder" : "ListBuilder";
             return new BuilderFactoryExpr(
                     collection + ", [FullType(" + innerFullType + ")]",
                     builder + "<" + innerDart + ">");
         }
-        if (prop.isMap) {
+        if (prop.getIsMap()) {
             return new BuilderFactoryExpr(
                     "BuiltMap, [FullType(String), FullType(" + innerFullType + ")]",
                     "MapBuilder<String, " + innerDart + ">");
@@ -745,18 +745,18 @@ public class DartDioClientCodegen extends AbstractDartCodegen {
      */
     private String renderInnerFullType(CodegenProperty prop) {
         if (prop == null) return "dynamic";
-        if (!prop.isContainer || prop.items == null) {
-            return prop.dataType;
+        if (!prop.isContainer() || prop.getItems() == null) {
+            return prop.getDataType();
         }
-        String inner = renderInnerFullType(prop.items);
-        if (prop.isArray) {
+        String inner = renderInnerFullType(prop.getItems());
+        if (prop.getIsArray()) {
             String collection = prop.getUniqueItems() ? "BuiltSet" : "BuiltList";
             return collection + ", [FullType(" + inner + ")]";
         }
-        if (prop.isMap) {
+        if (prop.getIsMap()) {
             return "BuiltMap, [FullType(String), FullType(" + inner + ")]";
         }
-        return prop.dataType;
+        return prop.getDataType();
     }
 
     /**
@@ -765,18 +765,18 @@ public class DartDioClientCodegen extends AbstractDartCodegen {
      */
     private String renderDartType(CodegenProperty prop) {
         if (prop == null) return "dynamic";
-        if (!prop.isContainer || prop.items == null) {
-            return prop.dataType;
+        if (!prop.isContainer() || prop.getItems() == null) {
+            return prop.getDataType();
         }
-        String inner = renderDartType(prop.items);
-        if (prop.isArray) {
+        String inner = renderDartType(prop.getItems());
+        if (prop.getIsArray()) {
             String collection = prop.getUniqueItems() ? "BuiltSet" : "BuiltList";
             return collection + "<" + inner + ">";
         }
-        if (prop.isMap) {
+        if (prop.getIsMap()) {
             return "BuiltMap<String, " + inner + ">";
         }
-        return prop.dataType;
+        return prop.getDataType();
     }
 
     private static final class BuilderFactoryExpr {
@@ -868,7 +868,7 @@ public class DartDioClientCodegen extends AbstractDartCodegen {
                                 param.isArray,
                                 param.uniqueItems,
                                 param.isMap,
-                                param.items.isNullable,
+                           param.items.isNullable(),
                                 param.baseType
                         ));
                     }

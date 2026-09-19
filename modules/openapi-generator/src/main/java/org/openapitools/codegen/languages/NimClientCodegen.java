@@ -198,7 +198,7 @@ public class NimClientCodegen extends DefaultCodegen implements CodegenConfig {
 
                 // Check if this model has fields with custom JSON names
                 for (CodegenProperty var : cm.vars) {
-                    if (var.vendorExtensions.containsKey("x-json-name")) {
+                    if (var.getExts().containsKey("x-json-name")) {
                         modelsWithCustomJson.add(cm.classname);
                         break;
                     }
@@ -218,15 +218,15 @@ public class NimClientCodegen extends DefaultCodegen implements CodegenConfig {
 
                     // Check if any field's type needs custom JSON and mark array fields appropriately
                     for (CodegenProperty var : cm.vars) {
-                        String fieldType = var.complexType != null ? var.complexType : var.baseType;
+                        String fieldType = var.getComplexType() != null ? var.getComplexType() : var.getBaseType();
 
                         // Handle arrays - check if the inner type has custom JSON
-                        if (var.isArray && var.items != null) {
-                            String innerType = var.items.complexType != null ? var.items.complexType : var.items.baseType;
+                        if (var.getIsArray() && var.getItems() != null) {
+                            String innerType = var.getItems().getComplexType() != null ? var.getItems().getComplexType() : var.getItems().getBaseType();
                             if (innerType != null && modelsWithCustomJson.contains(innerType)) {
                                 // Mark this array field as containing types with custom JSON
-                                var.vendorExtensions.put("x-is-array-with-custom-json", "true");
-                                var.vendorExtensions.put("x-array-inner-type", innerType);
+                                var.getExts().put("x-is-array-with-custom-json", "true");
+                                var.getExts().put("x-array-inner-type", innerType);
                             }
                             fieldType = innerType;
                         }
@@ -294,48 +294,48 @@ public class NimClientCodegen extends DefaultCodegen implements CodegenConfig {
             // This handles cases like Table[string, Record_string__foo__value]
             // Also wrap optional fields in Option[T]
             for (CodegenProperty var : cm.vars) {
-                if (var.dataType != null && var.dataType.contains("Record_")) {
-                    var.dataType = fixRecordTypeReferences(var.dataType);
+                if (var.getDataType() != null && var.getDataType().contains("Record_")) {
+                    var.setDatatype(fixRecordTypeReferences(var.getDataType()));
                 }
-                if (var.datatypeWithEnum != null && var.datatypeWithEnum.contains("Record_")) {
-                    var.datatypeWithEnum = fixRecordTypeReferences(var.datatypeWithEnum);
+                if (var.getDatatypeWithEnum() != null && var.getDatatypeWithEnum().contains("Record_")) {
+                    var.setDatatypeWithEnum(fixRecordTypeReferences(var.getDatatypeWithEnum()));
                 }
 
                 // Check if the field name was changed from the original (baseName)
                 // This happens for fields like "_id" which are renamed to "id"
                 // But we need to exclude cases where the name is just escaped with backticks
                 // (e.g., "from" becomes "`from`" because it's a reserved word)
-                if (var.baseName != null && !var.baseName.equals(var.name)) {
+                if (var.getBaseName() != null && !var.getBaseName().equals(var.getName())) {
                     // Check if this is just a reserved word escaping (name is `baseName`)
-                    String escapedName = "`" + var.baseName + "`";
-                    if (!var.name.equals(escapedName)) {
+                    String escapedName = "`" + var.getBaseName() + "`";
+                    if (!var.getName().equals(escapedName)) {
                         // This is a real rename, not just escaping
-                        var.vendorExtensions.put("x-json-name", var.baseName);
+                        var.getExts().put("x-json-name", var.getBaseName());
                         hasCustomJsonNames = true;
                     }
                 }
 
                 // Wrap optional (non-required) or nullable fields in Option[T]
                 // For non-enum fields only (enums are handled specially in the template)
-                if ((!var.required || var.isNullable) && !var.isReadOnly && !var.isEnum) {
-                    String baseType = var.dataType;
+                if ((!var.getRequired() || var.isNullable()) && !var.isReadOnly() && !var.getIsEnum()) {
+                    String baseType = var.getDataType();
                     if (baseType != null && !baseType.startsWith("Option[")) {
-                        var.dataType = "Option[" + baseType + "]";
-                        if (var.datatypeWithEnum != null) {
-                            var.datatypeWithEnum = "Option[" + var.datatypeWithEnum + "]";
+                        var.setDatatype("Option[" + baseType + "]");
+                        if (var.getDatatypeWithEnum() != null) {
+                            var.setDatatypeWithEnum("Option[" + var.getDatatypeWithEnum() + "]");
                         }
                     }
                 }
 
                 // For enum fields, set x-is-optional if they are not required
-                if (var.isEnum && (!var.required || var.isNullable)) {
-                    var.vendorExtensions.put("x-is-optional", true);
+                if (var.getIsEnum() && (!var.getRequired() || var.isNullable())) {
+                    var.getExts().put("x-is-optional", true);
                 }
 
                 // Always set x-is-optional based on the final dataType (for non-enum fields)
                 // This ensures consistency between type declaration and JSON handling
-                if (!var.isEnum && var.dataType != null && var.dataType.startsWith("Option[")) {
-                    var.vendorExtensions.put("x-is-optional", true);
+                if (!var.getIsEnum() && var.getDataType() != null && var.getDataType().startsWith("Option[")) {
+                    var.getExts().put("x-is-optional", true);
                 }
             }
 
@@ -508,33 +508,33 @@ public class NimClientCodegen extends DefaultCodegen implements CodegenConfig {
             CodegenProperty newVariant = variant.clone();
 
             // Sanitize baseName to remove underscores and properly format for Nim
-            if (newVariant.baseName != null) {
+            if (newVariant.getBaseName() != null) {
                 // Remove trailing underscores and convert to proper format
-                String sanitizedBase = newVariant.baseName.replaceAll("_+$", ""); // Remove trailing underscores
+                String sanitizedBase = newVariant.getBaseName().replaceAll("_+$", ""); // Remove trailing underscores
                 if (sanitizedBase.length() > 0 && Character.isUpperCase(sanitizedBase.charAt(0))) {
-                    newVariant.baseName = toModelName(sanitizedBase);
+                    newVariant.setBaseName(toModelName(sanitizedBase));
                 } else {
-                    newVariant.baseName = sanitizeNimIdentifier(sanitizedBase);
+                    newVariant.setBaseName(sanitizeNimIdentifier(sanitizedBase));
                 }
             }
 
             // Sanitize dataType to remove underscores and properly format for Nim
             // For model types (not primitives), use toModelName to get the proper type name
-            if (newVariant.dataType != null) {
+            if (newVariant.getDataType() != null) {
                 // Check if this is a model type (starts with uppercase) vs primitive
-                if (newVariant.dataType.length() > 0 && Character.isUpperCase(newVariant.dataType.charAt(0))) {
+                if (newVariant.getDataType().length() > 0 && Character.isUpperCase(newVariant.getDataType().charAt(0))) {
                     // This is likely a model type, use toModelName to properly format it
-                    newVariant.dataType = toModelName(newVariant.dataType);
+                    newVariant.setDatatype(toModelName(newVariant.getDataType()));
                 } else {
                     // Primitive type, just sanitize
-                    newVariant.dataType = sanitizeNimIdentifier(newVariant.dataType);
+                    newVariant.setDatatype(sanitizeNimIdentifier(newVariant.getDataType()));
                 }
             }
-            if (newVariant.datatypeWithEnum != null) {
-                if (newVariant.datatypeWithEnum.length() > 0 && Character.isUpperCase(newVariant.datatypeWithEnum.charAt(0))) {
-                    newVariant.datatypeWithEnum = toModelName(newVariant.datatypeWithEnum);
+            if (newVariant.getDatatypeWithEnum() != null) {
+                if (newVariant.getDatatypeWithEnum().length() > 0 && Character.isUpperCase(newVariant.getDatatypeWithEnum().charAt(0))) {
+                    newVariant.setDatatypeWithEnum(toModelName(newVariant.getDatatypeWithEnum()));
                 } else {
-                    newVariant.datatypeWithEnum = sanitizeNimIdentifier(newVariant.datatypeWithEnum);
+                    newVariant.setDatatypeWithEnum(sanitizeNimIdentifier(newVariant.getDatatypeWithEnum()));
                 }
             }
 
@@ -709,7 +709,7 @@ public class NimClientCodegen extends DefaultCodegen implements CodegenConfig {
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        String name = StringUtils.camelize(property.name);
+        String name = StringUtils.camelize(property.getName());
 
         if (name.matches("\\d.*")) { // starts with number
             return "`" + name + "`";

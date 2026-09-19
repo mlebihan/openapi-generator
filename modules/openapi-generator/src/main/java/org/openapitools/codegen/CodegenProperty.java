@@ -28,196 +28,196 @@ public class CodegenProperty implements Cloneable, IJsonSchemaValidationProperti
      * The per-language codegen logic may change to a language-specific type.
      */
     @Getter
-    public String openApiType;
+    private String openApiType;
     @Getter @Setter
-    public String baseName;
-    @Setter public String complexType;
+    private String baseName;
+    @Setter private String complexType;
     @Getter @Setter
-    public String getter;
+    private String getter;
     @Getter @Setter
-    public String setter;
+    private String setter;
     /**
      * The value of the 'description' attribute in the OpenAPI schema.
      */
     @Getter @Setter
-    public String description;
+    private String description;
     /**
      * The language-specific data type for this property. For example, the OpenAPI type 'integer'
      * may be represented as 'int', 'int32', 'Integer', etc, depending on the programming language.
      */
-    public String dataType;
+    private String dataType;
     @Getter @Setter
-    public String datatypeWithEnum;
+    private String datatypeWithEnum;
     @Getter @Setter
-    public String dataFormat;
+    private String dataFormat;
     /**
      * The name of this property in the OpenAPI schema.
      */
     @Getter @Setter
-    public String name;
+    private String name;
     @Getter @Setter
-    public String min; // TODO: is this really used?
+    private String min; // TODO: is this really used?
     @Getter @Setter
-    public String max; // TODO: is this really used?
+    private String max; // TODO: is this really used?
     @Getter @Setter
-    public String defaultValue;
+    private String defaultValue;
     @Getter @Setter
-    public String defaultValueWithParam;
-    @Setter public String baseType;
+    private String defaultValueWithParam;
+    @Setter private String baseType;
     @Getter @Setter
-    public String containerType;
+    private String containerType;
     @Getter @Setter
-    public String containerTypeMapped; // language-specified container type (e.g. `dict` in python for map)
+    private String containerTypeMapped; // language-specified container type (e.g. `dict` in python for map)
 
     /**
      * The value of the 'title' attribute in the OpenAPI schema.
      */
     @Getter @Setter
-    public String title;
+    private String title;
 
     /**
      * The 'description' string without escape characters needed by some programming languages/targets
      */
     @Getter @Setter
-    public String unescapedDescription;
+    private String unescapedDescription;
 
     /**
      * maxLength validation for strings, see http://json-schema.org/latest/json-schema-validation.html#rfc.section.5.2.1
      */
-    public Integer maxLength;
+    private Integer maxLength;
     /**
      * minLength validation for strings, see http://json-schema.org/latest/json-schema-validation.html#rfc.section.5.2.2
      */
-    public Integer minLength;
+    private Integer minLength;
     /**
      * pattern validation for strings, see http://json-schema.org/latest/json-schema-validation.html#rfc.section.5.2.3
      */
-    public String pattern;
+    private String pattern;
     /**
      * A free-form property to include an example of an instance for this schema.
      */
     @Getter @Setter
-    public String example;
+    private String example;
 
     @Getter @Setter
-    public String jsonSchema;
+    private String jsonSchema;
     /**
      * The value of the 'minimum' attribute in the OpenAPI schema.
      * The value of "minimum" MUST be a number, representing an inclusive lower limit for a numeric instance.
      */
-    public String minimum;
+    private String minimum;
     /**
      * The value of the 'maximum' attribute in the OpenAPI schema.
      * The value of "maximum" MUST be a number, representing an inclusive upper limit for a numeric instance.
      */
-    public String maximum;
+    private String maximum;
     /**
      * The value of the 'multipleOf' attribute in the OpenAPI schema.
      * The value of "multipleOf" MUST be a number, strictly greater than 0.
      */
-    public Number multipleOf;
+    private Number multipleOf;
     /**
      * The value of the 'exclusiveMinimum' attribute in the OpenAPI schema.
      * The value of "exclusiveMinimum" MUST be number, representing an exclusive lower limit for a numeric instance.
      */
-    public boolean exclusiveMinimum;
+    private boolean exclusiveMinimum;
     /**
      * The value of the 'exclusiveMaximum' attribute in the OpenAPI schema.
      * The value of "exclusiveMaximum" MUST be number, representing an exclusive upper limit for a numeric instance.
      */
-    public boolean exclusiveMaximum;
-    @Setter public boolean required;
-    public boolean deprecated;
-    public boolean isPrimitiveType;
-    public boolean isModel;
+    private boolean exclusiveMaximum;
+    @Setter private boolean required;
+    private boolean deprecated;
+    private boolean isPrimitiveType;
+    private boolean isModel;
     /**
      * True if this property is an array of items or a map container.
      * See:
      * - ModelUtils.isArraySchema()
      * - ModelUtils.isMapSchema()
      */
-    public boolean isContainer;
-    public boolean isString;
-    public boolean isNumeric;
-    public boolean isInteger;
-    public boolean isShort;
-    public boolean isLong;
-    public boolean isUnboundedInteger;
-    public boolean isNumber;
-    public boolean isFloat;
-    public boolean isDouble;
-    public boolean isDecimal;
-    public boolean isByteArray;
-    public boolean isBinary;
-    public boolean isFile;
-    public boolean isBoolean;
-    public boolean isDate; // full-date notation as defined by RFC 3339, section 5.6, for example, 2017-07-21
-    public boolean isDateTime; // the date-time notation as defined by RFC 3339, section 5.6, for example, 2017-07-21T17:32:28Z
-    public boolean isUuid;
-    public boolean isUri;
-    public boolean isEmail;
-    public boolean isPassword;
-    public boolean isNull;
-    public boolean isVoid = false;
+    private boolean isContainer;
+    private boolean isString;
+    private boolean isNumeric;
+    private boolean isInteger;
+    private boolean isShort;
+    private boolean isLong;
+    private boolean isUnboundedInteger;
+    private boolean isNumber;
+    private boolean isFloat;
+    private boolean isDouble;
+    private boolean isDecimal;
+    private boolean isByteArray;
+    private boolean isBinary;
+    private boolean isFile;
+    private boolean isBoolean;
+    private boolean isDate; // full-date notation as defined by RFC 3339, section 5.6, for example, 2017-07-21
+    private boolean isDateTime; // the date-time notation as defined by RFC 3339, section 5.6, for example, 2017-07-21T17:32:28Z
+    private boolean isUuid;
+    private boolean isUri;
+    private boolean isEmail;
+    private boolean isPassword;
+    private boolean isNull;
+    private boolean isVoid = false;
     /**
      * The type is a free-form object, i.e. it is a map of string to values with no declared properties.
      * A OAS free-form schema may include the 'additionalProperties' attribute, which puts a constraint
      * on the type of the undeclared properties.
      */
-    public boolean isFreeFormObject;
+    private boolean isFreeFormObject;
     /**
      * The 'type' in the OAS schema is unspecified (i.e. not set). The value can be number, integer, string, object or array.
      * If the nullable attribute is set to true, the 'null' value is valid.
      */
-    public boolean isAnyType;
-    public boolean isArray;
-    public boolean isMap;
+    private boolean isAnyType;
+    private boolean isArray;
+    private boolean isMap;
     /**
      * datatype is the generic inner parameter of a std::optional for C++, or Optional (Java)
      */
-    public boolean isOptional;
-    public boolean isEnum; // true if the enum is defined inline
-    public boolean isInnerEnum; // Enums declared inline will be located inside the generic model, changing how the enum is referenced in some cases.
-    public boolean isEnumRef; // true if it's a reference to an enum
-    public boolean isReadOnly;
-    public boolean isWriteOnly;
-    public boolean isNullable;
-    public boolean isSelfReference;
-    public boolean isCircularReference;
-    public boolean isDiscriminator;
-    public boolean isNew; // true when this property overrides an inherited property
-    public Boolean isOverridden; // true if the property is a parent property (not defined in child/current schema)
+    private boolean isOptional;
+    private boolean isEnum; // true if the enum is defined inline
+    private boolean isInnerEnum; // Enums declared inline will be located inside the generic model, changing how the enum is referenced in some cases.
+    private boolean isEnumRef; // true if it's a reference to an enum
+    private boolean isReadOnly;
+    private boolean isWriteOnly;
+    private boolean isNullable;
+    private boolean isSelfReference;
+    private boolean isCircularReference;
+    private boolean isDiscriminator;
+    private boolean isNew; // true when this property overrides an inherited property
+    private Boolean isOverridden; // true if the property is a parent property (not defined in child/current schema)
     @Getter @Setter
-    public List<String> _enum;
+    private List<String> _enum;
     @Getter @Setter
-    public Map<String, Object> allowableValues;
+    private Map<String, Object> allowableValues;
     // If 'additionalProperties' is not set, items is null.
     // If 'additionalProperties' is set to a type or refers to a type, 'items' provides the type information for
     // the undeclared properties.
-    public CodegenProperty items;
-    public CodegenProperty additionalProperties;
-    public List<CodegenProperty> vars = new ArrayList<CodegenProperty>(); // all properties (without parent's properties)
-    public List<CodegenProperty> requiredVars = new ArrayList<>();
-    public CodegenProperty mostInnerItems;
+    private CodegenProperty items;
+    private CodegenProperty additionalProperties;
+    private List<CodegenProperty> vars = new ArrayList<CodegenProperty>(); // all properties (without parent's properties)
+    private List<CodegenProperty> requiredVars = new ArrayList<>();
+    private CodegenProperty mostInnerItems;
     @Getter @Setter
-    public Map<String, Object> vendorExtensions = new HashMap<String, Object>();
-    public boolean hasValidation; // true if pattern, maximum, etc are set (only used in the mustache template)
-    public boolean isInherited;
-    public String discriminatorValue;
+    private Map<String, Object> vendorExtensions = new HashMap<String, Object>();
+    private boolean hasValidation; // true if pattern, maximum, etc are set (only used in the mustache template)
+    private boolean isInherited;
+    private String discriminatorValue;
 
     @Getter @Setter
-    public String nameInLowerCase; // property name in lower case
+    private String nameInLowerCase; // property name in lower case
     @Getter @Setter
-    public String nameInCamelCase; // property name in camel case (e.g.  modifiedDate)
+    private String nameInCamelCase; // property name in camel case (e.g.  modifiedDate)
     @Getter @Setter
-    public String nameInPascalCase; // property name in pascal case (e.g. ModifiedDate)
+    private String nameInPascalCase; // property name in pascal case (e.g. ModifiedDate)
     @Getter
-    public String nameInSnakeCase; // property name in upper snake case
+    private String nameInSnakeCase; // property name in upper snake case
     // enum name based on the property name, usually use as a prefix (e.g. VAR_NAME) for enum name (e.g. VAR_NAME_VALUE1)
     @Getter @Setter
-    public String enumName;
-    public Integer maxItems;
-    public Integer minItems;
+    private String enumName;
+    private Integer maxItems;
+    private Integer minItems;
 
     private Integer maxProperties;
     private Integer minProperties;
@@ -225,14 +225,14 @@ public class CodegenProperty implements Cloneable, IJsonSchemaValidationProperti
     private Boolean uniqueItemsBoolean;
 
     // XML
-    public boolean isXmlAttribute = false;
+    private boolean isXmlAttribute = false;
     @Getter @Setter
-    public String xmlPrefix;
+    private String xmlPrefix;
     @Getter @Setter
-    public String xmlName;
+    private String xmlName;
     @Getter @Setter
-    public String xmlNamespace;
-    public boolean isXmlWrapped = false;
+    private String xmlNamespace;
+    private boolean isXmlWrapped = false;
     private boolean additionalPropertiesIsAnyType;
     private boolean hasVars;
     private boolean hasRequired;
@@ -302,9 +302,161 @@ public class CodegenProperty implements Cloneable, IJsonSchemaValidationProperti
         this.isBooleanSchemaFalse = isBooleanSchemaFalse;
     }
 
+    public boolean isCircularReference() {
+        return this.isCircularReference;
+    }
+
+    public void isCircularReference(boolean isCircularReference) {
+        this.isCircularReference = isCircularReference;
+    }
+
     @Override
     public String getComplexType() {
         return complexType;
+    }
+
+    public boolean isContainer() {
+        return this.isContainer;
+    }
+
+    public void isContainer(boolean isContainer) {
+        this.isContainer = isContainer;
+    }
+
+    public boolean isDeprecated() {
+        return this.deprecated;
+    }
+
+    public void isDeprecated(boolean isDeprecated) {
+        this.deprecated = isDeprecated;
+    }
+
+    public String getDiscriminatorValue() {
+        return this.discriminatorValue;
+    }
+
+    public void setDiscriminatorValue(String discriminatorValue) {
+        this.discriminatorValue = discriminatorValue;
+    }
+
+    public boolean getIsDiscriminator() {
+        return this.isDiscriminator;
+    }
+
+    public void setIsDiscriminator(boolean isDiscriminator) {
+        this.isDiscriminator = isDiscriminator;
+    }
+
+    public boolean isEmail() {
+        return this.isEmail;
+    }
+
+    public void isEmail(boolean isEmail) {
+        this.isEmail = isEmail;
+    }
+
+    public boolean isEnumRef() {
+        return this.isEnumRef;
+    }
+
+    public void isEnumRef(boolean isEnumRef) {
+        this.isEnumRef = isEnumRef;
+    }
+
+    public boolean isInherited() {
+        return this.isInherited;
+    }
+
+    public void isInherited(boolean isInherited) {
+        this.isInherited = isInherited;
+    }
+
+    public boolean isInnerEnum() {
+        return this.isInnerEnum;
+    }
+
+    public void isInnerEnum(boolean isInnerEnum) {
+        this.isInnerEnum = isInnerEnum;
+    }
+
+    public CodegenProperty getMostInnerItems() {
+        return mostInnerItems;
+    }
+
+    public void setMostInnerItems(CodegenProperty mostInnerItems) {
+        this.mostInnerItems = mostInnerItems;
+    }
+
+    public String getNameInSnakeCase() {
+        return this.nameInSnakeCase;
+    }
+
+    public void setNameInSnakeCase(String nameInSnakeCase) {
+        this.nameInSnakeCase = nameInSnakeCase;
+    }
+
+    public boolean isNumeric() {
+        return this.isNumeric;
+    }
+
+    public void isNumeric(boolean isNumeric) {
+        this.isNumeric = isNumeric;
+    }
+
+    public Boolean isOverridden() {
+        return this.isOverridden;
+    }
+
+    public void isOverridden(Boolean isOverridden) {
+        this.isOverridden = isOverridden;
+    }
+
+    public boolean isPassword() {
+        return this.isPassword;
+    }
+
+    public void isPassword(boolean isPassword) {
+        this.isPassword = isPassword;
+    }
+
+    public boolean isReadOnly() {
+        return this.isReadOnly;
+    }
+
+    public void isReadOnly(boolean isReadOnly) {
+        this.isReadOnly = isReadOnly;
+    }
+
+    public boolean isSelfReference() {
+        return this.isSelfReference;
+    }
+
+    public void isSelfReference(boolean isSelfReference) {
+        this.isSelfReference = isSelfReference;
+    }
+
+    public boolean isXmlAttribute() {
+        return this.isXmlAttribute;
+    }
+
+    public void isXmlAttribute(boolean isXmlAttribute) {
+        this.isXmlAttribute = isXmlAttribute;
+    }
+
+    public boolean isXmlWrapped() {
+        return this.isXmlWrapped;
+    }
+
+    public void isXmlWrapped(boolean isXmlWrapped) {
+        this.isXmlWrapped = isXmlWrapped;
+    }
+
+    public boolean isWriteOnly() {
+        return this.isWriteOnly;
+    }
+
+    public void isWriteOnly(boolean isWriteOnly) {
+        this.isWriteOnly = isWriteOnly;
     }
 
     /**
@@ -424,8 +576,48 @@ public class CodegenProperty implements Cloneable, IJsonSchemaValidationProperti
         this.exclusiveMaximum = exclusiveMaximum;
     }
 
+    public boolean isFile() {
+        return this.isFile;
+    }
+
+    public void isFile(boolean isFile) {
+        this.isFile = isFile;
+    }
+
+    public void isNew(boolean isNew) {
+        this.isNew = isNew;
+    }
+
+    public boolean isNew() {
+        return this.isNew;
+    }
+
+    public boolean isNullable() {
+        return this.isNullable;
+    }
+
+    public void isNullable(boolean isNullable) {
+        this.isNullable = isNullable;
+    }
+
+    public boolean isUri() {
+        return this.isUri;
+    }
+
+    public void isUri(boolean isUri) {
+        this.isUri = isUri;
+    }
+
     public boolean getRequired() {
         return required;
+    }
+
+    public String getOpenApiType() {
+        return this.openApiType;
+    }
+
+    public void setOpenApiType(String openApiType) {
+        this.openApiType = openApiType;
     }
 
     public boolean requiredAndNotNullable() {

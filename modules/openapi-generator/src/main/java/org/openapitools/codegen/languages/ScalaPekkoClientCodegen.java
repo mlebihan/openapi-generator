@@ -269,7 +269,7 @@ public class ScalaPekkoClientCodegen extends AbstractScalaCodegen implements Cod
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return formatIdentifier(property.baseName, true);
+        return formatIdentifier(property.getBaseName(), true);
     }
 
     @Override

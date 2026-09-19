@@ -127,16 +127,16 @@ public class TypeScriptRxjsClientCodegen extends AbstractTypeScriptClientCodegen
             cm.imports = new TreeSet<>(cm.imports);
             // name enum with model name, e.g. StatusEnum => PetStatusEnum
             for (CodegenProperty var : cm.vars) {
-                if (Boolean.TRUE.equals(var.isEnum)) {
+                if (Boolean.TRUE.equals(var.getIsEnum())) {
                     // behaviour for enum names is specific for typescript to not use namespaces
-                    var.datatypeWithEnum = var.datatypeWithEnum.replace(var.enumName, cm.classname + var.enumName);
+                    var.setDatatypeWithEnum(var.getDatatypeWithEnum().replace(var.getEnumName(), cm.classname + var.getEnumName()));
                 }
             }
             if (cm.parent != null) {
                 for (CodegenProperty var : cm.allVars) {
-                    if (Boolean.TRUE.equals(var.isEnum)) {
-                        var.datatypeWithEnum = var.datatypeWithEnum
-                                .replace(var.enumName, cm.classname + var.enumName);
+                    if (Boolean.TRUE.equals(var.getIsEnum())) {
+                        var.setDatatypeWithEnum(var.getDatatypeWithEnum()
+                           .replace(var.getEnumName(), cm.classname + var.getEnumName()));
                     }
                 }
             }

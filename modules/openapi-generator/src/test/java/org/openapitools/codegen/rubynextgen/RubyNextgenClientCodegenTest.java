@@ -204,8 +204,8 @@ public class RubyNextgenClientCodegenTest {
                 .createCodegenModelWrapper(cm);
         codegen.postProcessModels(mm);
         org.openapitools.codegen.CodegenProperty status = cm.vars.stream()
-                .filter(v -> v.baseName.equals("status")).findFirst().orElseThrow(RuntimeException::new);
-        org.testng.Assert.assertEquals(status.vendorExtensions.get("x-rb-validated"), Boolean.TRUE);
+                .filter(v -> v.getBaseName().equals("status")).findFirst().orElseThrow(RuntimeException::new);
+        org.testng.Assert.assertEquals(status.getExts().get("x-rb-validated"), Boolean.TRUE);
     }
 
     @Test
@@ -220,10 +220,10 @@ public class RubyNextgenClientCodegenTest {
                 .createCodegenModelWrapper(cm);
         codegen.postProcessModels(mm);
         org.openapitools.codegen.CodegenProperty arrayOfString = cm.vars.stream()
-                .filter(v -> v.baseName.equals("array_of_string")).findFirst().orElseThrow(RuntimeException::new);
-        org.testng.Assert.assertTrue(arrayOfString.isArray);
-        org.testng.Assert.assertEquals(arrayOfString.maxItems, Integer.valueOf(3));
-        org.testng.Assert.assertEquals(arrayOfString.vendorExtensions.get("x-rb-validated"), Boolean.TRUE);
+                .filter(v -> v.getBaseName().equals("array_of_string")).findFirst().orElseThrow(RuntimeException::new);
+        org.testng.Assert.assertTrue(arrayOfString.getIsArray());
+        org.testng.Assert.assertEquals(arrayOfString.getMaxItems(), Integer.valueOf(3));
+        org.testng.Assert.assertEquals(arrayOfString.getExts().get("x-rb-validated"), Boolean.TRUE);
     }
 
     @Test

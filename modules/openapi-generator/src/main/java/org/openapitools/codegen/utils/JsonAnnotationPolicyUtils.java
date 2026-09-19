@@ -200,15 +200,15 @@ public final class JsonAnnotationPolicyUtils {
     public static void resolveJsonIncludePolicy(CodegenModel model, CodegenProperty property,
             TriStateBoolean generateJsonIncludeAnnotations, JsonIncludePolicy optionalNonNullPropertyJsonInclude,
             JsonIncludePolicy requiredNonNullablePolicy, JsonIncludePolicy requiredNullablePolicy) {
-        if (property.vendorExtensions.containsKey(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName())) {
+        if (property.getExts().containsKey(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName())) {
             String manualPolicy = resolveManualJsonIncludePolicy(
-                    property.vendorExtensions.get(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName()), VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName());
+                    property.getExts().get(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName()), VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName());
             if (manualPolicy != null) {
-                property.vendorExtensions.put(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName(), manualPolicy);
+                property.getExts().put(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName(), manualPolicy);
                 model.imports.add("JsonInclude");
             } else {
                 // NONE / empty means "emit nothing"; drop the extension so the template renders no annotation.
-                property.vendorExtensions.remove(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName());
+                property.getExts().remove(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName());
             }
             return;
         }
@@ -216,13 +216,13 @@ public final class JsonAnnotationPolicyUtils {
             return;
         }
         JsonIncludePolicy policy = null;
-        if (property.required) {
-            policy = property.isNullable ? requiredNullablePolicy : requiredNonNullablePolicy;
-        } else if (!property.isNullable) {
+        if (property.getRequired()) {
+            policy = property.isNullable() ? requiredNullablePolicy : requiredNonNullablePolicy;
+        } else if (!property.isNullable()) {
             policy = optionalNonNullPropertyJsonInclude;
         }
         if (policy != null && policy.isEmitted()) {
-            property.vendorExtensions.put(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName(), policy.name());
+            property.getExts().put(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY.getName(), policy.name());
             model.imports.add("JsonInclude");
         }
     }
@@ -370,13 +370,13 @@ public final class JsonAnnotationPolicyUtils {
             TriStateBoolean generateJsonSetterNullsAnnotations, JsonSetterNullsMode optionalNonNullOverride,
             boolean openApiNullable, boolean failModeSupported) {
         JsonSetterNullsMode mode;
-        if (property.vendorExtensions.containsKey(VendorExtension.X_JACKSON_JSON_SETTER_NULLS.getName())) {
+        if (property.getExts().containsKey(VendorExtension.X_JACKSON_JSON_SETTER_NULLS.getName())) {
             mode = resolveManualJsonSetterNulls(
-                    property.vendorExtensions.get(VendorExtension.X_JACKSON_JSON_SETTER_NULLS.getName()),
+                    property.getExts().get(VendorExtension.X_JACKSON_JSON_SETTER_NULLS.getName()),
                     VendorExtension.X_JACKSON_JSON_SETTER_NULLS.getName());
         } else {
-            mode = resolveJsonSetterNullsMode(generateJsonSetterNullsAnnotations, property.required,
-                    property.isNullable, openApiNullable, failModeSupported, optionalNonNullOverride);
+            mode = resolveJsonSetterNullsMode(generateJsonSetterNullsAnnotations, property.getRequired(),
+               property.isNullable(), openApiNullable, failModeSupported, optionalNonNullOverride);
         }
         applyJsonSetterNullsMode(model, property, mode);
     }
@@ -390,7 +390,7 @@ public final class JsonAnnotationPolicyUtils {
         if (mode == null || mode == JsonSetterNullsMode.NONE) {
             return;
         }
-        property.vendorExtensions.put(mode == JsonSetterNullsMode.FAIL
+        property.getExts().put(mode == JsonSetterNullsMode.FAIL
                 ? "x-has-json-setter-nulls-fail" : "x-has-json-setter-nulls-skip", true);
         model.imports.add("JsonSetter");
         model.imports.add("Nulls");

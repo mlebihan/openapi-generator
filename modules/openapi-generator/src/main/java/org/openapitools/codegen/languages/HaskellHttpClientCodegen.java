@@ -852,7 +852,7 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
                 if ((boolean) additionalProperties.get(PROP_GENERATE_FORM_URLENCODED_INSTANCES) && mimeTypes.contains("MimeFormUrlEncoded")) {
                     boolean hasMimeFormUrlEncoded = true;
                     for (CodegenProperty v : m.vars) {
-                        if (!(v.isPrimitiveType || v.isString || v.isDate || v.isDateTime)) {
+                        if (!(v.getIsPrimitiveType() || v.getIsString() || v.getIsDate() || v.getIsDateTime())) {
                             hasMimeFormUrlEncoded = false;
                         }
                     }
@@ -878,7 +878,7 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
         // From the model name, compute the prefix for the fields.
         String prefix = StringUtils.uncapitalize(model.classname);
         for (CodegenProperty prop : model.vars) {
-            prop.name = toVarName(prefix, prop.name);
+            prop.setName(toVarName(prefix, prop.getName()));
         }
 
         return model;
@@ -1323,12 +1323,12 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
                 }
             }
             for (CodegenProperty var : cm.vars) {
-                String datatype = genEnums && !StringUtils.isBlank(var.datatypeWithEnum)
-                        ? var.datatypeWithEnum
-                        : var.dataType;
-                var.vendorExtensions.put(VENDOR_EXTENSION_X_DATA_TYPE, datatype);
-                if (!var.required && datatype.equals("A.Value") || var.required && datatype.equals("Maybe A.Value")) {
-                    var.vendorExtensions.put(VENDOR_EXTENSION_X_IS_MAYBE_VALUE, true);
+                String datatype = genEnums && !StringUtils.isBlank(var.getDatatypeWithEnum())
+                        ? var.getDatatypeWithEnum()
+                        : var.getDataType();
+                var.getExts().put(VENDOR_EXTENSION_X_DATA_TYPE, datatype);
+                if (!var.getRequired() && datatype.equals("A.Value") || var.getRequired() && datatype.equals("Maybe A.Value")) {
+                    var.getExts().put(VENDOR_EXTENSION_X_IS_MAYBE_VALUE, true);
                 }
             }
         }
@@ -1352,18 +1352,18 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
 
     @Override
     protected void updateDataTypeWithEnumForMap(CodegenProperty property) {
-        CodegenProperty baseItem = property.items;
-        while (baseItem != null && (Boolean.TRUE.equals(baseItem.isMap) || Boolean.TRUE.equals(baseItem.isArray))) {
-            baseItem = baseItem.items;
+        CodegenProperty baseItem = property.getItems();
+        while (baseItem != null && (Boolean.TRUE.equals(baseItem.getIsMap()) || Boolean.TRUE.equals(baseItem.getIsArray()))) {
+            baseItem = baseItem.getItems();
         }
         if (baseItem != null) {
 
             // this replacement is/needs to be language-specific
-            property.datatypeWithEnum = property.datatypeWithEnum.replace(baseItem.baseType + ")", toEnumName(baseItem) + ")");
+            property.setDatatypeWithEnum(property.getDatatypeWithEnum().replace(baseItem.getBaseType() + ")", toEnumName(baseItem) + ")"));
 
-            property.enumName = toEnumName(property);
-            if (property.defaultValue != null) {
-                property.defaultValue = property.defaultValue.replace(", " + property.items.baseType, ", " + toEnumName(property.items));
+            property.setEnumName(toEnumName(property));
+            if (property.getDefaultValue() != null) {
+                property.setDefaultValue(property.getDefaultValue().replace(", " + property.getItems().getBaseType(), ", " + toEnumName(property.getItems())));
             }
         }
     }
@@ -1372,20 +1372,20 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
     public String toEnumName(CodegenProperty var) {
         if (!genEnums) return super.toEnumName(var);
 
-        if (var.items != null && var.items.isEnum) {
-            return toEnumName(var.items);
+        if (var.getItems() != null && var.getItems().getIsEnum()) {
+            return toEnumName(var.getItems());
         }
-        String paramNameType = "E'" + toTypeName("", var.name);
-        String enumValues = var._enum.toString();
+        String paramNameType = "E'" + toTypeName("", var.getName());
+        String enumValues = var.get_enum().toString();
 
         Pair<Boolean, String> duplicateEnum = isDuplicateEnumValues(enumValues);
         if (duplicateEnum.getLeft()) {
             paramNameType = duplicateEnum.getRight();
         } else {
             paramNameType = toDedupedModelName(paramNameType, enumValues, false);
-            var.datatypeWithEnum = paramNameType;
+            var.setDatatypeWithEnum(paramNameType);
             updateCodegenPropertyEnum(var);
-            addEnumToUniques(paramNameType, var.dataType, enumValues, var.allowableValues, var.description);
+            addEnumToUniques(paramNameType, var.getDataType(), enumValues, var.getAllowableValues(), var.getDescription());
         }
 
         return paramNameType;
@@ -1395,16 +1395,16 @@ public class HaskellHttpClientCodegen extends DefaultCodegen implements CodegenC
     public void updateCodegenPropertyEnum(CodegenProperty var) {
         super.updateCodegenPropertyEnum(var);
         if (!genEnums) return;
-        updateCodegenPropertyEnumValues(var, var.datatypeWithEnum);
+        updateCodegenPropertyEnumValues(var, var.getDatatypeWithEnum());
     }
 
     public void updateCodegenPropertyEnumValues(CodegenProperty var, String paramNameType) {
-        if (var.items != null && var.items.allowableValues != null) {
-            updateCodegenPropertyEnumValues(var.items, var.items.datatypeWithEnum);
+        if (var.getItems() != null && var.getItems().getAllowableValues() != null) {
+            updateCodegenPropertyEnumValues(var.getItems(), var.getItems().getDatatypeWithEnum());
             return;
         }
-        if (var.isEnum && var.allowableValues != null) {
-            updateAllowableValuesNames(paramNameType, var.allowableValues);
+        if (var.getIsEnum() && var.getAllowableValues() != null) {
+            updateAllowableValuesNames(paramNameType, var.getAllowableValues());
         }
     }
 

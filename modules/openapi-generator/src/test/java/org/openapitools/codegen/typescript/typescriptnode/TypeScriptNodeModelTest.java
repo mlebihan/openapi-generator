@@ -65,45 +65,45 @@ public class TypeScriptNodeModelTest {
         Assert.assertEquals(cm.vars.size(), 5);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "number");
-        Assert.assertEquals(property1.name, "id");
-        Assert.assertEquals(property1.defaultValue, null);
-        Assert.assertEquals(property1.baseType, "number");
-        Assert.assertTrue(property1.required);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "number");
+        Assert.assertEquals(property1.getName(), "id");
+        Assert.assertEquals(property1.getDefaultValue(), null);
+        Assert.assertEquals(property1.getBaseType(), "number");
+        Assert.assertTrue(property1.getRequired());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "name");
-        Assert.assertEquals(property2.dataType, "string");
-        Assert.assertEquals(property2.name, "name");
-        Assert.assertEquals(property2.defaultValue, null);
-        Assert.assertEquals(property2.baseType, "string");
-        Assert.assertTrue(property2.required);
+        Assert.assertEquals(property2.getBaseName(), "name");
+        Assert.assertEquals(property2.getDataType(), "string");
+        Assert.assertEquals(property2.getName(), "name");
+        Assert.assertEquals(property2.getDefaultValue(), null);
+        Assert.assertEquals(property2.getBaseType(), "string");
+        Assert.assertTrue(property2.getRequired());
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.complexType, null);
-        Assert.assertEquals(property3.dataType, "Date");
-        Assert.assertEquals(property3.name, "createdAt");
-        Assert.assertEquals(property3.defaultValue, null);
-        Assert.assertFalse(property3.required);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getComplexType(), null);
+        Assert.assertEquals(property3.getDataType(), "Date");
+        Assert.assertEquals(property3.getName(), "createdAt");
+        Assert.assertEquals(property3.getDefaultValue(), null);
+        Assert.assertFalse(property3.getRequired());
 
         final CodegenProperty property4 = cm.vars.get(3);
-        Assert.assertEquals(property4.baseName, "birthDate");
-        Assert.assertEquals(property4.complexType, null);
-        Assert.assertEquals(property4.dataType, "string");
-        Assert.assertEquals(property4.name, "birthDate");
-        Assert.assertEquals(property4.defaultValue, null);
-        Assert.assertFalse(property4.required);
+        Assert.assertEquals(property4.getBaseName(), "birthDate");
+        Assert.assertEquals(property4.getComplexType(), null);
+        Assert.assertEquals(property4.getDataType(), "string");
+        Assert.assertEquals(property4.getName(), "birthDate");
+        Assert.assertEquals(property4.getDefaultValue(), null);
+        Assert.assertFalse(property4.getRequired());
 
         final CodegenProperty property5 = cm.vars.get(4);
-        Assert.assertEquals(property5.baseName, "active");
-        Assert.assertEquals(property5.complexType, null);
-        Assert.assertEquals(property5.dataType, "boolean");
-        Assert.assertEquals(property5.name, "active");
-        Assert.assertEquals(property5.defaultValue, null);
-        Assert.assertFalse(property5.required);
-        Assert.assertFalse(property5.isContainer);
+        Assert.assertEquals(property5.getBaseName(), "active");
+        Assert.assertEquals(property5.getComplexType(), null);
+        Assert.assertEquals(property5.getDataType(), "boolean");
+        Assert.assertEquals(property5.getName(), "active");
+        Assert.assertEquals(property5.getDefaultValue(), null);
+        Assert.assertFalse(property5.getRequired());
+        Assert.assertFalse(property5.isContainer());
     }
 
     @Test(description = "convert and check default values for a simple TypeScript Angular model")
@@ -146,24 +146,24 @@ public class TypeScriptNodeModelTest {
         Assert.assertEquals(cm.vars.size(), 5);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.defaultValue, "1234");
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDefaultValue(), "1234");
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "name");
-        Assert.assertEquals(property2.defaultValue, "'Jack'");
+        Assert.assertEquals(property2.getBaseName(), "name");
+        Assert.assertEquals(property2.getDefaultValue(), "'Jack'");
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(OffsetDateTime.parse(property3.defaultValue), testOffsetDateTime);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(OffsetDateTime.parse(property3.getDefaultValue()), testOffsetDateTime);
 
         final CodegenProperty property4 = cm.vars.get(3);
-        Assert.assertEquals(property4.baseName, "birthDate");
-        Assert.assertEquals(new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH).parse(property4.defaultValue), testDate);
+        Assert.assertEquals(property4.getBaseName(), "birthDate");
+        Assert.assertEquals(new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH).parse(property4.getDefaultValue()), testDate);
 
         final CodegenProperty property5 = cm.vars.get(4);
-        Assert.assertEquals(property5.baseName, "active");
-        Assert.assertEquals(property5.defaultValue, "true");
+        Assert.assertEquals(property5.getBaseName(), "active");
+        Assert.assertEquals(property5.getDefaultValue(), "true");
     }
 
     @Test(description = "convert a model with list property")
@@ -184,19 +184,19 @@ public class TypeScriptNodeModelTest {
         Assert.assertEquals(cm.vars.size(), 2);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "number");
-        Assert.assertEquals(property1.name, "id");
-        Assert.assertEquals(property1.defaultValue, null);
-        Assert.assertEquals(property1.baseType, "number");
-        Assert.assertTrue(property1.required);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "number");
+        Assert.assertEquals(property1.getName(), "id");
+        Assert.assertEquals(property1.getDefaultValue(), null);
+        Assert.assertEquals(property1.getBaseType(), "number");
+        Assert.assertTrue(property1.getRequired());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "urls");
-        Assert.assertEquals(property2.dataType, "Array<string>");
-        Assert.assertEquals(property2.name, "urls");
-        Assert.assertEquals(property2.baseType, "Array");
-        Assert.assertFalse(property2.required);
+        Assert.assertEquals(property2.getBaseName(), "urls");
+        Assert.assertEquals(property2.getDataType(), "Array<string>");
+        Assert.assertEquals(property2.getName(), "urls");
+        Assert.assertEquals(property2.getBaseType(), "Array");
+        Assert.assertFalse(property2.getRequired());
     }
 
     @Test(description = "convert a model with complex property")
@@ -215,11 +215,11 @@ public class TypeScriptNodeModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.dataType, "Children");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.baseType, "Children");
-        Assert.assertFalse(property1.required);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getDataType(), "Children");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getBaseType(), "Children");
+        Assert.assertFalse(property1.getRequired());
     }
 
     @Test(description = "convert a model with complex list property")
@@ -239,12 +239,12 @@ public class TypeScriptNodeModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.complexType, "Children");
-        Assert.assertEquals(property1.dataType, "Array<Children>");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.baseType, "Array");
-        Assert.assertFalse(property1.required);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getComplexType(), "Children");
+        Assert.assertEquals(property1.getDataType(), "Array<Children>");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getBaseType(), "Array");
+        Assert.assertFalse(property1.getRequired());
     }
 
     @Test(description = "convert an array model")

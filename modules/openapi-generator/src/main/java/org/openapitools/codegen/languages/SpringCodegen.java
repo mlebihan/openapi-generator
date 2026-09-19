@@ -1346,12 +1346,12 @@ public class SpringCodegen extends AbstractJavaCodegen
         super.postProcessModelProperty(model, property);
 
         // add org.springframework.format.annotation.DateTimeFormat when needed
-        if (property.isDate || property.isDateTime) {
+        if (property.getIsDate() || property.getIsDateTime()) {
             model.imports.add("DateTimeFormat");
         }
 
-        if ("null".equals(property.example)) {
-            property.example = null;
+        if ("null".equals(property.getExample())) {
+            property.setExample(null);
         }
 
         // Add imports for Jackson
@@ -1369,7 +1369,7 @@ public class SpringCodegen extends AbstractJavaCodegen
         }
 
         // Add imports for java.util.Arrays
-        if (property.isByteArray) {
+        if (property.getIsByteArray()) {
             model.imports.add("Arrays");
         }
 

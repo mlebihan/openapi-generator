@@ -21,10 +21,10 @@ public class OneOfImplementorAdditionalDataTest {
         oneOfModel.classname = "OneOfModel";
         oneOfModel.vars = new ArrayList<>();
         CodegenProperty cp1 = new CodegenProperty();
-        cp1.baseName = "OneOfModelProperty";
+        cp1.setBaseName("OneOfModelProperty");
         oneOfModel.vars.add(cp1);
         CodegenProperty cp2 = new CodegenProperty();
-        cp2.baseName = "InterfaceModelProperty";
+        cp2.setBaseName("InterfaceModelProperty");
         oneOfModel.vars.add(cp2);
         // if the OneOfModel has interface models, we want to verify that their properties don't get
         // added to the oneOf-implementing model
@@ -44,7 +44,7 @@ public class OneOfImplementorAdditionalDataTest {
         CodegenModel implModel = new CodegenModel();
         implModel.vars = new ArrayList<>();
         CodegenProperty cp3 = new CodegenProperty();
-        cp3.baseName = "OtherProperty";
+        cp3.setBaseName("OtherProperty");
         implModel.vars.add(cp3);
         List<Map<String, String>> implModelImports = new ArrayList<>();
         GoClientCodegen cc = new GoClientCodegen();

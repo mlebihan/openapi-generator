@@ -222,8 +222,8 @@ public class JavaCXFClientCodegenTest {
 
         CodegenModel codegenModel = new CodegenModel();
         CodegenProperty codegenProperty = new CodegenProperty();
-        codegenProperty.required = false;
-        codegenProperty.isNullable = true;
+        codegenProperty.setRequired(false);
+        codegenProperty.isNullable(true);
 
         codegen.postProcessModelProperty(codegenModel, codegenProperty);
         Assert.assertTrue(codegenModel.imports.contains("JsonNullable"));
@@ -240,8 +240,8 @@ public class JavaCXFClientCodegenTest {
 
         CodegenModel codegenModel = new CodegenModel();
         CodegenProperty codegenProperty = new CodegenProperty();
-        codegenProperty.required = false;
-        codegenProperty.isNullable = true;
+        codegenProperty.setRequired(false);
+        codegenProperty.isNullable(true);
 
         codegen.postProcessModelProperty(codegenModel, codegenProperty);
         Assert.assertFalse(codegenModel.imports.contains("JsonNullable"));
@@ -258,8 +258,8 @@ public class JavaCXFClientCodegenTest {
 
         CodegenModel codegenModel = new CodegenModel();
         CodegenProperty codegenProperty = new CodegenProperty();
-        codegenProperty.required = true;
-        codegenProperty.isNullable = true;
+        codegenProperty.setRequired(true);
+        codegenProperty.isNullable(true);
 
         codegen.postProcessModelProperty(codegenModel, codegenProperty);
         Assert.assertFalse(codegenModel.imports.contains("JsonNullable"));
@@ -276,8 +276,8 @@ public class JavaCXFClientCodegenTest {
 
         CodegenModel codegenModel = new CodegenModel();
         CodegenProperty codegenProperty = new CodegenProperty();
-        codegenProperty.required = false;
-        codegenProperty.isNullable = false;
+        codegenProperty.setRequired(false);
+        codegenProperty.isNullable(false);
 
         codegen.postProcessModelProperty(codegenModel, codegenProperty);
         Assert.assertFalse(codegenModel.imports.contains("JsonNullable"));
@@ -294,8 +294,8 @@ public class JavaCXFClientCodegenTest {
 
         CodegenModel codegenModel = new CodegenModel();
         CodegenProperty codegenProperty = new CodegenProperty();
-        codegenProperty.required = false;
-        codegenProperty.isNullable = true;
+        codegenProperty.setRequired(false);
+        codegenProperty.isNullable(true);
 
         codegen.postProcessModelProperty(codegenModel, codegenProperty);
         Assert.assertTrue(codegenModel.imports.contains("JsonNullable"));

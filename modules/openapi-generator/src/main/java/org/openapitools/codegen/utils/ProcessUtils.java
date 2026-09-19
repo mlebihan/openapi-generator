@@ -25,13 +25,13 @@ public class ProcessUtils {
 
             int i = initialIndex;
             for (CodegenProperty var : cm.vars) {
-                var.vendorExtensions.put("x-index", i);
+                var.getExts().put("x-index", i);
                 i++;
             }
 
             int j = initialIndex;
             for (CodegenProperty var : cm.allVars) {
-                var.vendorExtensions.put("x-index", j);
+                var.getExts().put("x-index", j);
                 j++;
             }
         }

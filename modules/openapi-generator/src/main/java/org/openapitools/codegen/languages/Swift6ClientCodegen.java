@@ -421,7 +421,7 @@ public class Swift6ClientCodegen extends DefaultCodegen implements CodegenConfig
             Iterator<CodegenProperty> iterator = codegenProperties.iterator();
             while (iterator.hasNext()) {
                 CodegenProperty codegenProperty = iterator.next();
-                if (codegenProperty.baseName.equals(parentModelCodegenProperty.baseName)) {
+                if (codegenProperty.getBaseName().equals(parentModelCodegenProperty.getBaseName())) {
                     // We found a property in the child class that is
                     // a duplicate of the one in the parent, so remove it.
                     iterator.remove();
@@ -1098,7 +1098,7 @@ public class Swift6ClientCodegen extends DefaultCodegen implements CodegenConfig
         if (identifiableModels && !codegenModel.vendorExtensions.containsKey("x-swift-identifiable")) {
             for (CodegenProperty cp : codegenModel.getVars()) {
                 if (!cp.getBaseName().equals("id")) continue;
-                if (cp.isString || cp.isUuid || cp.isInteger || cp.isLong) {
+                if (cp.getIsString() || cp.getIsUuid() || cp.getIsInteger() || cp.getIsLong()) {
                     codegenModel.vendorExtensions.put("x-swift-identifiable", true);
                     break;
                 }
@@ -1239,18 +1239,18 @@ public class Swift6ClientCodegen extends DefaultCodegen implements CodegenConfig
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        if (enumNameMapping.containsKey(property.name)) {
-            return enumNameMapping.get(property.name);
+        if (enumNameMapping.containsKey(property.getName())) {
+            return enumNameMapping.get(property.getName());
         }
 
-        String enumName = toModelName(property.name);
+        String enumName = toModelName(property.getName());
 
         // Ensure that the enum type doesn't match a reserved word or
         // the variable name doesn't match the generated enum type or the
         // Swift compiler will generate an error
-        if (isReservedWord(property.datatypeWithEnum)
-                || toVarName(property.name).equals(property.datatypeWithEnum)) {
-            enumName = property.datatypeWithEnum + "Enum";
+        if (isReservedWord(property.getDatatypeWithEnum())
+                || toVarName(property.getName()).equals(property.getDatatypeWithEnum())) {
+            enumName = property.getDatatypeWithEnum() + "Enum";
         }
 
         // TODO: toModelName already does something for names starting with number,
@@ -1283,17 +1283,17 @@ public class Swift6ClientCodegen extends DefaultCodegen implements CodegenConfig
             CodegenModel cm = mo.getModel();
             boolean modelHasPropertyWithEscapedName = false;
             for (CodegenProperty prop : cm.allVars) {
-                if (!prop.name.equals(prop.baseName)) {
-                    prop.vendorExtensions.put("x-codegen-escaped-property-name", true);
+                if (!prop.getName().equals(prop.getBaseName())) {
+                    prop.getExts().put("x-codegen-escaped-property-name", true);
                     modelHasPropertyWithEscapedName = true;
                 }
 
-                if (prop.vendorExtensions.containsKey("x-null-encodable")) {
-                    if (prop.vendorExtensions.get("x-null-encodable").toString().equals("true")) {
-                        if (prop.defaultValue == null || prop.defaultValue.equals("null")) {
-                            prop.vendorExtensions.put("x-null-encodable-default-value", ".encodeNull");
+                if (prop.getExts().containsKey("x-null-encodable")) {
+                    if (prop.getExts().get("x-null-encodable").toString().equals("true")) {
+                        if (prop.getDefaultValue() == null || prop.getDefaultValue().equals("null")) {
+                            prop.getExts().put("x-null-encodable-default-value", ".encodeNull");
                         } else {
-                            prop.vendorExtensions.put("x-null-encodable-default-value", ".encodeValue(" + prop.defaultValue + ")");
+                            prop.getExts().put("x-null-encodable-default-value", ".encodeValue(" + prop.getDefaultValue() + ")");
                         }
                     }
                 }
@@ -1310,14 +1310,14 @@ public class Swift6ClientCodegen extends DefaultCodegen implements CodegenConfig
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         super.postProcessModelProperty(model, property);
 
-        boolean isSwiftScalarType = property.isInteger || property.isLong || property.isFloat
-                || property.isDouble || property.isBoolean;
-        if ((!property.required || property.isNullable) && isSwiftScalarType) {
+        boolean isSwiftScalarType = property.getIsInteger() || property.getIsLong() || property.getIsFloat()
+                || property.getIsDouble() || property.getIsBoolean();
+        if ((!property.getRequired() || property.isNullable()) && isSwiftScalarType) {
             // Optional scalar types like Int?, Int64?, Float?, Double?, and Bool?
             // do not translate to Objective-C. So we want to flag those
             // properties in case we want to put special code in the templates
             // which provide Objective-C compatibility.
-            property.vendorExtensions.put("x-swift-optional-scalar", true);
+            property.getExts().put("x-swift-optional-scalar", true);
         }
     }
 
@@ -1412,43 +1412,43 @@ public class Swift6ClientCodegen extends DefaultCodegen implements CodegenConfig
     }
 
     public String constructExampleCode(CodegenProperty codegenProperty, HashMap<String, CodegenModel> modelMaps, Set<String> visitedModels) {
-        if (codegenProperty.isArray) { // array
-            return "[" + constructExampleCode(codegenProperty.items, modelMaps, visitedModels) + "]";
-        } else if (codegenProperty.isMap) { // TODO: map, file type
+        if (codegenProperty.getIsArray()) { // array
+            return "[" + constructExampleCode(codegenProperty.getItems(), modelMaps, visitedModels) + "]";
+        } else if (codegenProperty.getIsMap()) { // TODO: map, file type
             return "\"TODO\"";
-        } else if (languageSpecificPrimitives.contains(codegenProperty.dataType)) { // primitive type
-            if ("String".equals(codegenProperty.dataType) || "Character".equals(codegenProperty.dataType)) {
-                if (StringUtils.isEmpty(codegenProperty.example)) {
-                    return "\"" + codegenProperty.example + "\"";
+        } else if (languageSpecificPrimitives.contains(codegenProperty.getDataType())) { // primitive type
+            if ("String".equals(codegenProperty.getDataType()) || "Character".equals(codegenProperty.getDataType())) {
+                if (StringUtils.isEmpty(codegenProperty.getExample())) {
+                    return "\"" + codegenProperty.getExample() + "\"";
                 } else {
-                    return "\"" + codegenProperty.name + "_example\"";
+                    return "\"" + codegenProperty.getName() + "_example\"";
                 }
-            } else if ("Bool".equals(codegenProperty.dataType)) { // boolean
-                if (Boolean.parseBoolean(codegenProperty.example)) {
+            } else if ("Bool".equals(codegenProperty.getDataType())) { // boolean
+                if (Boolean.parseBoolean(codegenProperty.getExample())) {
                     return "true";
                 } else {
                     return "false";
                 }
-            } else if ("URL".equals(codegenProperty.dataType)) { // URL
+            } else if ("URL".equals(codegenProperty.getDataType())) { // URL
                 return "URL(string: \"https://example.com\")!";
-            } else if ("Date".equals(codegenProperty.dataType)) { // date
+            } else if ("Date".equals(codegenProperty.getDataType())) { // date
                 return "Date()";
             } else { // numeric
-                if (StringUtils.isEmpty(codegenProperty.example)) {
-                    return codegenProperty.example;
+                if (StringUtils.isEmpty(codegenProperty.getExample())) {
+                    return codegenProperty.getExample();
                 } else {
                     return "123";
                 }
             }
         } else {
             // look up the model
-            if (modelMaps.containsKey(codegenProperty.dataType)) {
-                if (visitedModels.contains(codegenProperty.dataType)) {
+            if (modelMaps.containsKey(codegenProperty.getDataType())) {
+                if (visitedModels.contains(codegenProperty.getDataType())) {
                     // recursive/self-referencing model, simply return nil to avoid stackoverflow
                     return "nil";
                 } else {
-                    visitedModels.add(codegenProperty.dataType);
-                    return constructExampleCode(modelMaps.get(codegenProperty.dataType), modelMaps, visitedModels);
+                    visitedModels.add(codegenProperty.getDataType());
+                    return constructExampleCode(modelMaps.get(codegenProperty.getDataType()), modelMaps, visitedModels);
                 }
             } else {
                 //LOGGER.error("Error in constructing examples. Failed to look up the model " + codegenProperty.dataType);
@@ -1462,7 +1462,7 @@ public class Swift6ClientCodegen extends DefaultCodegen implements CodegenConfig
         example = codegenModel.name + "(";
         List<String> propertyExamples = new ArrayList<>();
         for (CodegenProperty codegenProperty : codegenModel.vars) {
-            propertyExamples.add(codegenProperty.name + ": " + constructExampleCode(codegenProperty, modelMaps, visitedModels));
+            propertyExamples.add(codegenProperty.getName() + ": " + constructExampleCode(codegenProperty, modelMaps, visitedModels));
         }
         example += StringUtils.join(propertyExamples, ", ");
         example += ")";

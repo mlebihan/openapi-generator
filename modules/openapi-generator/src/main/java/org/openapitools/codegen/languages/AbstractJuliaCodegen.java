@@ -472,8 +472,8 @@ public abstract class AbstractJuliaCodegen extends DefaultCodegen {
     public CodegenProperty fromProperty(String name, Schema schema, boolean required) {
         CodegenProperty property = super.fromProperty(name, schema, required);
         // if the name needs any escaping, we set it to var"name"
-        if (needsVarEscape(property.name)) {
-            property.name = "var\"" + property.name + "\"";
+        if (needsVarEscape(property.getName())) {
+            property.setName("var\"" + property.getName() + "\"");
         }
         return property;
     }

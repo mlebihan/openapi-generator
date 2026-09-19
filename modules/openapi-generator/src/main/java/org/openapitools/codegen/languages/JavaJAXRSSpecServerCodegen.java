@@ -367,7 +367,7 @@ public class JavaJAXRSSpecServerCodegen extends AbstractJavaJAXRSServerCodegen {
         super.postProcessModelProperty(model, property);
 
         // Add imports for java.util.Arrays
-        if (property.isByteArray) {
+        if (property.getIsByteArray()) {
             model.imports.add("Arrays");
         }
     }

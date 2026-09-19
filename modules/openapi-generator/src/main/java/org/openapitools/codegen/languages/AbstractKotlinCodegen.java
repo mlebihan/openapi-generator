@@ -501,7 +501,7 @@ public abstract class AbstractKotlinCodegen extends DefaultCodegen implements Co
             }
 
             for (CodegenProperty var : cm.vars) {
-                if (var.isEnum || isSerializableModel()) {
+                if (var.getIsEnum() || isSerializableModel()) {
                     cm.vendorExtensions.put("x-has-data-class-body", true);
                     break;
                 }
@@ -755,7 +755,7 @@ public abstract class AbstractKotlinCodegen extends DefaultCodegen implements Co
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return property.nameInPascalCase;
+        return property.getNameInPascalCase();
     }
 
     @Override
@@ -1069,14 +1069,14 @@ public abstract class AbstractKotlinCodegen extends DefaultCodegen implements Co
         }
 
         // Update the allVars
-        allVarsMap.values().forEach(p -> p.isInherited = true);
+        allVarsMap.values().forEach(p -> p.isInherited(true));
         // Update any other vars (requiredVars, optionalVars)
         Stream.of(m.requiredVars, m.optionalVars)
                 .flatMap(List::stream)
-                .filter(p -> allVarsMap.containsKey(p.baseName)
-                             || combinedImplementedInterfacesFields.contains(p.baseName)
+                .filter(p -> allVarsMap.containsKey(p.getBaseName())
+                             || combinedImplementedInterfacesFields.contains(p.getBaseName())
                 )
-                .forEach(p -> p.isInherited = true);
+                .forEach(p -> p.isInherited(true));
         return m;
     }
 
@@ -1285,9 +1285,9 @@ public abstract class AbstractKotlinCodegen extends DefaultCodegen implements Co
             _default.elements().forEachRemaining((element) -> {
                 String defaultValue = element.asText();
                 if (defaultValue != null) {
-                    if (cp.items.getIsEnumOrRef()) {
-                        String className = cp.items.datatypeWithEnum;
-                        String enumVarName = toEnumVarName(defaultValue, cp.items.dataType);
+                    if (cp.getItems().getIsEnumOrRef()) {
+                        String className = cp.getItems().getDatatypeWithEnum();
+                        String enumVarName = toEnumVarName(defaultValue, cp.getItems().getDataType());
                         defaultContent.append(className).append(".").append(enumVarName).append(",");
                     } else {
                         itemsSchema.setDefault(defaultValue);

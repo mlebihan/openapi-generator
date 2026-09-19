@@ -462,9 +462,9 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
     public CodegenProperty fromProperty(String name, Schema p, boolean required) {
         CodegenProperty property = super.fromProperty(name, p, required);
         if (property != null) {
-            String nameInPascalCase = property.nameInPascalCase;
+            String nameInPascalCase = property.getNameInPascalCase();
             nameInPascalCase = sanitizeName(nameInPascalCase);
-            property.nameInPascalCase = nameInPascalCase;
+            property.setNameInPascalCase(nameInPascalCase);
         }
         return property;
     }
@@ -722,7 +722,7 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
             } else {
                 CodegenProperty schema = p.getSchema();
                 if (schema != null) {
-                    dataType = (String) schema.vendorExtensions.get(X_ADA_TYPE_NAME);
+                    dataType = (String) schema.getExts().get(X_ADA_TYPE_NAME);
                 } else {
                     dataType = p.dataType;
                 }
@@ -757,18 +757,18 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
             returnType = itemType;
             if (itemType != null) {
                 String dataType;
-                if (itemType.vendorExtensions.containsKey(X_ADA_VECTOR_TYPE_NAME)) {
-                    dataType = (String) itemType.vendorExtensions.get(X_ADA_VECTOR_TYPE_NAME);
-                    returnProperty.vendorExtensions.put(X_ADA_TYPE_NAME, dataType);
+                if (itemType.getExts().containsKey(X_ADA_VECTOR_TYPE_NAME)) {
+                    dataType = (String) itemType.getExts().get(X_ADA_VECTOR_TYPE_NAME);
+                    returnProperty.getExts().put(X_ADA_TYPE_NAME, dataType);
                 }
-                returnProperty.vendorExtensions.put("x-is-model-type", isModelType(itemType));
-                returnProperty.vendorExtensions.put("x-is-stream-type", isStreamType(itemType));
+                returnProperty.getExts().put("x-is-model-type", isModelType(itemType));
+                returnProperty.getExts().put("x-is-stream-type", isStreamType(itemType));
             } else {
-                if (!returnProperty.vendorExtensions.containsKey(X_ADA_TYPE_NAME)) {
-                    returnProperty.vendorExtensions.put(X_ADA_TYPE_NAME, returnProperty.dataType);
+                if (!returnProperty.getExts().containsKey(X_ADA_TYPE_NAME)) {
+                    returnProperty.getExts().put(X_ADA_TYPE_NAME, returnProperty.getDataType());
                 }
-                returnProperty.vendorExtensions.put("x-is-model-type", isModelType(returnProperty));
-                returnProperty.vendorExtensions.put("x-is-stream-type", isStreamType(returnProperty));
+                returnProperty.getExts().put("x-is-model-type", isModelType(returnProperty));
+                returnProperty.getExts().put("x-is-stream-type", isStreamType(returnProperty));
             }
         }
 
@@ -777,13 +777,13 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
             if (rsp.dataType != null) {
                 String dataType = rsp.dataType;
                 if (returnType != null) {
-                    if (returnType.vendorExtensions.containsKey(X_ADA_VECTOR_TYPE_NAME)) {
-                        dataType = (String) returnType.vendorExtensions.get(X_ADA_VECTOR_TYPE_NAME);
+                    if (returnType.getExts().containsKey(X_ADA_VECTOR_TYPE_NAME)) {
+                        dataType = (String) returnType.getExts().get(X_ADA_VECTOR_TYPE_NAME);
                         rsp.vendorExtensions.put(X_ADA_TYPE_NAME, dataType);
                     }
                     rsp.vendorExtensions.put("x-is-model-type", isModelType(returnType));
                     rsp.vendorExtensions.put("x-is-stream-type", isStreamType(returnType));
-                    rsp.vendorExtensions.put("x-is-nullable", returnType.isNull);
+                    rsp.vendorExtensions.put("x-is-nullable", returnType.getIsNull());
 
                     // Convert optional members to use the Nullable_<T> type.
                     Boolean required = returnType.getHasRequired();
@@ -794,9 +794,9 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
                         rsp.vendorExtensions.put("x-is-required", true);
                     }
                     if (!rsp.vendorExtensions.containsKey(X_ADA_SERIALIZE_OP)) {
-                        if (returnType.isLong && !required) {
+                        if (returnType.getIsLong() && !required) {
                             rsp.vendorExtensions.put(X_ADA_SERIALIZE_OP, "Write_Entity");
-                        } else if (rsp.isLong && "int64".equals(returnType.dataFormat)) {
+                        } else if (rsp.isLong && "int64".equals(returnType.getDataFormat())) {
                             rsp.vendorExtensions.put(X_ADA_SERIALIZE_OP, "Write_Long_Entity");
                         } else {
                             rsp.vendorExtensions.put(X_ADA_SERIALIZE_OP, "Write_Entity");
@@ -807,11 +807,11 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
                     rsp.vendorExtensions.put("x-scz-no-return", true);
                     if (returnProperty != null) {
                         if (!rsp.vendorExtensions.containsKey(X_ADA_TYPE_NAME)) {
-                            rsp.vendorExtensions.put(X_ADA_TYPE_NAME, returnProperty.dataType);
+                            rsp.vendorExtensions.put(X_ADA_TYPE_NAME, returnProperty.getDataType());
                         }
                         rsp.vendorExtensions.put("x-is-model-type", isModelType(returnProperty));
                         rsp.vendorExtensions.put("x-is-stream-type", isStreamType(returnProperty));
-                        rsp.vendorExtensions.put("x-is-nullable", returnProperty.isNull);
+                        rsp.vendorExtensions.put("x-is-nullable", returnProperty.getIsNull());
 
                         // Convert optional members to use the Nullable_<T> type.
                         Boolean required = returnProperty.getHasRequired();
@@ -822,9 +822,9 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
                             rsp.vendorExtensions.put("x-is-required", true);
                         }
                         if (!rsp.vendorExtensions.containsKey(X_ADA_SERIALIZE_OP)) {
-                            if (returnProperty.isLong && !required) {
+                            if (returnProperty.getIsLong() && !required) {
                                 rsp.vendorExtensions.put(X_ADA_SERIALIZE_OP, "Write_Entity");
-                            } else if (rsp.isLong && "int64".equals(returnProperty.dataFormat)) {
+                            } else if (rsp.isLong && "int64".equals(returnProperty.getDataFormat())) {
                                 rsp.vendorExtensions.put(X_ADA_SERIALIZE_OP, "Write_Long_Entity");
                             } else {
                                 rsp.vendorExtensions.put(X_ADA_SERIALIZE_OP, "Write_Entity");
@@ -921,22 +921,22 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
                 CodegenProperty item = p;
                 String dataType = null;
                 String arrayDataType = null;
-                if (p.vendorExtensions.containsKey(X_ADA_TYPE_NAME)) {
-                    dataType = (String) p.vendorExtensions.get(X_ADA_TYPE_NAME);
-                    LOGGER.info("Data type {} mapped to {}", p.dataType, dataType);
+                if (p.getExts().containsKey(X_ADA_TYPE_NAME)) {
+                    dataType = (String) p.getExts().get(X_ADA_TYPE_NAME);
+                    LOGGER.info("Data type {} mapped to {}", p.getDataType(), dataType);
                 }
-                arrayDataType = (String) p.vendorExtensions.get(X_ADA_VECTOR_TYPE_NAME);
-                if (p.isContainer) {
-                    item = p.items;
+                arrayDataType = (String) p.getExts().get(X_ADA_VECTOR_TYPE_NAME);
+                if (p.isContainer()) {
+                    item = p.getItems();
                 }
                 boolean isStreamType = isStreamType(p);
-                if (!isStreamType && item != null && !item.isString && !item.isPrimitiveType && !item.isContainer && !item.isInteger) {
+                if (!isStreamType && item != null && !item.getIsString() && !item.getIsPrimitiveType() && !item.isContainer() && !item.getIsInteger()) {
                     if (dataType == null) {
-                        dataType = item.dataType;
-                        if (dataType.startsWith(modelPackage + ".Models.") || item.isFreeFormObject) {
-                            p.vendorExtensions.put(X_ADA_TYPE_NAME, dataType);
+                        dataType = item.getDataType();
+                        if (dataType.startsWith(modelPackage + ".Models.") || item.getIsFreeFormObject()) {
+                            p.getExts().put(X_ADA_TYPE_NAME, dataType);
                         } else {
-                            p.vendorExtensions.put(X_ADA_TYPE_NAME, modelPackage + ".Models." + dataType);
+                            p.getExts().put(X_ADA_TYPE_NAME, modelPackage + ".Models." + dataType);
                         }
                         LOGGER.debug("Setting ada-type name {} for datatype {}", modelPackage + ".Models." + dataType,
                                 dataType);
@@ -948,36 +948,36 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
                     isModel = true;
                 }
                 Boolean noVector = Boolean.FALSE;
-                if (p.vendorExtensions.get(X_ADA_NO_VECTOR) instanceof Boolean) {
-                    noVector = (Boolean) p.vendorExtensions.get(X_ADA_NO_VECTOR);
+                if (p.getExts().get(X_ADA_NO_VECTOR) instanceof Boolean) {
+                    noVector = (Boolean) p.getExts().get(X_ADA_NO_VECTOR);
                 }
-                p.vendorExtensions.put(X_ADA_NO_VECTOR, noVector);
-                p.vendorExtensions.put("x-is-model-type", isModel);
-                p.vendorExtensions.put("x-is-stream-type", isStreamType);
+                p.getExts().put(X_ADA_NO_VECTOR, noVector);
+                p.getExts().put("x-is-model-type", isModel);
+                p.getExts().put("x-is-stream-type", isStreamType);
                 String pkgImport = useType(dataType);
-                p.vendorExtensions.put("x-is-imported-type", pkgImport != null);
+                p.getExts().put("x-is-imported-type", pkgImport != null);
                 if (pkgImport != null) {
                     adaImportSet.add(pkgImport);
                 }
                 Boolean required = p.getRequired();
-                if (!p.vendorExtensions.containsKey(X_ADA_SERIALIZE_OP)) {
-                    if (p.isLong && !required) {
-                        p.vendorExtensions.put(X_ADA_SERIALIZE_OP, "Write_Entity");
-                    } else if (p.isLong && "int64".equals(p.dataFormat)) {
-                        p.vendorExtensions.put(X_ADA_SERIALIZE_OP, "Write_Long_Entity");
+                if (!p.getExts().containsKey(X_ADA_SERIALIZE_OP)) {
+                    if (p.getIsLong() && !required) {
+                        p.getExts().put(X_ADA_SERIALIZE_OP, "Write_Entity");
+                    } else if (p.getIsLong() && "int64".equals(p.getDataFormat())) {
+                        p.getExts().put(X_ADA_SERIALIZE_OP, "Write_Long_Entity");
                     } else {
-                        p.vendorExtensions.put(X_ADA_SERIALIZE_OP, "Write_Entity");
+                        p.getExts().put(X_ADA_SERIALIZE_OP, "Write_Entity");
                     }
                 }
 
                 // Convert optional members to use the Nullable_<T> type.
-                if (!Boolean.TRUE.equals(required) && nullableTypeMapping.containsKey(p.dataType)) {
-                    p.dataType = nullableTypeMapping.get(p.dataType);
-                    p.vendorExtensions.put("x-is-required", false);
+                if (!Boolean.TRUE.equals(required) && nullableTypeMapping.containsKey(p.getDataType())) {
+                    p.setDatatype(nullableTypeMapping.get(p.getDataType()));
+                    p.getExts().put("x-is-required", false);
                 } else {
-                    p.vendorExtensions.put("x-is-required", true);
+                    p.getExts().put("x-is-required", true);
                 }
-                p.vendorExtensions.put("x-is-nullable", p.isNullable);
+                p.getExts().put("x-is-nullable", p.isNullable());
             }
             String name = (String) m.vendorExtensions.get(X_ADA_TYPE_NAME);
             if (name == null) {
@@ -1119,17 +1119,17 @@ abstract public class AbstractAdaCodegen extends DefaultCodegen implements Codeg
     }
 
     private boolean isStreamType(CodegenProperty parameter) {
-        return parameter.isString || parameter.isBoolean || parameter.isDate
-                || parameter.isDateTime || parameter.isInteger || parameter.isLong
-                || (parameter.isFreeFormObject && !parameter.isMap);
+        return parameter.getIsString() || parameter.getIsBoolean() || parameter.getIsDate()
+                || parameter.getIsDateTime() || parameter.getIsInteger() || parameter.getIsLong()
+                || (parameter.getIsFreeFormObject() && !parameter.getIsMap());
     }
 
     private boolean isModelType(CodegenProperty parameter) {
-        boolean isModel = parameter.dataType.startsWith(modelPackage);
-        if (!isModel && !parameter.isPrimitiveType && !parameter.isDate
-                && !parameter.isFreeFormObject
-                && !parameter.isString && !parameter.isContainer && !parameter.isFile
-                && !parameter.dataType.startsWith(openApiPackageName)) {
+        boolean isModel = parameter.getDataType().startsWith(modelPackage);
+        if (!isModel && !parameter.getIsPrimitiveType() && !parameter.getIsDate()
+                && !parameter.getIsFreeFormObject()
+                && !parameter.getIsString() && !parameter.isContainer() && !parameter.isFile()
+                && !parameter.getDataType().startsWith(openApiPackageName)) {
             isModel = true;
         }
         return isModel;

@@ -473,13 +473,13 @@ public abstract class AbstractEiffelCodegen extends DefaultCodegen implements Co
     private void processParentPropertiesInChildModel(final CodegenModel parent, final CodegenModel child) {
         final Map<String, CodegenProperty> childPropertiesByName = new HashMap<>(child.vars.size());
         for (final CodegenProperty childProperty : child.vars) {
-            childPropertiesByName.put(childProperty.name, childProperty);
+            childPropertiesByName.put(childProperty.getName(), childProperty);
         }
         if (parent != null) {
             for (final CodegenProperty parentProperty : parent.vars) {
-                final CodegenProperty duplicatedByParent = childPropertiesByName.get(parentProperty.name);
+                final CodegenProperty duplicatedByParent = childPropertiesByName.get(parentProperty.getName());
                 if (duplicatedByParent != null) {
-                    duplicatedByParent.isInherited = true;
+                    duplicatedByParent.isInherited(true);
                 }
             }
         }
@@ -517,13 +517,13 @@ public abstract class AbstractEiffelCodegen extends DefaultCodegen implements Co
         boolean removedChildEnum = false;
         for (CodegenProperty parentModelCodegenProperty : parentModelCodegenProperties) {
             // Look for enums
-            if (parentModelCodegenProperty.isEnum) {
+            if (parentModelCodegenProperty.getIsEnum()) {
                 // Now that we have found an enum in the parent class,
                 // and search the child class for the same enum.
                 Iterator<CodegenProperty> iterator = codegenProperties.iterator();
                 while (iterator.hasNext()) {
                     CodegenProperty codegenProperty = iterator.next();
-                    if (codegenProperty.isEnum && codegenProperty.equals(parentModelCodegenProperty)) {
+                    if (codegenProperty.getIsEnum() && codegenProperty.equals(parentModelCodegenProperty)) {
                         // We found an enum in the child class that is
                         // a duplicate of the one in the parent, so remove it.
                         iterator.remove();
@@ -607,13 +607,13 @@ public abstract class AbstractEiffelCodegen extends DefaultCodegen implements Co
             LOGGER.warn("skipping invalid array property {}", Json.pretty(property));
             return;
         }
-        property.dataFormat = innerProperty.dataFormat;
-        if (!languageSpecificPrimitives.contains(innerProperty.baseType)) {
-            property.complexType = innerProperty.baseType;
+        property.setDataFormat(innerProperty.getDataFormat());
+        if (!languageSpecificPrimitives.contains(innerProperty.getBaseType())) {
+            property.setComplexType(innerProperty.getBaseType());
         } else {
-            property.isPrimitiveType = true;
+            property.setIsPrimitiveType(true);
         }
-        property.items = innerProperty;
+        property.setItems(innerProperty);
         // inner item is Enum
         if (isPropertyInnerMostEnum(property)) {
             // We use the data type instead of the Enum class.

@@ -245,7 +245,7 @@ public class PostmanCollectionCodegen extends DefaultCodegen implements CodegenC
                 acceptHeader.baseName = "Accept";
                 acceptHeader.paramName = "Accept";
                 CodegenProperty schema = new CodegenProperty();
-                schema.defaultValue = mediaType;
+                schema.setDefaultValue(mediaType);
                 acceptHeader.setSchema(schema);
                 codegenOperation.headerParams.add(0, acceptHeader);
             }
@@ -258,7 +258,7 @@ public class PostmanCollectionCodegen extends DefaultCodegen implements CodegenC
                 contentTypeHeader.baseName = "Content-Type";
                 contentTypeHeader.paramName = "Content-Type";
                 CodegenProperty schema = new CodegenProperty();
-                schema.defaultValue = mediaType;
+                schema.setDefaultValue(mediaType);
                 contentTypeHeader.setSchema(schema);
                 codegenOperation.headerParams.add(0, contentTypeHeader);
             }
@@ -745,7 +745,7 @@ public class PostmanCollectionCodegen extends DefaultCodegen implements CodegenC
         int counter = 1;
 
         for (CodegenProperty codegenProperty : codegenParameter.vars) {
-            ret = ret + JSON_ESCAPE_DOUBLE_QUOTE + codegenProperty.baseName + JSON_ESCAPE_DOUBLE_QUOTE + ": " +
+            ret = ret + JSON_ESCAPE_DOUBLE_QUOTE + codegenProperty.getBaseName() + JSON_ESCAPE_DOUBLE_QUOTE + ": " +
                     JSON_ESCAPE_DOUBLE_QUOTE + "<" + getPostmanType(codegenProperty) + ">" + JSON_ESCAPE_DOUBLE_QUOTE;
 
             if (counter < numVars) {
@@ -892,9 +892,9 @@ public class PostmanCollectionCodegen extends DefaultCodegen implements CodegenC
     }
 
     public String getPostmanType(CodegenProperty codegenProperty) {
-        if (codegenProperty.isNumeric) {
+        if (codegenProperty.isNumeric()) {
             return "number";
-        } else if (codegenProperty.isDate) {
+        } else if (codegenProperty.getIsDate()) {
             return "date";
         } else {
             return "string";

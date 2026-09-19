@@ -643,9 +643,9 @@ public class SpringCodegenTest {
         CodegenProperty int64Prop = cm.vars.get(0);
         CodegenProperty floatProp = cm.vars.get(1);
         CodegenProperty doubleProp = cm.vars.get(2);
-        Assert.assertEquals(int64Prop.defaultValue, int64Val);
-        Assert.assertEquals(floatProp.defaultValue, floatVal);
-        Assert.assertEquals(doubleProp.defaultValue, doubleVal);
+        Assert.assertEquals(int64Prop.getDefaultValue(), int64Val);
+        Assert.assertEquals(floatProp.getDefaultValue(), floatVal);
+        Assert.assertEquals(doubleProp.getDefaultValue(), doubleVal);
 
         int64Val = "9223372036854775807";
         floatVal = "3.14159";

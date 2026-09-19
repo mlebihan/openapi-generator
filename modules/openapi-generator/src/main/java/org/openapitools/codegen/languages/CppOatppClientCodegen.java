@@ -215,7 +215,7 @@ public class CppOatppClientCodegen extends AbstractCppCodegen {
                 if (response != null) {
                     CodegenProperty cm = fromProperty("response", response, false);
                     op.vendorExtensions.put("x-codegen-response", cm);
-                    if ("HttpContent".equals(cm.dataType)) {
+                    if ("HttpContent".equals(cm.getDataType())) {
                         op.vendorExtensions.put("x-codegen-response-ishttpcontent", true);
                     }
                 }

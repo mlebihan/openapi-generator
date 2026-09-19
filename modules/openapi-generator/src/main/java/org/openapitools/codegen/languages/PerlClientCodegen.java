@@ -557,53 +557,53 @@ public class PerlClientCodegen extends DefaultCodegen implements CodegenConfig {
             return "null";
         }
 
-        if (p.defaultValue == null) {
-            example = p.example;
+        if (p.getDefaultValue() == null) {
+            example = p.getExample();
         } else {
-            example = p.defaultValue;
+            example = p.getDefaultValue();
         }
 
-        String type = p.baseType;
+        String type = p.getBaseType();
         if (type == null) {
-            type = p.dataType;
+            type = p.getDataType();
         }
 
-        if (Boolean.TRUE.equals(p.isInteger)) {
+        if (Boolean.TRUE.equals(p.getIsInteger())) {
             if (example == null) {
                 example = "56";
             }
-        } else if (Boolean.TRUE.equals(p.isLong)) {
+        } else if (Boolean.TRUE.equals(p.getIsLong())) {
             if (example == null) {
                 example = "789";
             }
-        } else if (Boolean.TRUE.equals(p.isDouble)
-                || Boolean.TRUE.equals(p.isFloat)
-                || Boolean.TRUE.equals(p.isNumber)) {
+        } else if (Boolean.TRUE.equals(p.getIsDouble())
+                || Boolean.TRUE.equals(p.getIsFloat())
+                || Boolean.TRUE.equals(p.getIsNumber())) {
             if (example == null) {
                 example = "3.4";
             }
-        } else if (Boolean.TRUE.equals(p.isBoolean)) {
+        } else if (Boolean.TRUE.equals(p.getIsBoolean())) {
             if (example == null) {
                 example = "true";
             }
-        } else if (Boolean.TRUE.equals(p.isFile) || Boolean.TRUE.equals(p.isBinary)) {
+        } else if (Boolean.TRUE.equals(p.isFile()) || Boolean.TRUE.equals(p.getIsBinary())) {
             if (example == null) {
                 example = "/path/to/file";
             }
             example = "\"" + escapeText(example) + "\"";
-        } else if (Boolean.TRUE.equals(p.isDate)) {
+        } else if (Boolean.TRUE.equals(p.getIsDate())) {
             if (example == null) {
                 example = "2013-10-20";
             }
-            example = "DateTime->from_epoch(epoch => str2time('" + escapeText(p.example) + "'))";
-        } else if (Boolean.TRUE.equals(p.isDateTime)) {
+            example = "DateTime->from_epoch(epoch => str2time('" + escapeText(p.getExample()) + "'))";
+        } else if (Boolean.TRUE.equals(p.getIsDateTime())) {
             if (example == null) {
                 example = "2013-10-20T19:20:30+01:00";
             }
-            example = "DateTime->from_epoch(epoch => str2time('" + escapeText(p.example) + "'))";
-        } else if (Boolean.TRUE.equals(p.isString)) {
+            example = "DateTime->from_epoch(epoch => str2time('" + escapeText(p.getExample()) + "'))";
+        } else if (Boolean.TRUE.equals(p.getIsString())) {
             if (example == null) {
-                example = p.name + "_example";
+                example = p.getName() + "_example";
             }
             example = "\"" + escapeText(example) + "\"";
 

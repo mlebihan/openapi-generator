@@ -46,7 +46,7 @@ public class CppTinyBaseTest {
         // We can then test, and see if the codegen model have the right data.
         // Assert
         CodegenProperty id_property = model_to_be_generated.vars.get(0);
-        Assert.assertEquals(id_property.dataType, "long");
+        Assert.assertEquals(id_property.getDataType(), "long");
     }
 
     // Make example test of assert that some codegen is generated correctly

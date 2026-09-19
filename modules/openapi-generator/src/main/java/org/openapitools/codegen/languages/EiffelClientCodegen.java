@@ -197,7 +197,7 @@ public class EiffelClientCodegen extends AbstractEiffelCodegen {
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return sanitizeName(property.name).toUpperCase(Locale.ROOT) + "_ENUM";
+        return sanitizeName(property.getName()).toUpperCase(Locale.ROOT) + "_ENUM";
     }
 
     @Override

@@ -59,7 +59,7 @@ public class DiscriminatorUtils {
             Schema discSchema = ModelUtils.getReferencedSchema(openAPI, getDiscriminatorSchema(refSchema, discPropName));
             CodegenProperty cp = new CodegenProperty();
             if (ModelUtils.isStringSchema(discSchema)) {
-                cp.isString = true;
+                cp.setIsString(true);
             }
             cp.setRequired(false);
             if (refSchema.getRequired() != null && refSchema.getRequired().contains(discPropName)) {
@@ -201,10 +201,10 @@ public class DiscriminatorUtils {
         if (codegenProperty == null) {
             msgSuffix += discPropName + " is missing from the schema, define it as required and type string";
         } else {
-            if (!codegenProperty.isString) {
+            if (!codegenProperty.getIsString()) {
                 msgSuffix += "invalid type for " + discPropName + ", set it to string";
             }
-            if (!codegenProperty.required) {
+            if (!codegenProperty.getRequired()) {
                 String spacer = "";
                 if (!msgSuffix.isEmpty()) {
                     spacer = ". ";
@@ -312,7 +312,7 @@ public class DiscriminatorUtils {
             once(LOGGER).warn(DEFINES_DISCRIMINATOR_BUT_REFERENCE_ALTERNATIVE_IS_MISSING,
                     composedSchemaName, discPropName, modelName, discPropName);
         }
-        if (cp != null && cp.dataType == null) {
+        if (cp != null && cp.getDataType() == null) {
             return thisCp;
         }
         if (cp != thisCp) {

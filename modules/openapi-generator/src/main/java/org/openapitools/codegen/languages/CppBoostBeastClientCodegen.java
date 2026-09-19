@@ -993,7 +993,7 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
                 }
             }
             for (CodegenProperty var : codegenModel.vars) {
-                Object rawProp = allProps.get(var.baseName);
+                Object rawProp = allProps.get(var.getBaseName());
                 if (!(rawProp instanceof Schema)) {
                     continue;
                 }
@@ -1012,41 +1012,41 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
                 } else if (varSchema.getEnum() != null && !varSchema.getEnum().isEmpty()) {
                     constRawValue = varSchema.getEnum().get(0).toString();
                 }
-                if (constRawValue == null && var.example != null) {
-                    constRawValue = var.example;
+                if (constRawValue == null && var.getExample() != null) {
+                    constRawValue = var.getExample();
                 }
                 if (constRawValue == null) {
-                    constRawValue = "std::string".equals(var.dataType) ? "" : "0";
+                    constRawValue = "std::string".equals(var.getDataType()) ? "" : "0";
                 }
                 String inlineValue;
-                boolean isStringConst = "std::string".equals(var.dataType)
-                        || "std::optional<std::string>".equals(var.dataType)
-                        || (var.isString && !var.isInteger && !var.isLong && !var.isNumber
-                        && !var.isBoolean);
-                if ("std::optional<std::string>".equals(var.dataType)) {
+                boolean isStringConst = "std::string".equals(var.getDataType())
+                        || "std::optional<std::string>".equals(var.getDataType())
+                        || (var.getIsString() && !var.getIsInteger() && !var.getIsLong() && !var.getIsNumber()
+                        && !var.getIsBoolean());
+                if ("std::optional<std::string>".equals(var.getDataType())) {
                     inlineValue = "std::optional<std::string>{\""
                             + escapeCppStringContent(constRawValue) + "\"}";
-                } else if (isStringConst || "std::string".equals(var.dataType)) {
+                } else if (isStringConst || "std::string".equals(var.getDataType())) {
                     inlineValue = "\"" + escapeCppStringContent(constRawValue) + "\"";
                 } else {
                     inlineValue = constRawValue;
                 }
                 // Neutral OAS-first flag used by templates.
-                var.vendorExtensions.put("x-cpp-const", true);
-                var.vendorExtensions.put("x-cpp-const-value", constRawValue);
-                var.vendorExtensions.put("x-cpp-const-inline-value", inlineValue);
+                var.getExts().put("x-cpp-const", true);
+                var.getExts().put("x-cpp-const-value", constRawValue);
+                var.getExts().put("x-cpp-const-inline-value", inlineValue);
                 // Mustache is truthy on key presence — only set when string-typed.
-                if (isStringConst || "std::string".equals(var.dataType)
-                        || "std::optional<std::string>".equals(var.dataType)) {
-                    var.vendorExtensions.put("x-cpp-const-is-string", true);
-                } else if (var.isBoolean || "bool".equals(var.dataType)
-                        || "std::optional<bool>".equals(var.dataType)) {
-                    var.vendorExtensions.put("x-cpp-const-is-boolean", true);
+                if (isStringConst || "std::string".equals(var.getDataType())
+                        || "std::optional<std::string>".equals(var.getDataType())) {
+                    var.getExts().put("x-cpp-const-is-string", true);
+                } else if (var.getIsBoolean() || "bool".equals(var.getDataType())
+                        || "std::optional<bool>".equals(var.getDataType())) {
+                    var.getExts().put("x-cpp-const-is-boolean", true);
                 }
                 // Keep stainless keys as aliases so older template forks still work.
-                var.vendorExtensions.put("x-stainless-const", true);
-                var.vendorExtensions.put("x-stainless-const-value", constRawValue);
-                var.vendorExtensions.put("x-stainless-const-inline-value", inlineValue);
+                var.getExts().put("x-stainless-const", true);
+                var.getExts().put("x-stainless-const-value", constRawValue);
+                var.getExts().put("x-stainless-const-inline-value", inlineValue);
             }
         }
 
@@ -1110,10 +1110,10 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
 
     private void addContainerPropertyNames(List<CodegenProperty> properties) {
         for (CodegenProperty property : properties) {
-            CodegenProperty item = property.items;
+            CodegenProperty item = property.getItems();
             while (item != null) {
-                item.vendorExtensions.put("x-container-property-name", property.name);
-                item = item.items;
+                item.getExts().put("x-container-property-name", property.getName());
+                item = item.getItems();
             }
         }
     }
@@ -1123,14 +1123,14 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
         Set<String> propertyMembers = new HashSet<>();
         if (codegenModel.allVars != null) {
             for (CodegenProperty property : codegenModel.allVars) {
-                if (property.getter != null) {
-                    propertyAccessors.add(property.getter);
+                if (property.getGetter() != null) {
+                    propertyAccessors.add(property.getGetter());
                 }
-                if (property.setter != null) {
-                    propertyAccessors.add(property.setter);
+                if (property.getSetter() != null) {
+                    propertyAccessors.add(property.getSetter());
                 }
-                if (property.name != null) {
-                    propertyMembers.add("m_" + property.name);
+                if (property.getName() != null) {
+                    propertyMembers.add("m_" + property.getName());
                 }
             }
         }
@@ -1331,19 +1331,19 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
         // decode rules (exactly-one vs first-match) instead of always using
         // the generic JsonValueConverter exactly-one path.
         if (p.getOneOf() != null && !p.getOneOf().isEmpty()) {
-            prop.vendorExtensions.put("x-cpp-composed-keyword", "oneOf");
-            prop.vendorExtensions.put("x-cpp-is-oneof", true);
+            prop.getExts().put("x-cpp-composed-keyword", "oneOf");
+            prop.getExts().put("x-cpp-is-oneof", true);
         } else if (p.getAnyOf() != null && !p.getAnyOf().isEmpty()) {
-            prop.vendorExtensions.put("x-cpp-composed-keyword", "anyOf");
-            prop.vendorExtensions.put("x-cpp-is-anyof", true);
+            prop.getExts().put("x-cpp-composed-keyword", "anyOf");
+            prop.getExts().put("x-cpp-is-anyof", true);
         }
         if (Oas31RawSpecRecovery.hasExplicitDefault(p)) {
             String defaultValue = explicitScalarDefaultValue(prop, p);
             if (defaultValue != null) {
-                prop.defaultValue = defaultValue;
-                prop.vendorExtensions.put("x-cpp-has-explicit-default", true);
-                prop.vendorExtensions.put(X_CPP_EXPLICIT_DEFAULT_SCALAR, defaultValue);
-                prop.vendorExtensions.put("x-cpp-default-is-null",
+                prop.setDefaultValue(defaultValue);
+                prop.getExts().put("x-cpp-has-explicit-default", true);
+                prop.getExts().put(X_CPP_EXPLICIT_DEFAULT_SCALAR, defaultValue);
+                prop.getExts().put("x-cpp-default-is-null",
                         "null".equals(Oas31RawSpecRecovery.defaultJsonOf(p)));
             }
         }
@@ -1361,30 +1361,30 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
             value = io.swagger.v3.core.util.Json31.mapper().readTree(json);
         } catch (com.fasterxml.jackson.core.JsonProcessingException exception) {
             throw new IllegalArgumentException(
-                    "Unable to parse default for property '" + property.baseName + "'", exception);
+                    "Unable to parse default for property '" + property.getBaseName() + "'", exception);
         }
         if (value == null || !value.isValueNode()) {
             return null;
         }
 
-        Object nullableInner = property.vendorExtensions.get(
+        Object nullableInner = property.getExts().get(
                 "x-cpp-nullable-field-inner-type");
         if (value.isNull()) {
             if (nullableInner != null) {
                 return "NullableField<" + nullableInner + ">::makeDefaultNull()";
             }
-            if (property.dataType != null
-                    && property.dataType.startsWith("std::optional<")) {
+            if (property.getDataType() != null
+                    && property.getDataType().startsWith("std::optional<")) {
                 return "std::nullopt";
             }
-            if ("std::nullptr_t".equals(property.dataType)) {
+            if ("std::nullptr_t".equals(property.getDataType())) {
                 return "nullptr";
             }
-            if ("boost::json::value".equals(property.dataType)) {
+            if ("boost::json::value".equals(property.getDataType())) {
                 return "boost::json::value(nullptr)";
             }
-            if (property.dataType != null
-                    && property.dataType.startsWith("std::shared_ptr<")) {
+            if (property.getDataType() != null
+                    && property.getDataType().startsWith("std::shared_ptr<")) {
                 // A branch-local default:null is an annotation, not a model value.
                 // Ignore it rather than rejecting an otherwise legal schema.
                 return null;
@@ -1392,7 +1392,7 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
 
             throw new IllegalArgumentException(
                     "JSON null default is not representable by C++ property '"
-                            + property.baseName + "' of type " + property.dataType);
+                            + property.getBaseName() + "' of type " + property.getDataType());
         }
 
         String expression;
@@ -1415,22 +1415,22 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
 
     private static String explicitNumericDefault(
             CodegenProperty property, java.math.BigDecimal value) {
-        if (property.isInteger || property.isLong) {
+        if (property.getIsInteger() || property.getIsLong()) {
             java.math.BigInteger integer;
             try {
                 integer = value.toBigIntegerExact();
             } catch (ArithmeticException exception) {
                 throw new IllegalArgumentException(
                         "Non-integral default is not representable by integer property '"
-                                + property.baseName + "'", exception);
+                                + property.getBaseName() + "'", exception);
             }
-            if (property.isLong || "std::int64_t".equals(property.dataType)) {
+            if (property.getIsLong() || "std::int64_t".equals(property.getDataType())) {
                 java.math.BigInteger min = java.math.BigInteger.valueOf(Long.MIN_VALUE);
                 java.math.BigInteger max = java.math.BigInteger.valueOf(Long.MAX_VALUE);
                 if (integer.compareTo(min) < 0 || integer.compareTo(max) > 0) {
                     throw new IllegalArgumentException(
                             "Default is outside int64 range for property '"
-                                    + property.baseName + "'");
+                                    + property.getBaseName() + "'");
                 }
                 if (integer.equals(min)) {
                     return "std::int64_t{-9223372036854775807LL - 1LL}";
@@ -1442,7 +1442,7 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
             } catch (ArithmeticException exception) {
                 throw new IllegalArgumentException(
                         "Default is outside int32 range for property '"
-                                + property.baseName + "'", exception);
+                                + property.getBaseName() + "'", exception);
             }
         }
 
@@ -1452,13 +1452,13 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
         if (!hasFloatingMarker) {
             literal += ".0";
         }
-        if (property.isFloat || "float".equals(property.dataType)) {
+        if (property.getIsFloat() || "float".equals(property.getDataType())) {
             float narrowed = value.floatValue();
             if (!Float.isFinite(narrowed)
                     || (value.signum() != 0 && narrowed == 0.0f)) {
                 throw new IllegalArgumentException(
                         "Default is outside finite float range for property '"
-                                + property.baseName + "'");
+                                + property.getBaseName() + "'");
             }
             return literal + "F";
         }
@@ -1467,7 +1467,7 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
                 || (value.signum() != 0 && narrowed == 0.0)) {
             throw new IllegalArgumentException(
                     "Default is outside finite double range for property '"
-                            + property.baseName + "'");
+                            + property.getBaseName() + "'");
         }
         return literal;
     }
@@ -1559,10 +1559,10 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
     @Override
     public String toDefaultValue(CodegenProperty codegenProperty, Schema schema) {
         if (codegenProperty != null) {
-            if (codegenProperty.dataType != null && codegenProperty.dataType.startsWith("std::shared_ptr<")) {
+            if (codegenProperty.getDataType() != null && codegenProperty.getDataType().startsWith("std::shared_ptr<")) {
                 return "nullptr";
             }
-            if ("boost::json::value".equals(codegenProperty.dataType)) {
+            if ("boost::json::value".equals(codegenProperty.getDataType())) {
                 return "boost::json::value()";
             }
             Schema referenceSchema = Oas31CompositionLowering.referenceSchemaOf(schema);
@@ -1570,8 +1570,8 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
                     && schema.getDefault() == null) {
                 Schema referencedTarget = ModelUtils.getReferencedSchema(openAPI, referenceSchema);
                 if (referencedTarget != null && referencedTarget != referenceSchema
-                        && codegenProperty.dataType != null
-                        && codegenProperty.dataType.equals(getTypeDeclaration(referencedTarget))) {
+                        && codegenProperty.getDataType() != null
+                        && codegenProperty.getDataType().equals(getTypeDeclaration(referencedTarget))) {
                     return toDefaultValue(referencedTarget);
                 }
             }
@@ -1717,9 +1717,9 @@ public class CppBoostBeastClientCodegen extends CppBoostBeastModelCodegen {
     @Override
     public void updateCodegenPropertyEnum(CodegenProperty var) {
         // Remove prefix added by DefaultCodegen
-        String originalDefaultValue = var.defaultValue;
+        String originalDefaultValue = var.getDefaultValue();
         super.updateCodegenPropertyEnum(var);
-        var.defaultValue = originalDefaultValue;
+        var.setDefaultValue(originalDefaultValue);
     }
     @Override
     public Map<String, ModelsMap> updateAllModels(Map<String, ModelsMap> objs) {

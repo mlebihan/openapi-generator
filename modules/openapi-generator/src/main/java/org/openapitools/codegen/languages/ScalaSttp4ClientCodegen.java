@@ -372,10 +372,10 @@ public class ScalaSttp4ClientCodegen extends AbstractScalaCodegen implements Cod
                                 
                                 // Remove discriminator field from child
                                 // (the sealed trait's encoder writes it)
-                                childModel.vars.removeIf(prop -> prop.baseName.equals(discriminatorName));
-                                childModel.allVars.removeIf(prop -> prop.baseName.equals(discriminatorName));
-                                childModel.requiredVars.removeIf(prop -> prop.baseName.equals(discriminatorName));
-                                childModel.optionalVars.removeIf(prop -> prop.baseName.equals(discriminatorName));
+                                childModel.vars.removeIf(prop -> prop.getBaseName().equals(discriminatorName));
+                                childModel.allVars.removeIf(prop -> prop.getBaseName().equals(discriminatorName));
+                                childModel.requiredVars.removeIf(prop -> prop.getBaseName().equals(discriminatorName));
+                                childModel.optionalVars.removeIf(prop -> prop.getBaseName().equals(discriminatorName));
                             }
 
                             childModels.add(childModel);
@@ -427,10 +427,10 @@ public class ScalaSttp4ClientCodegen extends AbstractScalaCodegen implements Cod
                 // (circe-generic-extras adds it automatically)
                 if (cModel.parent != null && cModel.parentModel != null && cModel.parentModel.discriminator != null) {
                     String discriminatorName = cModel.parentModel.discriminator.getPropertyBaseName();
-                    cModel.vars.removeIf(prop -> prop.baseName.equals(discriminatorName));
-                    cModel.allVars.removeIf(prop -> prop.baseName.equals(discriminatorName));
-                    cModel.requiredVars.removeIf(prop -> prop.baseName.equals(discriminatorName));
-                    cModel.optionalVars.removeIf(prop -> prop.baseName.equals(discriminatorName));
+                    cModel.vars.removeIf(prop -> prop.getBaseName().equals(discriminatorName));
+                    cModel.allVars.removeIf(prop -> prop.getBaseName().equals(discriminatorName));
+                    cModel.requiredVars.removeIf(prop -> prop.getBaseName().equals(discriminatorName));
+                    cModel.optionalVars.removeIf(prop -> prop.getBaseName().equals(discriminatorName));
                 }
             }
         }
@@ -467,10 +467,10 @@ public class ScalaSttp4ClientCodegen extends AbstractScalaCodegen implements Cod
         for (String propName : parentPropNames) {
             // Find matching CodegenProperty in the parent model's vars
             for (CodegenProperty cp : parentModel.vars) {
-                if (cp.baseName.equals(propName)) {
+                if (cp.getBaseName().equals(propName)) {
                     CodegenProperty cloned = cp.clone();
                     // Ensure required flag reflects the parent schema's required list
-                    cloned.required = parentRequired.contains(propName);
+                    cloned.setRequired(parentRequired.contains(propName));
                     parentOwnProps.add(cloned);
                     break;
                 }
@@ -489,12 +489,12 @@ public class ScalaSttp4ClientCodegen extends AbstractScalaCodegen implements Cod
 
         Set<String> existingPropNames = new HashSet<>();
         for (CodegenProperty cp : childModel.allVars) {
-            existingPropNames.add(cp.baseName);
+            existingPropNames.add(cp.getBaseName());
         }
 
         List<CodegenProperty> toAdd = new ArrayList<>();
         for (CodegenProperty parentProp : parentOwnProps) {
-            if (!existingPropNames.contains(parentProp.baseName)) {
+            if (!existingPropNames.contains(parentProp.getBaseName())) {
                 toAdd.add(parentProp.clone());
             }
         }
@@ -630,7 +630,7 @@ public class ScalaSttp4ClientCodegen extends AbstractScalaCodegen implements Cod
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return formatIdentifier(property.baseName, true);
+        return formatIdentifier(property.getBaseName(), true);
     }
 
     @Override
@@ -672,18 +672,18 @@ public class ScalaSttp4ClientCodegen extends AbstractScalaCodegen implements Cod
      */
     @Override
     protected void updateDataTypeWithEnumForArray(CodegenProperty property) {
-        CodegenProperty baseItem = property.items;
-        while (baseItem != null && (Boolean.TRUE.equals(baseItem.isMap)
-                || Boolean.TRUE.equals(baseItem.isArray))) {
-            baseItem = baseItem.items;
+        CodegenProperty baseItem = property.getItems();
+        while (baseItem != null && (Boolean.TRUE.equals(baseItem.getIsMap())
+                || Boolean.TRUE.equals(baseItem.getIsArray()))) {
+            baseItem = baseItem.getItems();
         }
         if (baseItem != null) {
             // set datetypeWithEnum as only the inner type is enum
-            property.datatypeWithEnum = toEnumName(baseItem);
+            property.setDatatypeWithEnum(toEnumName(baseItem));
             // naming the enum with respect to the language enum naming convention
             // e.g. remove [], {} from array/map of enum
-            property.enumName = toEnumName(property);
-            property._enum = baseItem._enum;
+            property.setEnumName(toEnumName(property));
+            property.set_enum(baseItem.get_enum());
 
             updateCodegenPropertyEnum(property);
         }

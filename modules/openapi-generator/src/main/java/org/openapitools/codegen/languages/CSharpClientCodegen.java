@@ -460,21 +460,21 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
 
                 Map<String, CodegenProperty> propertyHash = new HashMap<>(codegenModel.vars.size());
                 for (final CodegenProperty property : codegenModel.vars) {
-                    propertyHash.put(property.name, property);
+                    propertyHash.put(property.getName(), property);
                 }
 
                 for (final CodegenProperty property : codegenModel.readWriteVars) {
-                    if (property.defaultValue == null && parentCodegenModel.discriminator != null && property.name.equals(parentCodegenModel.discriminator.getPropertyName())) {
-                        property.defaultValue = "\"" + name + "\"";
+                    if (property.getDefaultValue() == null && parentCodegenModel.discriminator != null && property.getName().equals(parentCodegenModel.discriminator.getPropertyName())) {
+                        property.setDefaultValue("\"" + name + "\"");
                     }
                 }
 
                 for (final CodegenProperty property : parentCodegenModel.vars) {
                     // helper list of parentVars simplifies templating
-                    if (!propertyHash.containsKey(property.name)) {
+                    if (!propertyHash.containsKey(property.getName())) {
                         final CodegenProperty parentVar = property.clone();
-                        parentVar.isInherited = true;
-                        LOGGER.debug("adding parent variable {}", property.name);
+                        parentVar.isInherited(true);
+                        LOGGER.debug("adding parent variable {}", property.getName());
                         codegenModel.parentVars.add(parentVar);
                     }
                 }
@@ -542,16 +542,16 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
     public static Comparator<CodegenProperty> propertyComparatorByName = new Comparator<CodegenProperty>() {
         @Override
         public int compare(CodegenProperty one, CodegenProperty another) {
-            return one.name.compareTo(another.name);
+            return one.getName().compareTo(another.getName());
         }
     };
 
     public static Comparator<CodegenProperty> propertyComparatorByNotNullableRequiredNoDefaultLegacy = new Comparator<CodegenProperty>() {
         @Override
         public int compare(CodegenProperty one, CodegenProperty another) {
-            if (one.isNullable == another.isNullable && one.required == another.required && (one.defaultValue == null) == (another.defaultValue == null))
+            if (one.isNullable() == another.isNullable() && one.getRequired() == another.getRequired() && (one.getDefaultValue() == null) == (another.getDefaultValue() == null))
                 return 0;
-            else if (!one.isNullable && one.required && one.defaultValue == null)
+            else if (!one.isNullable() && one.getRequired() && one.getDefaultValue() == null)
                 return -1;
             else
                 return 1;
@@ -559,7 +559,7 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
     };
 
     public static Comparator<CodegenProperty> propertyComparatorByNotNullableRequiredNoDefault =
-            Comparator.comparing(p -> p.isNullable || !p.required || p.defaultValue != null);
+            Comparator.comparing(p -> p.isNullable() || !p.getRequired() || p.getDefaultValue() != null);
 
     public static Comparator<CodegenParameter> parameterComparatorByDataType = new Comparator<CodegenParameter>() {
         @Override
@@ -682,8 +682,8 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
 
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
-        postProcessPattern(property.pattern, property.vendorExtensions);
-        postProcessEmitDefaultValue(property.vendorExtensions);
+        postProcessPattern(property.getPattern(), property.getExts());
+        postProcessEmitDefaultValue(property.getExts());
 
         super.postProcessModelProperty(model, property);
     }
@@ -1409,13 +1409,13 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
             boolean removedChildEnum = false;
             for (CodegenProperty parentModelCodegenProperty : parentModelCodegenProperties) {
                 // Look for enums
-                if (parentModelCodegenProperty.isEnum) {
+                if (parentModelCodegenProperty.getIsEnum()) {
                     // Now that we have found an enum in the parent class,
                     // and search the child class for the same enum.
                     Iterator<CodegenProperty> iterator = codegenProperties.iterator();
                     while (iterator.hasNext()) {
                         CodegenProperty codegenProperty = iterator.next();
-                        if (codegenProperty.isEnum && codegenProperty.equals(parentModelCodegenProperty)) {
+                        if (codegenProperty.getIsEnum() && codegenProperty.equals(parentModelCodegenProperty)) {
                             // We found an enum in the child class that is
                             // a duplicate of the one in the parent, so remove it.
                             iterator.remove();
@@ -1656,8 +1656,8 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
             // the isInherited property is not always correct
             // fixing it here causes a breaking change in some generators
             // only do this in generators that are prepared for the improvement
-            if (model.parentModel != null && model.parentModel.allVars.stream().anyMatch(v -> v.baseName.equals(property.baseName))) {
-                property.isInherited = true;
+            if (model.parentModel != null && model.parentModel.allVars.stream().anyMatch(v -> v.getBaseName().equals(property.getBaseName()))) {
+                property.isInherited(true);
             }
         }
     }
@@ -1667,8 +1667,8 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
         super.patchProperty(enumRefs, model, property);
 
         if (!GENERICHOST.equals(getLibrary())) {
-            if (!property.isContainer && (this.getNullableTypes().contains(property.dataType) || property.isEnum)) {
-                property.vendorExtensions.put(X_CSHARP_VALUE_TYPE, true);
+            if (!property.isContainer() && (this.getNullableTypes().contains(property.getDataType()) || property.getIsEnum())) {
+                property.getExts().put(X_CSHARP_VALUE_TYPE, true);
             }
         }
     }
@@ -1702,10 +1702,10 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
 
             if (cm.getComposedSchemas() != null) {
                 if (cm.getComposedSchemas().getOneOf() != null) {
-                    cm.getComposedSchemas().getOneOf().removeIf(o -> "Null".equals(o.dataType));
+                    cm.getComposedSchemas().getOneOf().removeIf(o -> "Null".equals(o.getDataType()));
                 }
                 if (cm.getComposedSchemas().getAnyOf() != null) {
-                    cm.getComposedSchemas().getAnyOf().removeIf(o -> "Null".equals(o.dataType));
+                    cm.getComposedSchemas().getAnyOf().removeIf(o -> "Null".equals(o.getDataType()));
                 }
             }
 
@@ -1715,8 +1715,8 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
                 // see modules\openapi-generator\src\test\resources\3_0\allOf.yaml
                 // property boosterSeat will be in readWriteVars but not allVars
                 // the property is present in the model but gets removed at CodegenModel#removeDuplicatedProperty
-                if (cm.allVars.stream().noneMatch(v -> v.baseName.equals(cp.baseName))) {
-                    LOGGER.debug("Property " + cp.baseName + " was found in readWriteVars but not in allVars. Adding it back to allVars");
+                if (cm.allVars.stream().noneMatch(v -> v.getBaseName().equals(cp.getBaseName()))) {
+                    LOGGER.debug("Property " + cp.getBaseName() + " was found in readWriteVars but not in allVars. Adding it back to allVars");
                     cm.allVars.add(cp);
                 }
             }
@@ -1744,17 +1744,17 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
                     CodegenModel composedModel = ModelUtils.getModelByName(composedEntry.getKey(), objs);
                     if (ref.endsWith("/" + composedModel.name)) {
                         for (CodegenProperty composedProperty : composedModel.allVars) {
-                            if (discriminatorName != null && composedProperty.name.equals(discriminatorName)) {
+                            if (discriminatorName != null && composedProperty.getName().equals(discriminatorName)) {
                                 continue;
                             }
-                            model.vars.removeIf(v -> v.name.equals(composedProperty.name));
-                            model.allVars.removeIf(v -> v.name.equals(composedProperty.name));
-                            model.readOnlyVars.removeIf(v -> v.name.equals(composedProperty.name));
-                            model.nonNullableVars.removeIf(v -> v.name.equals(composedProperty.name));
-                            model.optionalVars.removeIf(v -> v.name.equals(composedProperty.name));
-                            model.parentRequiredVars.removeIf(v -> v.name.equals(composedProperty.name));
-                            model.readWriteVars.removeIf(v -> v.name.equals(composedProperty.name));
-                            model.requiredVars.removeIf(v -> v.name.equals(composedProperty.name));
+                            model.vars.removeIf(v -> v.getName().equals(composedProperty.getName()));
+                            model.allVars.removeIf(v -> v.getName().equals(composedProperty.getName()));
+                            model.readOnlyVars.removeIf(v -> v.getName().equals(composedProperty.getName()));
+                            model.nonNullableVars.removeIf(v -> v.getName().equals(composedProperty.getName()));
+                            model.optionalVars.removeIf(v -> v.getName().equals(composedProperty.getName()));
+                            model.parentRequiredVars.removeIf(v -> v.getName().equals(composedProperty.getName()));
+                            model.readWriteVars.removeIf(v -> v.getName().equals(composedProperty.getName()));
+                            model.requiredVars.removeIf(v -> v.getName().equals(composedProperty.getName()));
                         }
                     }
                 }
@@ -1773,7 +1773,7 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
         // this is temporary until x-csharp-value-type is removed
         return this.getLibrary().equals(GENERICHOST)
                 ? super.isValueType(var)
-                : this.getValueTypes().contains(var.dataType) || var.isEnum;
+                : this.getValueTypes().contains(var.getDataType()) || var.getIsEnum();
     }
 
     @Override

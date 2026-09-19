@@ -183,8 +183,8 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
             for (CodegenProperty var : allVarsOf(cm)) {
                 if (var == null) continue;
                 checkAndSaveSharedPtr(var, cm.classname, modelSaves);
-                if (var.isContainer && var.items != null) {
-                    checkAndSaveSharedPtr(var.items, cm.classname, modelSaves);
+                if (var.isContainer() && var.getItems() != null) {
+                    checkAndSaveSharedPtr(var.getItems(), cm.classname, modelSaves);
                 }
             }
             if (!modelSaves.isEmpty()) {
@@ -203,8 +203,8 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
             for (CodegenProperty var : allVarsOf(cm)) {
                 if (var == null) continue;
                 restoreSavedSharedPtr(var, cm.classname, modelSaves);
-                if (var.isContainer && var.items != null) {
-                    restoreSavedSharedPtr(var.items, cm.classname, modelSaves);
+                if (var.isContainer() && var.getItems() != null) {
+                    restoreSavedSharedPtr(var.getItems(), cm.classname, modelSaves);
                 }
             }
         }
@@ -247,12 +247,12 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
      */
     private static void checkAndSaveSharedPtr(CodegenProperty var, String modelName,
                                                Map<String, String> saves) {
-        if (var.dataType != null && var.dataType.startsWith("std::shared_ptr<")) {
-            String key = modelName + "." + var.baseName;
+        if (var.getDataType() != null && var.getDataType().startsWith("std::shared_ptr<")) {
+            String key = modelName + "." + var.getBaseName();
             if (!saves.containsKey(key)) {
-                saves.put(key, var.dataType);
+                saves.put(key, var.getDataType());
             }
-            var.dataType = var.dataType.substring(16, var.dataType.length() - 1);
+            var.setDatatype(var.getDataType().substring(16, var.getDataType().length() - 1));
         }
     }
 
@@ -261,10 +261,10 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
      */
     private static void restoreSavedSharedPtr(CodegenProperty var, String modelName,
                                                Map<String, String> saves) {
-        String key = modelName + "." + var.baseName;
+        String key = modelName + "." + var.getBaseName();
         String saved = saves.get(key);
         if (saved != null) {
-            var.dataType = saved;
+            var.setDatatype(saved);
         }
     }
 
@@ -283,7 +283,7 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
         for (CodegenModel model : allModels.values()) {
             Set<String> references = dependencies.get(model.classname);
             for (CodegenProperty property : allVarsOf(model)) {
-                collectModelReferences(property == null ? null : property.dataType,
+                collectModelReferences(property == null ? null : property.getDataType(),
                         modelNames, references);
             }
         }
@@ -354,12 +354,12 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
         if (property == null) {
             return;
         }
-        String strippedDataType = stripNonCyclicSharedPtrType(property.dataType, cyclicTargets);
-        if (!Objects.equals(property.dataType, strippedDataType)) {
-            property.dataType = strippedDataType;
-            property.defaultValue = null;
+        String strippedDataType = stripNonCyclicSharedPtrType(property.getDataType(), cyclicTargets);
+        if (!Objects.equals(property.getDataType(), strippedDataType)) {
+            property.setDatatype(strippedDataType);
+            property.setDefaultValue(null);
         }
-        stripNonCyclicSharedPtrs(property.items, cyclicTargets);
+        stripNonCyclicSharedPtrs(property.getItems(), cyclicTargets);
     }
 
     private static String stripNonCyclicSharedPtrType(String dataType,
@@ -629,8 +629,8 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
         for (ModelMap mo : result.getModels()) {
             CodegenModel cm = mo.getModel();
             for (CodegenProperty var : allVarsOf(cm)) {
-                if (var.dataType != null && var.dataType.startsWith("std::optional<")) {
-                    var.vendorExtensions.put("x-cpp-no-is-set", true);
+                if (var.getDataType() != null && var.getDataType().startsWith("std::optional<")) {
+                    var.getExts().put("x-cpp-no-is-set", true);
                 }
             }
         }
@@ -651,9 +651,9 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
                     .remove("x-cpp-optional-impossible-properties");
             if (optImpProps == null || optImpProps.isEmpty()) continue;
             for (CodegenProperty var : allVarsOf(cm)) {
-                if (optImpProps.contains(var.baseName)) {
-                    var.vendorExtensions.put("x-cpp-optional-impossible", true);
-                    var.vendorExtensions.put("x-cpp-reject-if-present", true);
+                if (optImpProps.contains(var.getBaseName())) {
+                    var.getExts().put("x-cpp-optional-impossible", true);
+                    var.getExts().put("x-cpp-reject-if-present", true);
                 }
             }
         }
@@ -977,54 +977,54 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
                 CodegenModel cm = modelMap.getModel();
                 boolean needsNullableFieldInclude = false;
                 for (CodegenProperty var : allVarsOf(cm)) {
-                    if (tolerateNonNullableNulls && !var.isNullable) {
-                        var.vendorExtensions.put(X_CPP_TOLERATE_NONNULLABLE_NULL, true);
+                    if (tolerateNonNullableNulls && !var.isNullable()) {
+                        var.getExts().put(X_CPP_TOLERATE_NONNULLABLE_NULL, true);
                     }
-                    if (!var.isNullable || var.dataType == null
-                            || Boolean.TRUE.equals(var.vendorExtensions.get("x-cpp-nullable-field"))) {
+                    if (!var.isNullable() || var.getDataType() == null
+                            || Boolean.TRUE.equals(var.getExts().get("x-cpp-nullable-field"))) {
                         continue;
                     }
-                    String innerType = extractOptionalInnerType(var.dataType);
-                    if (innerType == null && !Boolean.TRUE.equals(var.vendorExtensions
+                    String innerType = extractOptionalInnerType(var.getDataType());
+                    if (innerType == null && !Boolean.TRUE.equals(var.getExts()
                             .get(Oas31RawSpecRecovery.LEGACY_NULLABLE_EXT))) {
                         continue;
                     }
-                    if (var.isEnum) {
-                        var.vendorExtensions.put(
+                    if (var.getIsEnum()) {
+                        var.getExts().put(
                                 "x-cpp-enum-value-type",
-                                innerType == null ? var.dataType : innerType);
+                                innerType == null ? var.getDataType() : innerType);
                     }
-                    if (var.required) {
+                    if (var.getRequired()) {
                         if (innerType == null) {
-                            var.dataType = "std::optional<" + var.dataType + ">";
+                            var.setDatatype("std::optional<" + var.getDataType() + ">");
                             cm.imports.add("#include <optional>");
-                            var.vendorExtensions.put("x-cpp-no-is-set", true);
+                            var.getExts().put("x-cpp-no-is-set", true);
                         }
                         continue;
                     }
                     if (innerType == null) {
-                        innerType = var.dataType;
-                        var.vendorExtensions.put("x-cpp-no-is-set", true);
+                        innerType = var.getDataType();
+                        var.getExts().put("x-cpp-no-is-set", true);
                     }
-                    if (Boolean.TRUE.equals(var.vendorExtensions.get(
+                    if (Boolean.TRUE.equals(var.getExts().get(
                             "x-cpp-has-explicit-default"))) {
-                        if (Boolean.TRUE.equals(var.vendorExtensions.get(
+                        if (Boolean.TRUE.equals(var.getExts().get(
                                 "x-cpp-default-is-null"))) {
-                            var.defaultValue = "NullableField<" + innerType
-                                    + ">::makeDefaultNull()";
+                            var.setDefaultValue("NullableField<" + innerType
+                               + ">::makeDefaultNull()");
                         } else {
-                            var.defaultValue = "NullableField<" + innerType
-                                    + ">::makeDefaultValue(" + var.defaultValue + ")";
+                            var.setDefaultValue("NullableField<" + innerType
+                               + ">::makeDefaultValue(" + var.getDefaultValue() + ")");
                         }
-                        var.vendorExtensions.put("x-cpp-member-default", true);
+                        var.getExts().put("x-cpp-member-default", true);
                     } else {
                         // DefaultCodegen seeds primitive placeholders even when the
                         // schema has no default; they are not NullableField values.
-                        var.defaultValue = null;
+                        var.setDefaultValue(null);
                     }
-                    var.dataType = "NullableField<" + innerType + ">";
-                    var.vendorExtensions.put("x-cpp-nullable-field", true);
-                    var.vendorExtensions.put("x-cpp-nullable-field-inner-type", innerType);
+                    var.setDatatype("NullableField<" + innerType + ">");
+                    var.getExts().put("x-cpp-nullable-field", true);
+                    var.getExts().put("x-cpp-nullable-field-inner-type", innerType);
                     needsNullableFieldInclude = true;
                 }
                 if (needsNullableFieldInclude) {
@@ -1041,14 +1041,14 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
             for (ModelMap mo : entry.getValue().getModels()) {
                 CodegenModel cm = mo.getModel();
                 for (CodegenProperty var : allVarsOf(cm)) {
-                    if (var.dataType != null) {
+                    if (var.getDataType() != null) {
                         // Strip NullableField wrapper when present: use inner type
                         // for alias lookup.
                         String lookupType;
-                        if (Boolean.TRUE.equals(var.vendorExtensions.get("x-cpp-nullable-field"))) {
-                            lookupType = (String) var.vendorExtensions.get("x-cpp-nullable-field-inner-type");
+                        if (Boolean.TRUE.equals(var.getExts().get("x-cpp-nullable-field"))) {
+                            lookupType = (String) var.getExts().get("x-cpp-nullable-field-inner-type");
                         } else {
-                            lookupType = var.dataType;
+                            lookupType = var.getDataType();
                         }
                         if (lookupType == null) {
                             continue;
@@ -1058,8 +1058,8 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
                             for (ModelMap targetMo : targetEntry.getModels()) {
                                 CodegenModel targetModel = targetMo.getModel();
                                 if (Boolean.TRUE.equals(targetModel.vendorExtensions.get("x-cpp-is-variant"))) {
-                                    var.vendorExtensions.put("x-cpp-variant-alias", true);
-                                    var.vendorExtensions.put("x-cpp-variant-alias-name", lookupType);
+                                    var.getExts().put("x-cpp-variant-alias", true);
+                                    var.getExts().put("x-cpp-variant-alias-name", lookupType);
                                     rewriteVariantAliasDefault(var, lookupType);
                                 }
                             }
@@ -1091,24 +1091,24 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
 
     private static void rewriteVariantAliasDefault(
             CodegenProperty property, String aliasName) {
-        Object scalarDefault = property.vendorExtensions.get(
+        Object scalarDefault = property.getExts().get(
                 X_CPP_EXPLICIT_DEFAULT_SCALAR);
         if (!(scalarDefault instanceof String)
-                || Boolean.TRUE.equals(property.vendorExtensions.get(
+                || Boolean.TRUE.equals(property.getExts().get(
                 "x-cpp-default-is-null"))) {
             return;
         }
 
         String decodedDefault = "fromJsonValue_" + aliasName
                 + "(boost::json::value(" + scalarDefault + "))";
-        Object nullableInner = property.vendorExtensions.get(
+        Object nullableInner = property.getExts().get(
                 "x-cpp-nullable-field-inner-type");
         if (nullableInner != null) {
             decodedDefault = "NullableField<" + nullableInner
                     + ">::makeDefaultValue(" + decodedDefault + ")";
         }
-        property.defaultValue = decodedDefault;
-        property.vendorExtensions.put("x-cpp-member-default", true);
+        property.setDefaultValue(decodedDefault);
+        property.getExts().put("x-cpp-member-default", true);
     }
 
     /**
@@ -1239,10 +1239,10 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
         for (int bi = 0; bi < branches.size(); bi++) {
             CodegenProperty b = branches.get(bi);
             String cppType;
-            if (b.isBinary || b.isFile) {
+            if (b.getIsBinary() || b.isFile()) {
                 cppType = "std::vector<std::uint8_t>";
             } else {
-                String rawType = stripSharedPtr(b.dataType);
+                String rawType = stripSharedPtr(b.getDataType());
                 if (rawType == null || "null".equals(rawType)) {
                     cppType = "std::nullptr_t";
                 } else {
@@ -1252,9 +1252,9 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
             if (cppType != null && cppType.equals(cm.classname)) {
                 continue;
             }
-            boolean isStringLike = b.isString || "std::string".equals(cppType)
-                    || "string".equals(b.dataType);
-            composedBranches.add(new ComposedBranch(cppType, b.isEnum, isStringLike, bi));
+            boolean isStringLike = b.getIsString() || "std::string".equals(cppType)
+                    || "string".equals(b.getDataType());
+            composedBranches.add(new ComposedBranch(cppType, b.getIsEnum(), isStringLike, bi));
         }
         List<String> branchTypes = composedBranches.stream()
                 .map(cb -> cb.cppType)
@@ -1573,7 +1573,7 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
                 ? ((Map<?, ?>) branchMetadata).get("branches") : null;
         int branchIndex = 0;
         for (CodegenProperty branch : codegenModel.getComposedSchemas().getOneOf()) {
-            String originalType = stripSharedPtr(branch.dataType);
+            String originalType = stripSharedPtr(branch.getDataType());
             CodegenModel referencedModel = allModels.get(originalType);
             String resolvedType = resolveThroughAliases(originalType);
             if (referencedModel != null && referencedModel.dataType != null) {
@@ -1644,7 +1644,7 @@ public abstract class CppBoostBeastModelCodegen extends AbstractCppCodegen {
     @SuppressWarnings("unchecked")
     private static List<Object> getEnumValues(
             CodegenProperty branch, CodegenModel referencedModel) {
-        Map<String, Object> allowableValues = branch.allowableValues;
+        Map<String, Object> allowableValues = branch.getAllowableValues();
         if ((allowableValues == null || allowableValues.get("values") == null)
                 && referencedModel != null) {
             allowableValues = referencedModel.allowableValues;

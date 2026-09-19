@@ -343,14 +343,14 @@ public class AbstractKotlinCodegenTest {
         Map<String, CodegenProperty> allVarsMap = pm.allVars.stream()
                 .collect(Collectors.toMap(CodegenProperty::getBaseName, Function.identity()));
         for (CodegenProperty p : pm.requiredVars) {
-            Assert.assertEquals(allVarsMap.get(p.baseName).isInherited, p.isInherited);
+            Assert.assertEquals(allVarsMap.get(p.getBaseName()).isInherited(), p.isInherited());
         }
         Assert.assertEqualsNoOrder(
                 pm.requiredVars.stream().map(CodegenProperty::getBaseName).toArray(),
                 new String[]{"a", "c"}
         );
         for (CodegenProperty p : pm.optionalVars) {
-            Assert.assertEquals(allVarsMap.get(p.baseName).isInherited, p.isInherited);
+            Assert.assertEquals(allVarsMap.get(p.getBaseName()).isInherited(), p.isInherited());
         }
         Assert.assertEqualsNoOrder(
                 pm.optionalVars.stream().map(CodegenProperty::getBaseName).toArray(),
@@ -508,13 +508,13 @@ public class AbstractKotlinCodegenTest {
         codegen.postProcessModels(createCodegenModelWrapper(cm));
 
         CodegenProperty optionalRef = cm.vars.stream()
-                .filter(v -> "optionalRef".equals(v.name))
+                .filter(v -> "optionalRef".equals(v.getName()))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("optionalRef property not found in MyObject"));
 
-        Assert.assertTrue(optionalRef.isNullable,
+        Assert.assertTrue(optionalRef.isNullable(),
                 "optionalRef must be nullable because the schema uses nullable:true");
-        Assert.assertEquals(optionalRef.dataType, "com.example.ExternalModel",
+        Assert.assertEquals(optionalRef.getDataType(), "com.example.ExternalModel",
                 "dataType must be the mapped FQN, not the raw schema name");
     }
 

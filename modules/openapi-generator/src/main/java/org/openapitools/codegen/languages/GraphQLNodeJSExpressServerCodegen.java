@@ -156,7 +156,7 @@ public class GraphQLNodeJSExpressServerCodegen extends AbstractGraphQLCodegen im
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        String enumName = toModelName(property.name);
+        String enumName = toModelName(property.getName());
 
         // Remove [] for array or map of ENUM
         enumName = enumName.replace("[]", "");

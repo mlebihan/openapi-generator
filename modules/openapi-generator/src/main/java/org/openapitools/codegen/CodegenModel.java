@@ -1196,11 +1196,11 @@ public class CodegenModel implements IJsonSchemaValidationProperties {
         while (iterator.hasNext()) {
             CodegenProperty element = iterator.next();
 
-            if (propertyNames.contains(element.baseName)) {
-                duplicatedNames.add(element.baseName);
+            if (propertyNames.contains(element.getBaseName())) {
+                duplicatedNames.add(element.getBaseName());
                 iterator.remove();
             } else {
-                propertyNames.add(element.baseName);
+                propertyNames.add(element.getBaseName());
             }
         }
 
@@ -1216,10 +1216,10 @@ public class CodegenModel implements IJsonSchemaValidationProperties {
                 // TODO cp shouldn't be null. Show a warning message instead
             } else {
                 // detect self import
-                if (this.classname.equalsIgnoreCase(cp.dataType) ||
-                        (cp.isContainer && cp.items != null && this.classname.equalsIgnoreCase(cp.items.dataType))) {
+                if (this.classname.equalsIgnoreCase(cp.getDataType()) ||
+                        (cp.isContainer() && cp.getItems() != null && this.classname.equalsIgnoreCase(cp.getItems().getDataType()))) {
                     this.imports.remove(this.classname); // remove self import
-                    cp.isSelfReference = true;
+                    cp.isSelfReference(true);
                 }
             }
         }

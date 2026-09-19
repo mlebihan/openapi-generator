@@ -667,14 +667,14 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
 
     private void setDefaultValueForCodegenProperty(CodegenProperty p) {
 
-        if (p.defaultValue == null || p.defaultValue.trim().isEmpty()) {
+        if (p.getDefaultValue() == null || p.getDefaultValue().trim().isEmpty()) {
             if (p.getIsEnumOrRef()) {
-                p.defaultValue = "null";
+                p.setDefaultValue("null");
             } else {
-                p.defaultValue = defaultValueNonOption(p, "null");
+                p.setDefaultValue(defaultValueNonOption(p, "null"));
             }
-        } else if (p.defaultValue.contains("Seq.empty")) {
-            p.defaultValue = "Nil";
+        } else if (p.getDefaultValue().contains("Seq.empty")) {
+            p.setDefaultValue("Nil");
         }
     }
 
@@ -771,7 +771,7 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
          */
 
         // we can't use !p.isModel, since 'isModel' is false (apparently) for models within arrays
-        return p.isPrimitiveType || p.isEnum || p.isEnumRef || p.isNumeric || isByteArray(p) || typesWhichDoNotNeedMapping.contains(p.dataType);
+        return p.getIsPrimitiveType() || p.getIsEnum() || p.isEnumRef() || p.isNumeric() || isByteArray(p) || typesWhichDoNotNeedMapping.contains(p.getDataType());
     }
 
     /**
@@ -784,11 +784,11 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
      * }}
      */
     private static boolean isByteArray(final CodegenProperty p) {
-        return "byte".equalsIgnoreCase(p.dataFormat); // &&
+        return "byte".equalsIgnoreCase(p.getDataFormat()); // &&
     }
 
     private static boolean wrapInOptional(CodegenProperty p) {
-        return !p.required && !p.isArray && !p.isMap;
+        return !p.getRequired() && !p.getIsArray() && !p.getIsMap();
     }
 
     /**
@@ -807,33 +807,33 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
     private static String asDataCode(final CodegenProperty p, final Set<String> typesWhichDoNotNeedMapping) {
         String code = "";
 
-        String dv = defaultValueNonOption(p, p.defaultValue);
+        String dv = defaultValueNonOption(p, p.getDefaultValue());
 
         if (doesNotNeedMapping(p, typesWhichDoNotNeedMapping)) {
             if (wrapInOptional(p)) {
-                code = String.format(Locale.ROOT, "%s.getOrElse(%s) /*  1 */", p.name, dv);
+                code = String.format(Locale.ROOT, "%s.getOrElse(%s) /*  1 */", p.getName(), dv);
             } else {
-                code = String.format(Locale.ROOT, "%s /* 2 */", p.name);
+                code = String.format(Locale.ROOT, "%s /* 2 */", p.getName());
             }
         } else {
             if (wrapInOptional(p)) {
                 if (isByteArray(p)) {
-                    code = String.format(Locale.ROOT, "%s.getOrElse(%s) /* 3 */", p.name, dv);
+                    code = String.format(Locale.ROOT, "%s.getOrElse(%s) /* 3 */", p.getName(), dv);
                 } else {
-                    code = String.format(Locale.ROOT, "%s.map(_.asData).getOrElse(%s) /* 4 */", p.name, dv);
+                    code = String.format(Locale.ROOT, "%s.map(_.asData).getOrElse(%s) /* 4 */", p.getName(), dv);
                 }
-            } else if (p.isArray) {
+            } else if (p.getIsArray()) {
                 if (isByteArray(p)) {
-                    code = String.format(Locale.ROOT, "%s /* 5 */", p.name);
+                    code = String.format(Locale.ROOT, "%s /* 5 */", p.getName());
                 } else if (!isObjectArray(p)) {
-                    code = String.format(Locale.ROOT, "%s /* 5.1 */", p.name);
+                    code = String.format(Locale.ROOT, "%s /* 5.1 */", p.getName());
                 } else {
-                    code = String.format(Locale.ROOT, "%s.map(_.asData) /* 6 */", p.name);
+                    code = String.format(Locale.ROOT, "%s.map(_.asData) /* 6 */", p.getName());
                 }
-            } else if (p.isMap) {
-                code = String.format(Locale.ROOT, "%s /* 7 */", p.name);
+            } else if (p.getIsMap()) {
+                code = String.format(Locale.ROOT, "%s /* 7 */", p.getName());
             } else {
-                code = String.format(Locale.ROOT, "%s.asData /* 8 */", p.name);
+                code = String.format(Locale.ROOT, "%s.asData /* 8 */", p.getName());
             }
         }
         return code;
@@ -857,23 +857,23 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
 
         if (doesNotNeedMapping(p, typesWhichDoNotNeedMapping)) {
             if (wrapInOptional(p)) {
-                code = String.format(Locale.ROOT, "Option(%s) /* 1 */", p.name);
+                code = String.format(Locale.ROOT, "Option(%s) /* 1 */", p.getName());
             } else {
-                code = String.format(Locale.ROOT, "%s /* 2 */", p.name);
+                code = String.format(Locale.ROOT, "%s /* 2 */", p.getName());
             }
         } else {
             if (wrapInOptional(p)) {
                 if (isByteArray(p)) {
-                    code = String.format(Locale.ROOT, "Option(%s) /* 3 */", p.name);
+                    code = String.format(Locale.ROOT, "Option(%s) /* 3 */", p.getName());
                 } else {
-                    code = String.format(Locale.ROOT, "Option(%s).map(_.asModel) /* 4 */", p.name);
+                    code = String.format(Locale.ROOT, "Option(%s).map(_.asModel) /* 4 */", p.getName());
                 }
-            } else if (p.isArray) {
-                code = String.format(Locale.ROOT, "%s.map(_.asModel) /* 5 */", p.name);
-            } else if (p.isMap) {
-                code = String.format(Locale.ROOT, "%s /* 5.1 */", p.name);
+            } else if (p.getIsArray()) {
+                code = String.format(Locale.ROOT, "%s.map(_.asModel) /* 5 */", p.getName());
+            } else if (p.getIsMap()) {
+                code = String.format(Locale.ROOT, "%s /* 5.1 */", p.getName());
             } else {
-                code = String.format(Locale.ROOT, "%s.asModel /* 6 */", p.name);
+                code = String.format(Locale.ROOT, "%s.asModel /* 6 */", p.getName());
             }
         }
         return code;
@@ -911,27 +911,27 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
     }
 
     private static boolean hasItemModel(final CodegenProperty p) {
-        return p.items != null && p.items.isModel;
+        return p.getItems() != null && p.getItems().getIsModel();
     }
 
     private static boolean isObjectArray(final CodegenProperty p) {
-        return p.isArray && hasItemModel(p);
+        return p.getIsArray() && hasItemModel(p);
     }
 
     private void postProcessProperty(final CodegenProperty p) {
 
-        p.vendorExtensions.put("x-datatype-model", asScalaDataType(p, p.required, false, wrapInOptional(p)));
-        p.vendorExtensions.put("x-defaultValue-model", defaultValue(p, p.required, p.defaultValue));
-        final String dataTypeData = asScalaDataType(p, p.required, true);
-        p.vendorExtensions.put("x-datatype-data", dataTypeData);
-        p.vendorExtensions.put("x-containertype-data", containerType(dataTypeData));
-        p.vendorExtensions.put("x-defaultValue-data", defaultValueNonOption(p, p.defaultValue));
+        p.getExts().put("x-datatype-model", asScalaDataType(p, p.getRequired(), false, wrapInOptional(p)));
+        p.getExts().put("x-defaultValue-model", defaultValue(p, p.getRequired(), p.getDefaultValue()));
+        final String dataTypeData = asScalaDataType(p, p.getRequired(), true);
+        p.getExts().put("x-datatype-data", dataTypeData);
+        p.getExts().put("x-containertype-data", containerType(dataTypeData));
+        p.getExts().put("x-defaultValue-data", defaultValueNonOption(p, p.getDefaultValue()));
 
         /*
          * Fix enum values which may be reserved words
          */
-        if (p._enum != null) {
-            p._enum = p._enum.stream().map(this::ensureNonKeyword).collect(Collectors.toList());
+        if (p.get_enum() != null) {
+            p.set_enum(p.get_enum().stream().map(this::ensureNonKeyword).collect(Collectors.toList()));
         }
 
         /*
@@ -943,8 +943,8 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
          *           type: string
          * }}}
          */
-        if (p.datatypeWithEnum != null && p.datatypeWithEnum.matches(".*[^a-zA-Z0-9_\\]\\[].*")) {
-            p.datatypeWithEnum = fixBackTicks(p.datatypeWithEnum);
+        if (p.getDatatypeWithEnum() != null && p.getDatatypeWithEnum().matches(".*[^a-zA-Z0-9_\\]\\[].*")) {
+            p.setDatatypeWithEnum(fixBackTicks(p.getDatatypeWithEnum()));
         }
 
         // We have two data models: a "data transfer" model: A "<Foo>Data" model for unvalidated data and a "<Foo>" model
@@ -965,22 +965,22 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
         typesWhichShouldNotBeMapped.add("byte");
 
         // when deserialising map objects, the logic is tricky.
-        p.vendorExtensions.put("x-deserialize-asModelMap", p.isMap && hasItemModel(p));
+        p.getExts().put("x-deserialize-asModelMap", p.getIsMap() && hasItemModel(p));
 
         // the 'asModel' logic for modelData.mustache
         //
         // if it's optional (not required), then wrap the value in Option()
         // ... unless it's a map or array, in which case it can just be empty
         //
-        p.vendorExtensions.put("x-asData", asDataCode(p, typesWhichShouldNotBeMapped));
-        p.vendorExtensions.put("x-asModel", asModelCode(p, typesWhichShouldNotBeMapped));
+        p.getExts().put("x-asData", asDataCode(p, typesWhichShouldNotBeMapped));
+        p.getExts().put("x-asModel", asModelCode(p, typesWhichShouldNotBeMapped));
 
         // for some reason, an openapi spec with pattern field like this:
         // pattern: '^[A-Za-z]+$'
         // will result in the pattern property text of
         // pattern: '/^[A-Za-z]+$/'
-        if (p.pattern != null && p.pattern.startsWith("/") && p.pattern.endsWith("/")) {
-            p.pattern = p.pattern.substring(1, p.pattern.length() - 1);
+        if (p.getPattern() != null && p.getPattern().startsWith("/") && p.getPattern().endsWith("/")) {
+            p.setPattern(p.getPattern().substring(1, p.getPattern().length() - 1));
         }
 
         // in our model class definition laid out in modelClass.mustache, we use 'Option' for non-required
@@ -995,7 +995,7 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
         //   someOptionalField : Seq[Foo]
         //
         // with an empty value
-        p.vendorExtensions.put("x-model-needs-option", wrapInOptional(p));
+        p.getExts().put("x-model-needs-option", wrapInOptional(p));
 
     }
 
@@ -1092,7 +1092,7 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
         if (p instanceof CodegenParameter) {
             return ((CodegenParameter) p).isNumeric;
         } else if (p instanceof CodegenProperty) {
-            return ((CodegenProperty) p).isNumeric;
+            return ((CodegenProperty) p).isNumeric();
         } else {
             return p.getIsNumber() || p.getIsFloat() || p.getIsDecimal() || p.getIsDouble() || p.getIsInteger() || p.getIsLong() || p.getIsUnboundedInteger();
         }
@@ -1136,8 +1136,8 @@ public class ScalaCaskServerCodegen extends AbstractScalaCodegen implements Code
 
         // Customize type for freeform objects
         if (ModelUtils.isFreeFormObject(schema, openAPI)) {
-            property.dataType = AdditionalPropertiesType;
-            property.baseType = AdditionalPropertiesType;
+            property.setDatatype(AdditionalPropertiesType);
+            property.setBaseType(AdditionalPropertiesType);
         }
 
         return property;

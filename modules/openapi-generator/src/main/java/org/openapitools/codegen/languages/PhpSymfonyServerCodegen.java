@@ -441,7 +441,7 @@ public class PhpSymfonyServerCodegen extends AbstractPhpCodegen implements Codeg
                     || !op.returnTypeIsPrimitive // it could make sense to remove it, but it would break retro-compatibility
             ) {
                 op.vendorExtensions.put("x-return-type", "array|object|null");
-            } else if ("binary".equals(op.returnProperty.dataFormat)) {
+            } else if ("binary".equals(op.returnProperty.getDataFormat())) {
                 op.vendorExtensions.put("x-return-type", "mixed");
             } else {
                 op.vendorExtensions.put("x-return-type", op.returnType);
@@ -616,14 +616,14 @@ public class PhpSymfonyServerCodegen extends AbstractPhpCodegen implements Codeg
 
         // Simplify model var type
         for (CodegenProperty var : model.vars) {
-            if (var.dataType != null) {
+            if (var.getDataType() != null) {
                 // Determine if the parameter type is supported as a type hint and make it available
                 // to the templating engine
-                var.vendorExtensions.put("x-parameter-type", getTypeHintNullable(var.dataType));
-                var.vendorExtensions.put("x-comment-type", getTypeHintNullableForComments(var.dataType));
-                if (var.isContainer) {
-                    var.vendorExtensions.put("x-parameter-type", getTypeHintNullable(var.dataType + "[]"));
-                    var.vendorExtensions.put("x-comment-type", getTypeHintNullableForComments(var.dataType + "[]"));
+                var.getExts().put("x-parameter-type", getTypeHintNullable(var.getDataType()));
+                var.getExts().put("x-comment-type", getTypeHintNullableForComments(var.getDataType()));
+                if (var.isContainer()) {
+                    var.getExts().put("x-parameter-type", getTypeHintNullable(var.getDataType() + "[]"));
+                    var.getExts().put("x-comment-type", getTypeHintNullableForComments(var.getDataType() + "[]"));
                 }
             }
         }

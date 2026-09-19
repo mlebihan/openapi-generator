@@ -1002,7 +1002,7 @@ public class KotlinClientCodegen extends AbstractKotlinCodegen {
                     .collect(Collectors.toList());
 
             for (CodegenProperty var : vars) {
-                var.vendorExtensions.put(VENDOR_EXTENSION_BASE_NAME_LITERAL, var.baseName.replace("$", "\\$"));
+                var.getExts().put(VENDOR_EXTENSION_BASE_NAME_LITERAL, var.getBaseName().replace("$", "\\$"));
             }
         }
 
@@ -1032,7 +1032,7 @@ public class KotlinClientCodegen extends AbstractKotlinCodegen {
                     }
 
                     // Remove discriminator property from the base class, it is not needed in the generated code
-                    getAllVarProperties(cm).forEach(list -> list.removeIf(var -> var.name.equals(discriminator.getPropertyName())));
+                    getAllVarProperties(cm).forEach(list -> list.removeIf(var -> var.getName().equals(discriminator.getPropertyName())));
 
                     for (CodegenDiscriminator.MappedModel mappedModel : discriminator.getMappedModels()) {
                         // Add the mapping name to additionalProperties.discriminatorValue
@@ -1043,9 +1043,9 @@ public class KotlinClientCodegen extends AbstractKotlinCodegen {
                             additionalProperties = new CodegenProperty();
                             mappedModel.getModel().setAdditionalProperties(additionalProperties);
                         }
-                        additionalProperties.discriminatorValue = mappedModel.getMappingName();
+                        additionalProperties.setDiscriminatorValue(mappedModel.getMappingName());
                         // Remove the discriminator property from the derived class, it is not needed in the generated code
-                        getAllVarProperties(mappedModel.getModel()).forEach(list -> list.removeIf(prop -> prop.name.equals(discriminator.getPropertyName())));
+                        getAllVarProperties(mappedModel.getModel()).forEach(list -> list.removeIf(prop -> prop.getName().equals(discriminator.getPropertyName())));
 
                         // If model has no properties after removing discriminator, mark it as empty
                         // so it generates as a class instead of an empty data class
@@ -1213,7 +1213,7 @@ public class KotlinClientCodegen extends AbstractKotlinCodegen {
             return;
         }
         for (CodegenProperty v : param.vars) {
-            v.vendorExtensions.put("x-kotlin-param-base-name", param.baseName);
+            v.getExts().put("x-kotlin-param-base-name", param.baseName);
         }
     }
 

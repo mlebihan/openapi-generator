@@ -135,7 +135,7 @@ public class AbstractRustCodegenTest {
     public void testToEnumName() {
         Function<String, String> toEnumName = (String name) -> {
             CodegenProperty property = new CodegenProperty();
-            property.baseName = name;
+            property.setBaseName(name);
             return codegen.toEnumName(property);
         };
         // Should be converted to camel case

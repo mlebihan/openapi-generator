@@ -420,25 +420,25 @@ public class Swift5ClientCodegenTest {
 
         Assert.assertEquals(cm.vars.size(), 9);
 
-        Assert.assertEquals(cm.vars.get(0).baseName, "nullableItems");
-        Assert.assertEquals(cm.vars.get(1).baseName, "notNullableItems");
-        Assert.assertEquals(cm.vars.get(2).baseName, "defaultItems");
-        Assert.assertEquals(cm.vars.get(3).baseName, "nullableDoubleItems");
-        Assert.assertEquals(cm.vars.get(4).baseName, "xNullableItems");
-        Assert.assertEquals(cm.vars.get(5).baseName, "aliasedNullableItems");
-        Assert.assertEquals(cm.vars.get(6).baseName, "nullableItemsSet");
-        Assert.assertEquals(cm.vars.get(7).baseName, "nestedNullableItems");
-        Assert.assertEquals(cm.vars.get(8).baseName, "modelRefNullableItems");
+        Assert.assertEquals(cm.vars.get(0).getBaseName(), "nullableItems");
+        Assert.assertEquals(cm.vars.get(1).getBaseName(), "notNullableItems");
+        Assert.assertEquals(cm.vars.get(2).getBaseName(), "defaultItems");
+        Assert.assertEquals(cm.vars.get(3).getBaseName(), "nullableDoubleItems");
+        Assert.assertEquals(cm.vars.get(4).getBaseName(), "xNullableItems");
+        Assert.assertEquals(cm.vars.get(5).getBaseName(), "aliasedNullableItems");
+        Assert.assertEquals(cm.vars.get(6).getBaseName(), "nullableItemsSet");
+        Assert.assertEquals(cm.vars.get(7).getBaseName(), "nestedNullableItems");
+        Assert.assertEquals(cm.vars.get(8).getBaseName(), "modelRefNullableItems");
 
-        Assert.assertEquals(cm.vars.get(0).dataType, "[String?]");
-        Assert.assertEquals(cm.vars.get(1).dataType, "[String]");
-        Assert.assertEquals(cm.vars.get(2).dataType, "[String]");
-        Assert.assertEquals(cm.vars.get(3).dataType, "[Double?]");
-        Assert.assertEquals(cm.vars.get(4).dataType, "[String?]");
-        Assert.assertEquals(cm.vars.get(5).dataType, "[String?]");
-        Assert.assertEquals(cm.vars.get(6).dataType, "Set<String?>");
-        Assert.assertEquals(cm.vars.get(7).dataType, "[[String?]]");
-        Assert.assertEquals(cm.vars.get(8).dataType, "[NullablePet?]");
+        Assert.assertEquals(cm.vars.get(0).getDataType(), "[String?]");
+        Assert.assertEquals(cm.vars.get(1).getDataType(), "[String]");
+        Assert.assertEquals(cm.vars.get(2).getDataType(), "[String]");
+        Assert.assertEquals(cm.vars.get(3).getDataType(), "[Double?]");
+        Assert.assertEquals(cm.vars.get(4).getDataType(), "[String?]");
+        Assert.assertEquals(cm.vars.get(5).getDataType(), "[String?]");
+        Assert.assertEquals(cm.vars.get(6).getDataType(), "Set<String?>");
+        Assert.assertEquals(cm.vars.get(7).getDataType(), "[[String?]]");
+        Assert.assertEquals(cm.vars.get(8).getDataType(), "[NullablePet?]");
     }
 
 }

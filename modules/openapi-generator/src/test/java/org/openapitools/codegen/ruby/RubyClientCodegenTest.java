@@ -188,22 +188,22 @@ public class RubyClientCodegenTest {
         codegen.setOpenAPI(openAPI);
         CodegenModel nullablePet = codegen.fromModel("NullablePet", schema);
         CodegenProperty cp0 = nullablePet.getVars().get(0);
-        Assert.assertTrue(cp0.isNullable);
+        Assert.assertTrue(cp0.isNullable());
 
         CodegenProperty cp1 = nullablePet.getVars().get(1);
-        Assert.assertFalse(cp1.isNullable);
+        Assert.assertFalse(cp1.isNullable());
 
         CodegenProperty cp2 = nullablePet.getVars().get(2);
-        Assert.assertTrue(cp2.isNullable);
+        Assert.assertTrue(cp2.isNullable());
 
         CodegenProperty cp3 = nullablePet.getVars().get(3);
-        Assert.assertTrue(cp3.isNullable);
+        Assert.assertTrue(cp3.isNullable());
 
         CodegenProperty cp4 = nullablePet.getVars().get(4);
-        Assert.assertFalse(cp4.isNullable);
+        Assert.assertFalse(cp4.isNullable());
 
         CodegenProperty cp5 = nullablePet.getVars().get(5);
-        Assert.assertTrue(cp5.isNullable);
+        Assert.assertTrue(cp5.isNullable());
     }
 
     @Test(description = "test properties without nullable")
@@ -219,64 +219,64 @@ public class RubyClientCodegenTest {
         Assert.assertNotNull(nullablePet);
         Assert.assertEquals(nullablePet.getVars().size(), 6);
         CodegenProperty cp0 = nullablePet.getVars().get(0);
-        Assert.assertFalse(cp0.isNullable);
-        Assert.assertEquals(cp0.name, "id");
+        Assert.assertFalse(cp0.isNullable());
+        Assert.assertEquals(cp0.getName(), "id");
 
         CodegenProperty cp1 = nullablePet.getVars().get(1);
-        Assert.assertFalse(cp1.isNullable);
-        Assert.assertEquals(cp1.name, "category");
+        Assert.assertFalse(cp1.isNullable());
+        Assert.assertEquals(cp1.getName(), "category");
 
         CodegenProperty cp2 = nullablePet.getVars().get(2);
-        Assert.assertFalse(cp2.isNullable);
-        Assert.assertEquals(cp2.name, "name");
+        Assert.assertFalse(cp2.isNullable());
+        Assert.assertEquals(cp2.getName(), "name");
 
         CodegenProperty cp3 = nullablePet.getVars().get(3);
-        Assert.assertFalse(cp3.isNullable);
-        Assert.assertEquals(cp3.name, "photo_urls");
+        Assert.assertFalse(cp3.isNullable());
+        Assert.assertEquals(cp3.getName(), "photo_urls");
 
         CodegenProperty cp4 = nullablePet.getVars().get(4);
-        Assert.assertFalse(cp4.isNullable);
-        Assert.assertEquals(cp4.name, "tags");
+        Assert.assertFalse(cp4.isNullable());
+        Assert.assertEquals(cp4.getName(), "tags");
 
         CodegenProperty cp5 = nullablePet.getVars().get(5);
-        Assert.assertFalse(cp5.isNullable);
-        Assert.assertEquals(cp5.name, "status");
+        Assert.assertFalse(cp5.isNullable());
+        Assert.assertEquals(cp5.getName(), "status");
 
         // test allVars
         Assert.assertEquals(nullablePet.getAllVars().size(), 6);
         cp0 = nullablePet.getVars().get(0);
-        Assert.assertFalse(cp0.isNullable);
-        Assert.assertEquals(cp0.name, "id");
+        Assert.assertFalse(cp0.isNullable());
+        Assert.assertEquals(cp0.getName(), "id");
 
         cp1 = nullablePet.getVars().get(1);
-        Assert.assertFalse(cp1.isNullable);
-        Assert.assertEquals(cp1.name, "category");
+        Assert.assertFalse(cp1.isNullable());
+        Assert.assertEquals(cp1.getName(), "category");
 
         cp2 = nullablePet.getVars().get(2);
-        Assert.assertFalse(cp2.isNullable);
-        Assert.assertEquals(cp2.name, "name");
+        Assert.assertFalse(cp2.isNullable());
+        Assert.assertEquals(cp2.getName(), "name");
 
         cp3 = nullablePet.getVars().get(3);
-        Assert.assertFalse(cp3.isNullable);
-        Assert.assertEquals(cp3.name, "photo_urls");
+        Assert.assertFalse(cp3.isNullable());
+        Assert.assertEquals(cp3.getName(), "photo_urls");
 
         cp4 = nullablePet.getVars().get(4);
-        Assert.assertFalse(cp4.isNullable);
-        Assert.assertEquals(cp4.name, "tags");
+        Assert.assertFalse(cp4.isNullable());
+        Assert.assertEquals(cp4.getName(), "tags");
 
         cp5 = nullablePet.getVars().get(5);
-        Assert.assertFalse(cp5.isNullable);
-        Assert.assertEquals(cp5.name, "status");
+        Assert.assertFalse(cp5.isNullable());
+        Assert.assertEquals(cp5.getName(), "status");
 
         // test requiredVars
         Assert.assertEquals(nullablePet.getRequiredVars().size(), 2);
         cp0 = nullablePet.getRequiredVars().get(0);
-        Assert.assertFalse(cp0.isNullable);
-        Assert.assertEquals(cp0.name, "name");
+        Assert.assertFalse(cp0.isNullable());
+        Assert.assertEquals(cp0.getName(), "name");
 
         cp1 = nullablePet.getRequiredVars().get(1);
-        Assert.assertFalse(cp1.isNullable);
-        Assert.assertEquals(cp1.name, "photo_urls");
+        Assert.assertFalse(cp1.isNullable());
+        Assert.assertEquals(cp1.getName(), "photo_urls");
 
         // test mandatory
         Set<String> mandatory = new TreeSet<String>();
@@ -421,19 +421,19 @@ public class RubyClientCodegenTest {
         Assert.assertEquals(modelC.getVars().size(), 5);
 
         CodegenProperty cp0 = modelC.getVars().get(0);
-        Assert.assertEquals(cp0.name, "foo");
+        Assert.assertEquals(cp0.getName(), "foo");
 
         CodegenProperty cp1 = modelC.getVars().get(1);
-        Assert.assertEquals(cp1.name, "duplicated_optional");
+        Assert.assertEquals(cp1.getName(), "duplicated_optional");
 
         CodegenProperty cp2 = modelC.getVars().get(2);
-        Assert.assertEquals(cp2.name, "duplicated_required");
+        Assert.assertEquals(cp2.getName(), "duplicated_required");
 
         CodegenProperty cp3 = modelC.getVars().get(3);
-        Assert.assertEquals(cp3.name, "bar");
+        Assert.assertEquals(cp3.getName(), "bar");
 
         CodegenProperty cp4 = modelC.getVars().get(4);
-        Assert.assertEquals(cp4.name, "baz");
+        Assert.assertEquals(cp4.getName(), "baz");
     }
 
 
@@ -505,49 +505,49 @@ public class RubyClientCodegenTest {
         Assert.assertEquals(adult.getAllVars().size(), 8);
 
         CodegenProperty cp0 = adult.getAllVars().get(0);
-        Assert.assertEquals(cp0.name, "_type");
+        Assert.assertEquals(cp0.getName(), "_type");
 
         CodegenProperty cp1 = adult.getAllVars().get(1);
-        Assert.assertEquals(cp1.name, "last_name");
+        Assert.assertEquals(cp1.getName(), "last_name");
 
         CodegenProperty cp2 = adult.getAllVars().get(2);
-        Assert.assertEquals(cp2.name, "first_name");
+        Assert.assertEquals(cp2.getName(), "first_name");
 
         CodegenProperty cp3 = adult.getAllVars().get(3);
-        Assert.assertEquals(cp3.name, "duplicated_optional");
+        Assert.assertEquals(cp3.getName(), "duplicated_optional");
 
         CodegenProperty cp4 = adult.getAllVars().get(4);
-        Assert.assertEquals(cp4.name, "duplicated_required");
+        Assert.assertEquals(cp4.getName(), "duplicated_required");
 
         CodegenProperty cp5 = adult.getAllVars().get(5);
-        Assert.assertEquals(cp5.name, "person_required");
+        Assert.assertEquals(cp5.getName(), "person_required");
 
         CodegenProperty cp6 = adult.getAllVars().get(6);
-        Assert.assertEquals(cp6.name, "children");
+        Assert.assertEquals(cp6.getName(), "children");
 
         CodegenProperty cp7 = adult.getAllVars().get(7);
-        Assert.assertEquals(cp7.name, "adult_required");
+        Assert.assertEquals(cp7.getName(), "adult_required");
 
         // to test vars (without parent's properties)
         Assert.assertEquals(adult.getVars().size(), 4);
 
         cp0 = adult.getVars().get(0);
-        Assert.assertEquals(cp0.name, "duplicated_optional");
+        Assert.assertEquals(cp0.getName(), "duplicated_optional");
 
         cp1 = adult.getVars().get(1);
-        Assert.assertEquals(cp1.name, "duplicated_required");
+        Assert.assertEquals(cp1.getName(), "duplicated_required");
 
         cp2 = adult.getVars().get(2);
-        Assert.assertEquals(cp2.name, "children");
+        Assert.assertEquals(cp2.getName(), "children");
 
         // to test requiredVars
         Assert.assertEquals(adult.getRequiredVars().size(), 2);
 
         cp0 = adult.getRequiredVars().get(0);
-        Assert.assertEquals(cp0.name, "duplicated_required");
+        Assert.assertEquals(cp0.getName(), "duplicated_required");
 
         cp1 = adult.getRequiredVars().get(1);
-        Assert.assertEquals(cp1.name, "person_required");
+        Assert.assertEquals(cp1.getName(), "person_required");
     }
 
     @Test(description = "test allOf composition")
@@ -568,62 +568,62 @@ public class RubyClientCodegenTest {
         Assert.assertEquals(superMan.getAllMandatory().size(), 3);
 
         CodegenProperty cp0 = superMan.getVars().get(0);
-        Assert.assertEquals(cp0.name, "id");
-        Assert.assertTrue(cp0.required);
+        Assert.assertEquals(cp0.getName(), "id");
+        Assert.assertTrue(cp0.getRequired());
 
         CodegenProperty cp1 = superMan.getVars().get(1);
-        Assert.assertEquals(cp1.name, "name");
-        Assert.assertFalse(cp1.required);
+        Assert.assertEquals(cp1.getName(), "name");
+        Assert.assertFalse(cp1.getRequired());
 
         CodegenProperty cp2 = superMan.getVars().get(2);
-        Assert.assertEquals(cp2.name, "nickname");
-        Assert.assertFalse(cp2.required);
-        Assert.assertTrue(cp2.deprecated);
+        Assert.assertEquals(cp2.getName(), "nickname");
+        Assert.assertFalse(cp2.getRequired());
+        Assert.assertTrue(cp2.isDeprecated());
 
         CodegenProperty cp3 = superMan.getVars().get(3);
-        Assert.assertEquals(cp3.name, "reward");
-        Assert.assertFalse(cp3.required);
+        Assert.assertEquals(cp3.getName(), "reward");
+        Assert.assertFalse(cp3.getRequired());
 
         CodegenProperty cp4 = superMan.getVars().get(4);
-        Assert.assertEquals(cp4.name, "origin");
-        Assert.assertTrue(cp4.required);
+        Assert.assertEquals(cp4.getName(), "origin");
+        Assert.assertTrue(cp4.getRequired());
 
         CodegenProperty cp5 = superMan.getVars().get(5);
-        Assert.assertEquals(cp5.name, "category");
-        Assert.assertFalse(cp5.required);
+        Assert.assertEquals(cp5.getName(), "category");
+        Assert.assertFalse(cp5.getRequired());
 
         CodegenProperty cp6 = superMan.getVars().get(6);
-        Assert.assertEquals(cp6.name, "level");
-        Assert.assertTrue(cp6.required);
+        Assert.assertEquals(cp6.getName(), "level");
+        Assert.assertTrue(cp6.getRequired());
 
         CodegenProperty cp7 = superMan.getAllVars().get(0);
-        Assert.assertEquals(cp7.name, "id");
-        Assert.assertTrue(cp7.required);
+        Assert.assertEquals(cp7.getName(), "id");
+        Assert.assertTrue(cp7.getRequired());
 
         CodegenProperty cp8 = superMan.getAllVars().get(1);
-        Assert.assertEquals(cp8.name, "name");
-        Assert.assertFalse(cp8.required);
+        Assert.assertEquals(cp8.getName(), "name");
+        Assert.assertFalse(cp8.getRequired());
 
         CodegenProperty cp9 = superMan.getAllVars().get(2);
-        Assert.assertEquals(cp9.name, "nickname");
-        Assert.assertFalse(cp9.required);
-        Assert.assertTrue(cp9.deprecated);
+        Assert.assertEquals(cp9.getName(), "nickname");
+        Assert.assertFalse(cp9.getRequired());
+        Assert.assertTrue(cp9.isDeprecated());
 
         CodegenProperty cp10 = superMan.getAllVars().get(3);
-        Assert.assertEquals(cp10.name, "reward");
-        Assert.assertFalse(cp10.required);
+        Assert.assertEquals(cp10.getName(), "reward");
+        Assert.assertFalse(cp10.getRequired());
 
         CodegenProperty cp11 = superMan.getAllVars().get(4);
-        Assert.assertEquals(cp11.name, "origin");
-        Assert.assertTrue(cp11.required);
+        Assert.assertEquals(cp11.getName(), "origin");
+        Assert.assertTrue(cp11.getRequired());
 
         CodegenProperty cp12 = superMan.getAllVars().get(5);
-        Assert.assertEquals(cp12.name, "category");
-        Assert.assertFalse(cp12.required);
+        Assert.assertEquals(cp12.getName(), "category");
+        Assert.assertFalse(cp12.getRequired());
 
         CodegenProperty cp13 = superMan.getAllVars().get(6);
-        Assert.assertEquals(cp13.name, "level");
-        Assert.assertTrue(cp13.required);
+        Assert.assertEquals(cp13.getName(), "level");
+        Assert.assertTrue(cp13.getRequired());
 
     }
 
@@ -716,9 +716,9 @@ public class RubyClientCodegenTest {
         CodegenModel animal = codegen.fromModel("Animal", schema);
         Assert.assertNotNull(animal);
         CodegenProperty cp2 = animal.getVars().get(2);
-        Assert.assertEquals(cp2.name, "mapping_test");
-        Assert.assertFalse(cp2.required);
-        Assert.assertEquals(cp2.dataType, "VerySpecialStringInRuby");
+        Assert.assertEquals(cp2.getName(), "mapping_test");
+        Assert.assertFalse(cp2.getRequired());
+        Assert.assertEquals(cp2.getDataType(), "VerySpecialStringInRuby");
     }
 
     @Test(description = "test regex patterns")

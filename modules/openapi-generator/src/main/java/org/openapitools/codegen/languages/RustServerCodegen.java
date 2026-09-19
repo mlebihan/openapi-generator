@@ -734,11 +734,11 @@ public class RustServerCodegen extends AbstractRustCodegen implements CodegenCon
             }
 
             for (CodegenProperty header : rsp.headers) {
-                if (uuidType.equals(header.dataType)) {
+                if (uuidType.equals(header.getDataType())) {
                     additionalProperties.put("apiUsesUuid", true);
                 }
-                header.nameInPascalCase = toModelName(header.baseName);
-                header.nameInLowerCase = header.baseName.toLowerCase(Locale.ROOT);
+                header.setNameInPascalCase(toModelName(header.getBaseName()));
+                header.setNameInLowerCase(header.getBaseName().toLowerCase(Locale.ROOT));
             }
         }
 
@@ -747,11 +747,11 @@ public class RustServerCodegen extends AbstractRustCodegen implements CodegenCon
         }
 
         for (CodegenProperty header : op.responseHeaders) {
-            if (uuidType.equals(header.dataType)) {
+            if (uuidType.equals(header.getDataType())) {
                 additionalProperties.put("apiUsesUuid", true);
             }
-            header.nameInPascalCase = toModelName(header.baseName);
-            header.nameInLowerCase = header.baseName.toLowerCase(Locale.ROOT);
+            header.setNameInPascalCase(toModelName(header.getBaseName()));
+            header.setNameInLowerCase(header.getBaseName().toLowerCase(Locale.ROOT));
         }
 
         return op;
@@ -1002,11 +1002,11 @@ public class RustServerCodegen extends AbstractRustCodegen implements CodegenCon
         }
 
         for (CodegenProperty header : op.responseHeaders) {
-            if (uuidType.equals(header.dataType)) {
+            if (uuidType.equals(header.getDataType())) {
                 additionalProperties.put("apiUsesUuid", true);
             }
-            header.nameInPascalCase = toModelName(header.baseName);
-            header.nameInLowerCase = header.baseName.toLowerCase(Locale.ROOT);
+            header.setNameInPascalCase(toModelName(header.getBaseName()));
+            header.setNameInLowerCase(header.getBaseName().toLowerCase(Locale.ROOT));
         }
 
         if (op.authMethods != null) {
@@ -1294,17 +1294,17 @@ public class RustServerCodegen extends AbstractRustCodegen implements CodegenCon
         }
 
         for (CodegenProperty prop : mdl.vars) {
-            if (uuidType.equals(prop.dataType)) {
+            if (uuidType.equals(prop.getDataType())) {
                 additionalProperties.put("apiUsesUuid", true);
             }
 
-            if (prop.isByteArray) {
+            if (prop.getIsByteArray()) {
                 additionalProperties.put("apiUsesByteArray", true);
             }
 
-            String xmlName = modelXmlNames.get(prop.dataType);
+            String xmlName = modelXmlNames.get(prop.getDataType());
             if (xmlName != null) {
-                prop.vendorExtensions.put("x-item-xml-name", xmlName);
+                prop.getExts().put("x-item-xml-name", xmlName);
             }
         }
 
@@ -1634,46 +1634,46 @@ public class RustServerCodegen extends AbstractRustCodegen implements CodegenCon
         super.postProcessModelProperty(model, property);
 
         // Check for reserved field names that conflict with serde_valid macro internals
-        if ("ok".equalsIgnoreCase(property.name) || "err".equalsIgnoreCase(property.name)) {
+        if ("ok".equalsIgnoreCase(property.getName()) || "err".equalsIgnoreCase(property.getName())) {
             model.vendorExtensions.put("x-skip-serde-valid", true);
         }
 
         // Mark properties that reference complex types (models) for nested validation
         // Only add nested validation for types that reference generated models (contain "models::")
-        if (property.dataType != null && property.dataType.contains("models::")) {
-            property.vendorExtensions.put("x-needs-nested-validation", true);
+        if (property.getDataType() != null && property.getDataType().contains("models::")) {
+            property.getExts().put("x-needs-nested-validation", true);
         }
 
         // TODO: We should avoid reverse engineering primitive type status from the data type
-        String strippedType = stripNullable(property.dataType);
+        String strippedType = stripNullable(property.getDataType());
         if (!languageSpecificPrimitives.contains(strippedType)) {
             // If we use a more qualified model name, then only camelize the actual type, not the qualifier.
-            if (property.dataType.contains(":")) {
-                int position = property.dataType.lastIndexOf(":");
-                property.dataType = property.dataType.substring(0, position) + camelize(property.dataType.substring(position));
+            if (property.getDataType().contains(":")) {
+                int position = property.getDataType().lastIndexOf(":");
+                property.setDatatype(property.getDataType().substring(0, position) + camelize(property.getDataType().substring(position)));
             } else {
-                property.dataType = camelize(property.dataType);
+                property.setDatatype(camelize(property.getDataType()));
             }
-            property.isPrimitiveType = property.isContainer && languageSpecificPrimitives.contains(typeMapping.get(stripNullable(property.complexType)));
+            property.setIsPrimitiveType(property.isContainer() && languageSpecificPrimitives.contains(typeMapping.get(stripNullable(property.getComplexType()))));
         } else {
-            property.isPrimitiveType = true;
+            property.setIsPrimitiveType(true);
         }
 
         // Integer type fitting
-        if (Objects.equals(property.baseType, "integer")) {
+        if (Objects.equals(property.getBaseType(), "integer")) {
 
-            property.dataType = applyIntegerTypeFitting(
-                property.dataFormat,
-                property.getMinimum(),
-                property.getMaximum(),
-                property.getExclusiveMinimum(),
-                property.getExclusiveMaximum());
+            property.setDatatype(applyIntegerTypeFitting(
+               property.getDataFormat(),
+               property.getMinimum(),
+               property.getMaximum(),
+               property.getExclusiveMinimum(),
+               property.getExclusiveMaximum()));
         }
 
-        property.name = underscore(property.name);
+        property.setName(underscore(property.getName()));
 
-        if (!property.required) {
-            property.defaultValue = (property.defaultValue != null) ? "Some(" + property.defaultValue + ")" : "None";
+        if (!property.getRequired()) {
+            property.setDefaultValue((property.getDefaultValue() != null) ? "Some(" + property.getDefaultValue() + ")" : "None");
         }
 
         // If a property has no type defined in the schema, it can take values of any type.
@@ -1682,9 +1682,9 @@ public class RustServerCodegen extends AbstractRustCodegen implements CodegenCon
         // the type from the value. If the property has no type, at this point it will have
         // baseType "object" allowing us to identify such properties. Moreover, set to not
         // nullable, we can use the serde_json::Value::Null enum variant.
-        if ("object".equals(property.baseType)) {
-            property.dataType = "serde_json::Value";
-            property.isNullable = false;
+        if ("object".equals(property.getBaseType())) {
+            property.setDatatype("serde_json::Value");
+            property.isNullable(false);
         }
     }
 
@@ -1829,7 +1829,7 @@ public class RustServerCodegen extends AbstractRustCodegen implements CodegenCon
         } else if (param.isArray) {
             boolean itemsAreEnum = param.items != null && param.items.getIsEnumOrRef();
             param.vendorExtensions.put("x-format-string", itemsAreEnum ? "{}" : "{:?}");
-            if (param.items.isString) {
+            if (param.items.getIsString()) {
                 // We iterate through the list of string and ensure they end up in the format vec!["example".to_string()]
                 example = (param.example != null)
                     ? "&vec![" + Arrays.stream(param.example.replace("[", "").replace("]", "").split(","))
@@ -1949,8 +1949,8 @@ public class RustServerCodegen extends AbstractRustCodegen implements CodegenCon
         if (Boolean.FALSE.equals(p.getNullable())) {
             LOGGER.warn("Schema '{}' is any type, which includes the 'null' value. 'nullable' cannot be set to 'false'", p.getName());
         }
-        if (languageSpecificPrimitives.contains(property.dataType)) {
-            property.isPrimitiveType = true;
+        if (languageSpecificPrimitives.contains(property.getDataType())) {
+            property.setIsPrimitiveType(true);
         }
         if (ModelUtils.isMapSchema(p)) {
             // an object or anyType composed schema that has additionalProperties set

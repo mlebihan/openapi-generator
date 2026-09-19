@@ -292,10 +292,10 @@ public class ApexClientCodegen extends AbstractApexCodegen {
     @Override
     public void updateCodegenPropertyEnum(CodegenProperty var) {
         super.updateCodegenPropertyEnum(var);
-        if (var.isEnum && var.example != null) {
-            String example = var.example.replace("'", "");
-            example = toEnumVarName(example, var.dataType);
-            var.example = toEnumDefaultValue(example, var.datatypeWithEnum);
+        if (var.getIsEnum() && var.getExample() != null) {
+            String example = var.getExample().replace("'", "");
+            example = toEnumVarName(example, var.getDataType());
+            var.setExample(toEnumDefaultValue(example, var.getDatatypeWithEnum()));
         }
     }
 

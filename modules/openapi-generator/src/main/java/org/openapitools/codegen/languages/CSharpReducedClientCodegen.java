@@ -352,8 +352,8 @@ public class CSharpReducedClientCodegen extends AbstractCSharpCodegen {
     protected void patchProperty(Map<String, CodegenModel> enumRefs, CodegenModel model, CodegenProperty property) {
         super.patchProperty(enumRefs, model, property);
 
-        if (!property.isContainer && (this.getNullableTypes().contains(property.dataType) || property.isEnum)) {
-            property.vendorExtensions.put(X_CSHARP_VALUE_TYPE, true);
+        if (!property.isContainer() && (this.getNullableTypes().contains(property.getDataType()) || property.getIsEnum())) {
+            property.getExts().put(X_CSHARP_VALUE_TYPE, true);
         }
     }
 
@@ -390,23 +390,23 @@ public class CSharpReducedClientCodegen extends AbstractCSharpCodegen {
 
                 Map<String, CodegenProperty> propertyHash = new HashMap<>(codegenModel.vars.size());
                 for (final CodegenProperty property : codegenModel.vars) {
-                    propertyHash.put(property.name, property);
+                    propertyHash.put(property.getName(), property);
                 }
 
                 for (final CodegenProperty property : codegenModel.readWriteVars) {
-                    if (property.defaultValue == null && parentCodegenModel.discriminator != null && property.name.equals(parentCodegenModel.discriminator.getPropertyName())) {
-                        property.defaultValue = "\"" + name + "\"";
+                    if (property.getDefaultValue() == null && parentCodegenModel.discriminator != null && property.getName().equals(parentCodegenModel.discriminator.getPropertyName())) {
+                        property.setDefaultValue("\"" + name + "\"");
                     }
                 }
 
                 CodegenProperty last = null;
                 for (final CodegenProperty property : parentCodegenModel.vars) {
                     // helper list of parentVars simplifies templating
-                    if (!propertyHash.containsKey(property.name)) {
+                    if (!propertyHash.containsKey(property.getName())) {
                         final CodegenProperty parentVar = property.clone();
-                        parentVar.isInherited = true;
+                        parentVar.isInherited(true);
                         last = parentVar;
-                        LOGGER.debug("adding parent variable {}", property.name);
+                        LOGGER.debug("adding parent variable {}", property.getName());
                         codegenModel.parentVars.add(parentVar);
                     }
                 }
@@ -500,8 +500,8 @@ public class CSharpReducedClientCodegen extends AbstractCSharpCodegen {
 
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
-        postProcessPattern(property.pattern, property.vendorExtensions);
-        postProcessEmitDefaultValue(property.vendorExtensions);
+        postProcessPattern(property.getPattern(), property.getExts());
+        postProcessEmitDefaultValue(property.getExts());
 
         super.postProcessModelProperty(model, property);
     }
@@ -918,13 +918,13 @@ public class CSharpReducedClientCodegen extends AbstractCSharpCodegen {
             boolean removedChildEnum = false;
             for (CodegenProperty parentModelCodegenProperty : parentModelCodegenProperties) {
                 // Look for enums
-                if (parentModelCodegenProperty.isEnum) {
+                if (parentModelCodegenProperty.getIsEnum()) {
                     // Now that we have found an enum in the parent class,
                     // and search the child class for the same enum.
                     Iterator<CodegenProperty> iterator = codegenProperties.iterator();
                     while (iterator.hasNext()) {
                         CodegenProperty codegenProperty = iterator.next();
-                        if (codegenProperty.isEnum && codegenProperty.equals(parentModelCodegenProperty)) {
+                        if (codegenProperty.getIsEnum() && codegenProperty.equals(parentModelCodegenProperty)) {
                             // We found an enum in the child class that is
                             // a duplicate of the one in the parent, so remove it.
                             iterator.remove();

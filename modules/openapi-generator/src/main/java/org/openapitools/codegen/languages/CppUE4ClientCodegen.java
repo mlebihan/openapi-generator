@@ -249,7 +249,7 @@ public class CppUE4ClientCodegen extends AbstractCppCodegen {
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         super.postProcessModelProperty(model, property);
         // Nullable will be handled as optional
-        property.required = !property.notRequiredOrIsNullable();
+        property.setRequired(!property.notRequiredOrIsNullable());
     }
 
     // override to post-process any response
@@ -258,7 +258,7 @@ public class CppUE4ClientCodegen extends AbstractCppCodegen {
     public void postProcessResponseWithProperty(CodegenResponse response, CodegenProperty property) {
         super.postProcessResponseWithProperty(response, property);
         // Nullable will be handled as optional
-        property.required = !property.notRequiredOrIsNullable();
+        property.setRequired(!property.notRequiredOrIsNullable());
     }
 
     // override to post-process any parameters

@@ -281,16 +281,16 @@ public class TypeScriptAxiosClientCodegen extends AbstractTypeScriptClientCodege
                 cm.imports = new TreeSet<>(cm.imports);
                 // name enum with model name, e.g. StatusEnum => PetStatusEnum
                 for (CodegenProperty var : cm.vars) {
-                    if (Boolean.TRUE.equals(var.isEnum)) {
-                        var.datatypeWithEnum = var.datatypeWithEnum.replace(var.enumName, cm.classname + var.enumName);
-                        var.enumName = var.enumName.replace(var.enumName, cm.classname + var.enumName);
+                    if (Boolean.TRUE.equals(var.getIsEnum())) {
+                        var.setDatatypeWithEnum(var.getDatatypeWithEnum().replace(var.getEnumName(), cm.classname + var.getEnumName()));
+                        var.setEnumName(var.getEnumName().replace(var.getEnumName(), cm.classname + var.getEnumName()));
                     }
                 }
                 if (cm.parent != null) {
                     for (CodegenProperty var : cm.allVars) {
-                        if (Boolean.TRUE.equals(var.isEnum)) {
-                            var.datatypeWithEnum = var.datatypeWithEnum.replace(var.enumName, cm.classname + var.enumName);
-                            var.enumName = var.enumName.replace(var.enumName, cm.classname + var.enumName);
+                        if (Boolean.TRUE.equals(var.getIsEnum())) {
+                            var.setDatatypeWithEnum(var.getDatatypeWithEnum().replace(var.getEnumName(), cm.classname + var.getEnumName()));
+                            var.setEnumName(var.getEnumName().replace(var.getEnumName(), cm.classname + var.getEnumName()));
                         }
                     }
                 }
@@ -362,8 +362,8 @@ public class TypeScriptAxiosClientCodegen extends AbstractTypeScriptClientCodege
         // The 'null' value is allowed when the OAS schema is 'any type'.
         // See https://github.com/OAI/OpenAPI-Specification/issues/1389
         // custom line here, do not set property.isNullable = true
-        if (languageSpecificPrimitives.contains(property.dataType)) {
-            property.isPrimitiveType = true;
+        if (languageSpecificPrimitives.contains(property.getDataType())) {
+            property.setIsPrimitiveType(true);
         }
         if (ModelUtils.isMapSchema(p)) {
             // an object or anyType composed schema that has additionalProperties set

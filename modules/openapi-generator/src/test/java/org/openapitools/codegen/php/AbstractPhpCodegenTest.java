@@ -154,7 +154,7 @@ public class AbstractPhpCodegenTest {
         // Assert the array type is properly detected.
         CodegenProperty cp1 = cm1.vars.get(0);
         cp1 = codegen.fromProperty("ArrayProp", test1);
-        Assert.assertTrue(cp1.isPrimitiveType);
+        Assert.assertTrue(cp1.getIsPrimitiveType());
     }
 
     @Test(description = "Issue #10244")

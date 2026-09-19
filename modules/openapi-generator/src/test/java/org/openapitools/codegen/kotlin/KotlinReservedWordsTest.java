@@ -121,25 +121,25 @@ public class KotlinReservedWordsTest {
         CodegenProperty property = codegen.fromProperty(reservedWord, (Schema) linked.getProperties().get(reservedWord));
 
         if ("object".equals(reservedWord)) {
-            assertEquals(property.complexType, "kotlin.Any");
-            assertEquals(property.dataType, "kotlin.Any");
-            assertEquals(property.datatypeWithEnum, "kotlin.Any");
-            assertEquals(property.baseType, "kotlin.Any");
+            assertEquals(property.getComplexType(), "kotlin.Any");
+            assertEquals(property.getDataType(), "kotlin.Any");
+            assertEquals(property.getDatatypeWithEnum(), "kotlin.Any");
+            assertEquals(property.getBaseType(), "kotlin.Any");
         } else {
-            assertEquals(property.complexType, titleCased);
-            assertEquals(property.dataType, titleCased);
-            assertEquals(property.datatypeWithEnum, titleCased);
-            assertEquals(property.baseType, titleCased);
+            assertEquals(property.getComplexType(), titleCased);
+            assertEquals(property.getDataType(), titleCased);
+            assertEquals(property.getDatatypeWithEnum(), titleCased);
+            assertEquals(property.getBaseType(), titleCased);
         }
 
         if ("class".equals(reservedWord)) {
             // this is a really weird "edge" case rename.
-            assertEquals(property.name, "propertyClass");
+            assertEquals(property.getName(), "propertyClass");
         } else {
-            assertEquals(property.name, escaped);
+            assertEquals(property.getName(), escaped);
         }
 
-        assertEquals(property.baseName, reservedWord);
+        assertEquals(property.getBaseName(), reservedWord);
     }
 
     @Test

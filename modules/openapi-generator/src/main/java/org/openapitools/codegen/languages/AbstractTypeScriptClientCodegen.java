@@ -996,7 +996,7 @@ public abstract class AbstractTypeScriptClientCodegen extends DefaultCodegen imp
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        String enumName = property.name;
+        String enumName = property.getName();
         enumName = addSuffix(enumName, enumSuffix);
         return toTypescriptTypeName(enumName, "_");
     }
@@ -1071,7 +1071,7 @@ public abstract class AbstractTypeScriptClientCodegen extends DefaultCodegen imp
         }
 
         CodegenProperty items = parameter.items;
-        return items != null && (items.isFile || items.isBinary || "binary".equals(items.dataFormat));
+        return items != null && (items.isFile() || items.getIsBinary() || "binary".equals(items.getDataFormat()));
     }
 
     /**
@@ -1086,24 +1086,24 @@ public abstract class AbstractTypeScriptClientCodegen extends DefaultCodegen imp
      */
     @Override
     protected void updateDataTypeWithEnumForArray(CodegenProperty property) {
-        CodegenProperty baseItem = property.items;
-        while (baseItem != null && (Boolean.TRUE.equals(baseItem.isMap)
-                || Boolean.TRUE.equals(baseItem.isArray))) {
-            baseItem = baseItem.items;
+        CodegenProperty baseItem = property.getItems();
+        while (baseItem != null && (Boolean.TRUE.equals(baseItem.getIsMap())
+                || Boolean.TRUE.equals(baseItem.getIsArray()))) {
+            baseItem = baseItem.getItems();
         }
 
         if (baseItem != null) {
             // First, set the property's enumName using the property itself (not the inner item)
             // This ensures the correct enum name (e.g., "OptionsEnum") is used
             // instead of the generic inner item name (e.g., "InnerEnum")
-            property.enumName = toEnumName(property);
+            property.setEnumName(toEnumName(property));
 
             // Now use property.enumName for datatypeWithEnum
-            property.datatypeWithEnum = property.datatypeWithEnum.replace(baseItem.baseType, property.enumName);
+            property.setDatatypeWithEnum(property.getDatatypeWithEnum().replace(baseItem.getBaseType(), property.getEnumName()));
 
             // set default value for variable with inner enum
-            if (property.defaultValue != null) {
-                property.defaultValue = property.defaultValue.replace(baseItem.baseType, property.enumName);
+            if (property.getDefaultValue() != null) {
+                property.setDefaultValue(property.getDefaultValue().replace(baseItem.getBaseType(), property.getEnumName()));
             }
 
             updateCodegenPropertyEnum(property);
@@ -1122,31 +1122,31 @@ public abstract class AbstractTypeScriptClientCodegen extends DefaultCodegen imp
      */
     @Override
     protected void updateDataTypeWithEnumForMap(CodegenProperty property) {
-        CodegenProperty baseItem = property.items;
-        while (baseItem != null && (Boolean.TRUE.equals(baseItem.isMap)
-                || Boolean.TRUE.equals(baseItem.isArray))) {
-            baseItem = baseItem.items;
+        CodegenProperty baseItem = property.getItems();
+        while (baseItem != null && (Boolean.TRUE.equals(baseItem.getIsMap())
+                || Boolean.TRUE.equals(baseItem.getIsArray()))) {
+            baseItem = baseItem.getItems();
         }
 
         if (baseItem != null) {
             // First, set the property's enumName using the property itself (not the inner item)
-            property.enumName = toEnumName(property);
+            property.setEnumName(toEnumName(property));
 
             // Replace only the LAST occurrence of baseType with enumName.
             // In map types, the value type appears last (after the key type),
             // so this approach is template-agnostic.
-            String datatypeWithEnum = property.datatypeWithEnum;
-            int lastIndex = datatypeWithEnum.lastIndexOf(baseItem.baseType);
+            String datatypeWithEnum = property.getDatatypeWithEnum();
+            int lastIndex = datatypeWithEnum.lastIndexOf(baseItem.getBaseType());
             if (lastIndex >= 0) {
-                property.datatypeWithEnum = datatypeWithEnum.substring(0, lastIndex)
-                        + property.enumName
-                        + datatypeWithEnum.substring(lastIndex + baseItem.baseType.length());
+                property.setDatatypeWithEnum(datatypeWithEnum.substring(0, lastIndex)
+                   + property.getEnumName()
+                   + datatypeWithEnum.substring(lastIndex + baseItem.getBaseType().length()));
             }
-            LOGGER.info("Updated datatypeWithEnum for map property '{}': {}", property.name, property.datatypeWithEnum);
+            LOGGER.info("Updated datatypeWithEnum for map property '{}': {}", property.getName(), property.getDatatypeWithEnum());
 
             // set default value for variable with inner enum
-            if (property.defaultValue != null) {
-                property.defaultValue = property.defaultValue.replace(baseItem.baseType, property.enumName);
+            if (property.getDefaultValue() != null) {
+                property.setDefaultValue(property.getDefaultValue().replace(baseItem.getBaseType(), property.getEnumName()));
             }
 
             updateCodegenPropertyEnum(property);
@@ -1165,15 +1165,15 @@ public abstract class AbstractTypeScriptClientCodegen extends DefaultCodegen imp
             // This applies to both direct enum properties (isEnum) and properties containing
             // inner enums (isInnerEnum) like maps or arrays of enums.
             for (CodegenProperty var : cm.vars) {
-                if (Boolean.TRUE.equals(var.isEnum) || Boolean.TRUE.equals(var.isInnerEnum)) {
-                    var.datatypeWithEnum = var.datatypeWithEnum.replace(var.enumName, cm.classname + classEnumSeparator + var.enumName);
+                if (Boolean.TRUE.equals(var.getIsEnum()) || Boolean.TRUE.equals(var.isInnerEnum())) {
+                    var.setDatatypeWithEnum(var.getDatatypeWithEnum().replace(var.getEnumName(), cm.classname + classEnumSeparator + var.getEnumName()));
                 }
             }
             if (cm.parent != null) {
                 for (CodegenProperty var : cm.allVars) {
-                    if (Boolean.TRUE.equals(var.isEnum) || Boolean.TRUE.equals(var.isInnerEnum)) {
-                        var.datatypeWithEnum = var.datatypeWithEnum
-                                .replace(var.enumName, cm.classname + classEnumSeparator + var.enumName);
+                    if (Boolean.TRUE.equals(var.getIsEnum()) || Boolean.TRUE.equals(var.isInnerEnum())) {
+                        var.setDatatypeWithEnum(var.getDatatypeWithEnum()
+                           .replace(var.getEnumName(), cm.classname + classEnumSeparator + var.getEnumName()));
                     }
                 }
             }
@@ -1201,8 +1201,8 @@ public abstract class AbstractTypeScriptClientCodegen extends DefaultCodegen imp
 
     private void setDiscriminatorValue(CodegenModel model, String baseName, String value) {
         for (CodegenProperty prop : model.allVars) {
-            if (prop.baseName.equals(baseName)) {
-                prop.discriminatorValue = value;
+            if (prop.getBaseName().equals(baseName)) {
+                prop.setDiscriminatorValue(value);
             }
         }
         if (model.children != null) {

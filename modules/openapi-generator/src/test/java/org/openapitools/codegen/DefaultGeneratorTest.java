@@ -598,7 +598,7 @@ public class DefaultGeneratorTest {
 
         // Validate when converting to property
         CodegenProperty stringRegexProperty = config.fromProperty("stringRegex", stringRegex);
-        Assert.assertEquals(stringRegexProperty.pattern, escapedPattern);
+        Assert.assertEquals(stringRegexProperty.getPattern(), escapedPattern);
 
         // Validate when converting to parameter
         Operation operation = openAPI.getPaths().get("/fake/StringRegex").getPost();

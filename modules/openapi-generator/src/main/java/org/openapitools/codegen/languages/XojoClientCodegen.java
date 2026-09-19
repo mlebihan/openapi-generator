@@ -210,7 +210,7 @@ public class XojoClientCodegen extends DefaultCodegen implements CodegenConfig {
             Iterator<CodegenProperty> iterator = codegenProperties.iterator();
             while (iterator.hasNext()) {
                 CodegenProperty codegenProperty = iterator.next();
-                if (codegenProperty.baseName.equals(parentModelCodegenProperty.baseName)) {
+                if (codegenProperty.getBaseName().equals(parentModelCodegenProperty.getBaseName())) {
                     // We found a property in the child class that is
                     // a duplicate of the one in the parent, so remove it.
                     iterator.remove();

@@ -123,7 +123,7 @@ public class KotlinWiremockServerCodegen extends AbstractKotlinCodegen {
                     .collect(Collectors.toList());
 
             for (CodegenProperty var : vars) {
-                var.vendorExtensions.put(VENDOR_EXTENSION_BASE_NAME_LITERAL, var.baseName.replace("$", "\\$"));
+                var.getExts().put(VENDOR_EXTENSION_BASE_NAME_LITERAL, var.getBaseName().replace("$", "\\$"));
             }
         }
 

@@ -154,7 +154,7 @@ public class ScalazClientCodegen extends AbstractScalaCodegen implements Codegen
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return formatIdentifier(property.baseName, true);
+        return formatIdentifier(property.getBaseName(), true);
     }
 
     @Override

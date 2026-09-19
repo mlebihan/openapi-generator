@@ -191,7 +191,7 @@ public class PhpNextgenClientCodegen extends AbstractPhpCodegen {
             members.addAll(composed.getAnyOf());
         }
         for (CodegenProperty member : members) {
-            memberTypes.add((member.isArray || member.isMap) ? "array" : member.dataType);
+            memberTypes.add((member.getIsArray() || member.getIsMap()) ? "array" : member.getDataType());
         }
         return memberTypes;
     }
@@ -299,7 +299,7 @@ public class PhpNextgenClientCodegen extends AbstractPhpCodegen {
      * {@code dataType} phpdoc untouched.
      */
     private String composedDocType(CodegenProperty prop, Map<String, String> composedTypeHints) {
-        return docTypeOf(prop.isArray, prop.isMap, prop.items, prop.dataType, composedTypeHints);
+        return docTypeOf(prop.getIsArray(), prop.getIsMap(), prop.getItems(), prop.getDataType(), composedTypeHints);
     }
 
     /** @see #composedDocType(CodegenProperty, Map) */
@@ -331,7 +331,7 @@ public class PhpNextgenClientCodegen extends AbstractPhpCodegen {
      * rather than using the {@code ?T} shorthand.
      */
     private String phpDocType(CodegenProperty prop, Map<String, String> composedTypeHints) {
-        return bakeDocType(composedDocType(prop, composedTypeHints), prop.dataType, prop.notRequiredOrIsNullable());
+        return bakeDocType(composedDocType(prop, composedTypeHints), prop.getDataType(), prop.notRequiredOrIsNullable());
     }
 
     private String phpDocType(CodegenParameter param, Map<String, String> composedTypeHints) {
@@ -359,7 +359,7 @@ public class PhpNextgenClientCodegen extends AbstractPhpCodegen {
             return;
         }
         String alias = composedTypeHints.containsKey(param.dataType) ? param.dataType
-                : (param.items != null && composedTypeHints.containsKey(param.items.dataType) ? param.items.dataType : null);
+                : (param.items != null && composedTypeHints.containsKey(param.items.getDataType()) ? param.items.getDataType() : null);
         if (alias == null) {
             return;
         }
@@ -382,9 +382,9 @@ public class PhpNextgenClientCodegen extends AbstractPhpCodegen {
             }
 
             for (CodegenProperty prop : model.vars) {
-                prop.vendorExtensions.putIfAbsent("x-php-prop-type",
-                        phpSignatureType(prop.dataType, prop.isArray || prop.isMap, prop.notRequiredOrIsNullable(), composedTypeHints));
-                prop.vendorExtensions.putIfAbsent("x-php-prop-doc-type", phpDocType(prop, composedTypeHints));
+                prop.getExts().putIfAbsent("x-php-prop-type",
+                        phpSignatureType(prop.getDataType(), prop.getIsArray() || prop.getIsMap(), prop.notRequiredOrIsNullable(), composedTypeHints));
+                prop.getExts().putIfAbsent("x-php-prop-doc-type", phpDocType(prop, composedTypeHints));
             }
         }
         return objs;
@@ -452,7 +452,7 @@ public class PhpNextgenClientCodegen extends AbstractPhpCodegen {
     @Override
     public String toDefaultValue(CodegenProperty codegenProperty, Schema schema) {
 
-        if (codegenProperty.isArray) {
+        if (codegenProperty.getIsArray()) {
             schema = ModelUtils.getReferencedSchema(this.openAPI, schema);
 
             if (schema.getDefault() != null) { // array schema has default value
@@ -473,7 +473,7 @@ public class PhpNextgenClientCodegen extends AbstractPhpCodegen {
 
     @Override
     public void setParameterExampleValue(CodegenParameter p) {
-        if (p.isArray && p.items.defaultValue != null) {
+        if (p.isArray && p.items.getDefaultValue() != null) {
             p.example = p.defaultValue;
         } else {
             super.setParameterExampleValue(p);

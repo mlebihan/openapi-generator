@@ -136,10 +136,10 @@ public class PlantumlDocumentationCodegen extends DefaultCodegen implements Code
         Map<String, Object> field = new HashMap<>();
         field.put("name", codegenProperty.getBaseName());
         field.put("isRequired", codegenProperty.getRequired());
-        field.put("isList", codegenProperty.isArray);
+        field.put("isList", codegenProperty.getIsArray());
         field.put("complexDataType", getComplexDataTypeFor(codegenProperty));
 
-        String dataType = codegenProperty.isArray && codegenProperty.getItems() != null ? "List<" + toModelName(codegenProperty.getItems().getDataType()) + ">" : toModelName(codegenProperty.getDataType());
+        String dataType = codegenProperty.getIsArray() && codegenProperty.getItems() != null ? "List<" + toModelName(codegenProperty.getItems().getDataType()) + ">" : toModelName(codegenProperty.getDataType());
         field.put("dataType", dataType);
 
         return field;
@@ -174,9 +174,9 @@ public class PlantumlDocumentationCodegen extends DefaultCodegen implements Code
     }
 
     private String getComplexDataTypeFor(CodegenProperty codegenProperty) {
-        if (codegenProperty.isModel) {
+        if (codegenProperty.getIsModel()) {
             return toModelName(codegenProperty.getDataType());
-        } else if (codegenProperty.isArray && codegenProperty.getItems().isModel) {
+        } else if (codegenProperty.getIsArray() && codegenProperty.getItems().getIsModel()) {
             return toModelName((codegenProperty.getItems().getDataType()));
         }
 

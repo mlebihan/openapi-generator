@@ -291,36 +291,36 @@ public class WsdlSchemaCodegen extends DefaultCodegen implements CodegenConfig {
                 Map<String, Object> propertyVendorExtensions = var.getVendorExtensions();
 
                 // lowercase basetypes if openapitype is string
-                if ("string".equals(var.openApiType)) {
-                    var.baseType = var.baseType.substring(0, 1).toLowerCase(Locale.getDefault())
-                            + var.baseType.substring(1);
+                if ("string".equals(var.getOpenApiType())) {
+                    var.setBaseType(var.getBaseType().substring(0, 1).toLowerCase(Locale.getDefault())
+                       + var.getBaseType().substring(1));
                 }
                 // if string enum, uppercase 'name' to have a reference to wsdl simpletype
-                if (var.isEnum) {
-                    var.name = var.name.substring(0, 1).toUpperCase(Locale.getDefault()) + var.name.substring(1);
+                if (var.getIsEnum()) {
+                    var.setName(var.getName().substring(0, 1).toUpperCase(Locale.getDefault()) + var.getName().substring(1));
                 }
                 // prevent default="null" in wsdl-tag if no default was specified for a property
-                if ("null".equals(var.defaultValue) || var.defaultValue == null) {
+                if ("null".equals(var.getDefaultValue()) || var.getDefaultValue() == null) {
                     propertyVendorExtensions.put("x-prop-has-defaultvalue", false);
                 } else {
                     propertyVendorExtensions.put("x-prop-has-defaultvalue", true);
                 }
 
                 // check if model property has a minimum or maximum number or length
-                if (var.minimum != null
-                        || var.maximum != null
-                        || var.minLength != null
-                        || var.maxLength != null) {
+                if (var.getMinimum() != null
+                        || var.getMaximum() != null
+                        || var.getMinLength() != null
+                        || var.getMaxLength() != null) {
                     propertyVendorExtensions.put("x-prop-has-minormax", true);
                 } else {
                     propertyVendorExtensions.put("x-prop-has-minormax", false);
                 }
 
                 // specify appearing schema names in case of openapi array with oneOf elements
-                if ("array".equals(var.openApiType) && var.items.dataType.startsWith("oneOf<")) {
+                if ("array".equals(var.getOpenApiType()) && var.getItems().getDataType().startsWith("oneOf<")) {
                     // get only comma separated names of schemas from oneOf<name1,name2...>
                     String schemaNamesString =
-                            var.items.dataType.substring(6, var.items.dataType.length() - 1);
+                            var.getItems().getDataType().substring(6, var.getItems().getDataType().length() - 1);
                     List<String> oneofSchemas =
                             new ArrayList<String>(Arrays.asList(schemaNamesString.split("\\s*,\\s*")));
 
@@ -411,8 +411,8 @@ public class WsdlSchemaCodegen extends DefaultCodegen implements CodegenConfig {
                 cr.isModel = true;
             }
             cr.simpleType = false;
-            cr.containerType = cp.containerType;
-            cr.containerTypeMapped = cp.containerTypeMapped;
+            cr.containerType = cp.getContainerType();
+            cr.containerTypeMapped = cp.getContainerTypeMapped();
             addVarsRequiredVarsAdditionalProps(responseSchema, cr);
         }
 

@@ -73,15 +73,15 @@ public class OneOfImplementorAdditionalData {
         if (cm.interfaceModels != null) {
             for (CodegenModel m : cm.interfaceModels) {
                 for (CodegenProperty v : m.vars) {
-                    omitAdding.add(v.baseName);
+                    omitAdding.add(v.getBaseName());
                 }
                 for (CodegenProperty v : m.allVars) {
-                    omitAdding.add(v.baseName);
+                    omitAdding.add(v.getBaseName());
                 }
             }
         }
         for (CodegenProperty v : toAdd) {
-            if (!omitAdding.contains(v.baseName)) {
+            if (!omitAdding.contains(v.getBaseName())) {
                 additionalProps.add(v.clone());
             }
         }

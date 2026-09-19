@@ -255,13 +255,13 @@ public class OCamlClientCodegen extends DefaultCodegen implements CodegenConfig 
 
             // Check if any property is a self-reference
             boolean hasSelfRef = cm.allVars.stream()
-                    .anyMatch(prop -> prop.isSelfReference);
+                    .anyMatch(prop -> prop.isSelfReference());
 
             if (hasSelfRef) {
                 // Collect names of self-referencing properties
                 Set<String> selfRefPropNames = cm.allVars.stream()
-                        .filter(p -> p.isSelfReference)
-                        .map(p -> p.name)
+                        .filter(p -> p.isSelfReference())
+                        .map(p -> p.getName())
                         .collect(Collectors.toSet());
 
                 // The property lists (vars, allVars, etc.) contain DIFFERENT objects
@@ -273,38 +273,38 @@ public class OCamlClientCodegen extends DefaultCodegen implements CodegenConfig 
 
                 for (List<CodegenProperty> propList : allPropertyLists) {
                     for (CodegenProperty prop : propList) {
-                        if (selfRefPropNames.contains(prop.name)) {
-                            if (prop.isContainer && prop.items != null) {
+                        if (selfRefPropNames.contains(prop.getName())) {
+                            if (prop.isContainer() && prop.getItems() != null) {
                                 // For containers, update items and reconstruct the container type
-                                prop.items.dataType = "t";
-                                prop.items.datatypeWithEnum = "t";
-                                if (prop.items.baseType != null) {
-                                    prop.items.baseType = "t";
+                                prop.getItems().setDatatype("t");
+                                prop.getItems().setDatatypeWithEnum("t");
+                                if (prop.getItems().getBaseType() != null) {
+                                    prop.getItems().setBaseType("t");
                                 }
-                                if (prop.items.complexType != null) {
-                                    prop.items.complexType = "t";
+                                if (prop.getItems().getComplexType() != null) {
+                                    prop.getItems().setComplexType("t");
                                 }
 
                                 // Reconstruct the container type based on the updated items
-                                if (prop.isArray) {
-                                    prop.dataType = "t list";
-                                    prop.datatypeWithEnum = "t list";
-                                } else if (prop.isMap) {
-                                    prop.dataType = "(string * t) list";
-                                    prop.datatypeWithEnum = "(string * t) list";
+                                if (prop.getIsArray()) {
+                                    prop.setDatatype("t list");
+                                    prop.setDatatypeWithEnum("t list");
+                                } else if (prop.getIsMap()) {
+                                    prop.setDatatype("(string * t) list");
+                                    prop.setDatatypeWithEnum("(string * t) list");
                                 }
                             } else {
                                 // For non-containers, just replace the type directly
-                                prop.dataType = "t";
-                                prop.datatypeWithEnum = "t";
+                                prop.setDatatype("t");
+                                prop.setDatatypeWithEnum("t");
                             }
 
                             // Update baseType and complexType for all cases
-                            if (prop.baseType != null) {
-                                prop.baseType = "t";
+                            if (prop.getBaseType() != null) {
+                                prop.setBaseType("t");
                             }
-                            if (prop.complexType != null) {
-                                prop.complexType = "t";
+                            if (prop.getComplexType() != null) {
+                                prop.setComplexType("t");
                             }
                         }
                     }
@@ -329,13 +329,13 @@ public class OCamlClientCodegen extends DefaultCodegen implements CodegenConfig 
 
         for (CodegenProperty schema : schemas) {
             // If this schema is an enum, add Enums. prefix to datatypeWithEnum
-            if (schema.isEnum) {
-                if (!schema.datatypeWithEnum.startsWith("Enums.")) {
-                    schema.datatypeWithEnum = "Enums." + schema.datatypeWithEnum;
+            if (schema.getIsEnum()) {
+                if (!schema.getDatatypeWithEnum().startsWith("Enums.")) {
+                    schema.setDatatypeWithEnum("Enums." + schema.getDatatypeWithEnum());
                 }
                 // Also update dataType for the variant constructor
-                if (!schema.dataType.startsWith("Enums.")) {
-                    schema.dataType = "Enums." + schema.dataType;
+                if (!schema.getDataType().startsWith("Enums.")) {
+                    schema.setDatatype("Enums." + schema.getDataType());
                 }
             }
         }
@@ -345,22 +345,22 @@ public class OCamlClientCodegen extends DefaultCodegen implements CodegenConfig 
         for (CodegenProperty property : properties) {
             if (property.get_enum() != null && property.get_enum().size() == 1) {
                 String value = property.get_enum().get(0);
-                property.defaultValue = ocamlizeEnumValue(value);
+                property.setDefaultValue(ocamlizeEnumValue(value));
             }
         }
     }
 
     @Override
     protected void updateDataTypeWithEnumForMap(CodegenProperty property) {
-        CodegenProperty baseItem = property.items;
-        while (baseItem != null && (baseItem.isMap || baseItem.isArray)) {
-            baseItem = baseItem.items;
+        CodegenProperty baseItem = property.getItems();
+        while (baseItem != null && (baseItem.getIsMap() || baseItem.getIsArray())) {
+            baseItem = baseItem.getItems();
         }
 
         if (baseItem != null) {
             // set default value for variable with inner enum
-            if (property.defaultValue != null) {
-                property.defaultValue = property.defaultValue.replace(", " + property.items.baseType, ", " + toEnumName(property.items));
+            if (property.getDefaultValue() != null) {
+                property.setDefaultValue(property.getDefaultValue().replace(", " + property.getItems().getBaseType(), ", " + toEnumName(property.getItems())));
             }
 
             updateCodegenPropertyEnum(property);
@@ -369,14 +369,14 @@ public class OCamlClientCodegen extends DefaultCodegen implements CodegenConfig 
 
     @Override
     protected void updateDataTypeWithEnumForArray(CodegenProperty property) {
-        CodegenProperty baseItem = property.items;
-        while (baseItem != null && (baseItem.isMap || baseItem.isArray)) {
-            baseItem = baseItem.items;
+        CodegenProperty baseItem = property.getItems();
+        while (baseItem != null && (baseItem.getIsMap() || baseItem.getIsArray())) {
+            baseItem = baseItem.getItems();
         }
         if (baseItem != null) {
             // set default value for variable with inner enum
-            if (property.defaultValue != null) {
-                property.defaultValue = property.defaultValue.replace(baseItem.baseType, toEnumName(baseItem));
+            if (property.getDefaultValue() != null) {
+                property.setDefaultValue(property.getDefaultValue().replace(baseItem.getBaseType(), toEnumName(baseItem)));
             }
 
             updateCodegenPropertyEnum(property);

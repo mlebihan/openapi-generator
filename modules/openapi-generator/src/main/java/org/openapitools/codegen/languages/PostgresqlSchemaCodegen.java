@@ -474,8 +474,8 @@ public class PostgresqlSchemaCodegen extends DefaultCodegen {
         boolean exclusiveMaximum = property.getIExclusiveMaximum();
         String defaultValue = property.getDefaultValue();
         Boolean required = property.getRequired();
-        Boolean isUuid = property.isUuid;
-        Boolean isEnum = property.isEnum;
+        Boolean isUuid = property.getIsUuid();
+        Boolean isEnum = property.getIsEnum();
         String tableName = this.toTableName(model.getName());
 
         if (vendorExtensions.containsKey(VENDOR_EXTENSION_POSTGRESQL_SCHEMA)) {
@@ -598,7 +598,7 @@ public class PostgresqlSchemaCodegen extends DefaultCodegen {
         boolean exclusiveMaximum = property.getIExclusiveMaximum();
         String defaultValue = property.getDefaultValue();
         Boolean required = property.getRequired();
-        Boolean isEnum = property.isEnum;
+        Boolean isEnum = property.getIsEnum();
         String tableName = this.toTableName(model.getName());
 
         if (vendorExtensions.containsKey(VENDOR_EXTENSION_POSTGRESQL_SCHEMA)) {
@@ -631,7 +631,7 @@ public class PostgresqlSchemaCodegen extends DefaultCodegen {
         }
 
         if (Boolean.TRUE.equals(isEnum)) {
-            List<Object> enumValues = getEnumValues(property.allowableValues);
+            List<Object> enumValues = getEnumValues(property.getAllowableValues());
             String typeName = this.toTableName(model.getName())
                     + "_" + this.toColumnName(property.getName());
             postgresqlSchema.put("typeDefinition", typeDefinition);
@@ -703,7 +703,7 @@ public class PostgresqlSchemaCodegen extends DefaultCodegen {
         Integer maxLength = property.getMaxLength();
         String defaultValue = property.getDefaultValue();
         Boolean required = property.getRequired();
-        Boolean isEnum = property.isEnum;
+        Boolean isEnum = property.getIsEnum();
         String tableName = this.toTableName(model.getName());
 
         if (vendorExtensions.containsKey(VENDOR_EXTENSION_POSTGRESQL_SCHEMA)) {
@@ -736,7 +736,7 @@ public class PostgresqlSchemaCodegen extends DefaultCodegen {
         }
 
         if (Boolean.TRUE.equals(isEnum)) {
-            List<Object> enumValues = getEnumValues(property.allowableValues);
+            List<Object> enumValues = getEnumValues(property.getAllowableValues());
             String typeName = this.toTableName(model.getName())
                     + "_" + this.toColumnName(property.getName());
             postgresqlSchema.put("typeDefinition", typeDefinition);

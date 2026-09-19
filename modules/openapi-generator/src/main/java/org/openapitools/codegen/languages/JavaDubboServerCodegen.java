@@ -811,11 +811,11 @@ public class JavaDubboServerCodegen extends AbstractJavaCodegen {
             }
 
             for (CodegenProperty var : model.vars) {
-                if (var.allowableValues != null && var.allowableValues.get("imports") != null) {
-                    ((Set<String>) var.allowableValues.get("imports")).remove("ApiModel");
-                    ((Set<String>) var.allowableValues.get("imports")).remove("ApiModelProperty");
-                    ((Set<String>) var.allowableValues.get("imports")).remove("io.swagger.annotations.ApiModel");
-                    ((Set<String>) var.allowableValues.get("imports")).remove("io.swagger.annotations.ApiModelProperty");
+                if (var.getAllowableValues() != null && var.getAllowableValues().get("imports") != null) {
+                    ((Set<String>) var.getAllowableValues().get("imports")).remove("ApiModel");
+                    ((Set<String>) var.getAllowableValues().get("imports")).remove("ApiModelProperty");
+                    ((Set<String>) var.getAllowableValues().get("imports")).remove("io.swagger.annotations.ApiModel");
+                    ((Set<String>) var.getAllowableValues().get("imports")).remove("io.swagger.annotations.ApiModelProperty");
                 }
             }
         }

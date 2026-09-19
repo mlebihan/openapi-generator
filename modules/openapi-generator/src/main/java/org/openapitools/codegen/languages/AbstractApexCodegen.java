@@ -277,12 +277,12 @@ public abstract class AbstractApexCodegen extends DefaultCodegen implements Code
         } else if (Boolean.TRUE.equals(p.isDateTime)) {
             p.example = "Datetime.newInstanceGmt(2013, 11, 12, 3, 3, 3)";
         } else if (Boolean.TRUE.equals(p.isArray)) {
-            if (p.items != null && p.items.example != null) {
-                p.example = "new " + p.dataType + "{" + p.items.example + "}";
+            if (p.items != null && p.items.getExample() != null) {
+                p.example = "new " + p.dataType + "{" + p.items.getExample() + "}";
             }
         } else if (Boolean.TRUE.equals(p.isMap)) {
-            if (p.items != null && p.items.example != null) {
-                p.example = "new " + p.dataType + "{" + p.items.example + "}";
+            if (p.items != null && p.items.getExample() != null) {
+                p.example = "new " + p.dataType + "{" + p.items.getExample() + "}";
             }
         } else if (Boolean.TRUE.equals(p.isString)) {
             p.example = "'" + p.example + "'";
@@ -439,11 +439,11 @@ public abstract class AbstractApexCodegen extends DefaultCodegen implements Code
         // for (de)serializing properties renamed for Apex (e.g. reserved words)
         List<Map<String, String>> propertyMappings = new ArrayList<>();
         for (CodegenProperty p : cm.allVars) {
-            hasDefaultValues |= p.defaultValue != null;
-            if (!p.baseName.equals(p.name)) {
+            hasDefaultValues |= p.getDefaultValue() != null;
+            if (!p.getBaseName().equals(p.getName())) {
                 Map<String, String> mapping = new HashMap<>();
-                mapping.put("externalName", p.baseName);
-                mapping.put("internalName", p.name);
+                mapping.put("externalName", p.getBaseName());
+                mapping.put("internalName", p.getName());
                 propertyMappings.add(mapping);
             }
         }
@@ -462,7 +462,7 @@ public abstract class AbstractApexCodegen extends DefaultCodegen implements Code
     public void postProcessParameter(CodegenParameter parameter) {
         if (parameter.isBodyParam && parameter.isArray) {
             // items of array bodyParams are being nested an extra level too deep for some reason
-            parameter.items = parameter.items.items;
+            parameter.items = parameter.items.getItems();
             setParameterExampleValue(parameter);
         }
     }
@@ -506,7 +506,7 @@ public abstract class AbstractApexCodegen extends DefaultCodegen implements Code
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return sanitizeName(camelize(property.name)) + "Enum";
+        return sanitizeName(camelize(property.getName())) + "Enum";
     }
 
     @Override
@@ -594,13 +594,13 @@ public abstract class AbstractApexCodegen extends DefaultCodegen implements Code
         boolean removedChildEnum = false;
         for (CodegenProperty parentModelCodegenProperty : parentModelCodegenProperties) {
             // Look for enums
-            if (parentModelCodegenProperty.isEnum) {
+            if (parentModelCodegenProperty.getIsEnum()) {
                 // Now that we have found an enum in the parent class,
                 // and search the child class for the same enum.
                 Iterator<CodegenProperty> iterator = codegenProperties.iterator();
                 while (iterator.hasNext()) {
                     CodegenProperty codegenProperty = iterator.next();
-                    if (codegenProperty.isEnum && codegenProperty.equals(parentModelCodegenProperty)) {
+                    if (codegenProperty.getIsEnum() && codegenProperty.equals(parentModelCodegenProperty)) {
                         // We found an enum in the child class that is
                         // a duplicate of the one in the parent, so remove it.
                         iterator.remove();

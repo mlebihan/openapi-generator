@@ -650,7 +650,7 @@ public abstract class AbstractDartCodegen extends DefaultCodegen {
 
                 if (shouldUseOptional) {
                     for (CodegenProperty prop : model.vars) {
-                        if (!prop.required && !prop.dataType.startsWith("Optional<")) {
+                        if (!prop.getRequired() && !prop.getDataType().startsWith("Optional<")) {
                             wrapPropertyWithOptional(prop);
                             hasOptionalProperties = true;
                         }
@@ -665,51 +665,51 @@ public abstract class AbstractDartCodegen extends DefaultCodegen {
     }
 
     private void wrapPropertyWithOptional(CodegenProperty property) {
-        property.vendorExtensions.put("x-unwrapped-datatype", property.dataType);
-        property.vendorExtensions.put("x-is-optional", true);
-        property.vendorExtensions.put("x-original-is-number", property.isNumber);
-        property.vendorExtensions.put("x-original-is-integer", property.isInteger);
+        property.getExts().put("x-unwrapped-datatype", property.getDataType());
+        property.getExts().put("x-is-optional", true);
+        property.getExts().put("x-original-is-number", property.getIsNumber());
+        property.getExts().put("x-original-is-integer", property.getIsInteger());
 
-        boolean hasNullableSuffix = property.dataType.endsWith("?");
-        String baseType = hasNullableSuffix ? property.dataType.substring(0, property.dataType.length() - 1) : property.dataType;
-        property.vendorExtensions.put("x-unwrapped-datatype-nullable", baseType + "?");
-        property.dataType = "Optional<" + baseType + "?" + ">";
+        boolean hasNullableSuffix = property.getDataType().endsWith("?");
+        String baseType = hasNullableSuffix ? property.getDataType().substring(0, property.getDataType().length() - 1) : property.getDataType();
+        property.getExts().put("x-unwrapped-datatype-nullable", baseType + "?");
+        property.setDatatype("Optional<" + baseType + "?" + ">");
 
-        if (property.datatypeWithEnum != null && !property.datatypeWithEnum.startsWith("Optional<")) {
-            hasNullableSuffix = property.datatypeWithEnum.endsWith("?");
-            baseType = hasNullableSuffix ? property.datatypeWithEnum.substring(0, property.datatypeWithEnum.length() - 1) : property.datatypeWithEnum;
-            property.datatypeWithEnum = "Optional<" + baseType + "?" + ">";
+        if (property.getDatatypeWithEnum() != null && !property.getDatatypeWithEnum().startsWith("Optional<")) {
+            hasNullableSuffix = property.getDatatypeWithEnum().endsWith("?");
+            baseType = hasNullableSuffix ? property.getDatatypeWithEnum().substring(0, property.getDatatypeWithEnum().length() - 1) : property.getDatatypeWithEnum();
+            property.setDatatypeWithEnum("Optional<" + baseType + "?" + ">");
         }
 
-        property.isNullable = false;
+        property.isNullable(false);
     }
 
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         super.postProcessModelProperty(model, property);
-        if (!model.isEnum && property.isEnum && property.getComposedSchemas() == null) {
+        if (!model.isEnum && property.getIsEnum() && property.getComposedSchemas() == null) {
             // These are inner enums, enums which do not exist as models, just as properties.
             // They are handled via the enum_inline template and are generated in the
             // same file as the containing class. To prevent name clashes the inline enum classes
             // are prefix with the classname of the containing class in the template.
             // Here the datatypeWithEnum template variable gets updated to match that scheme.
             // Also taking into account potential collection types e.g. List<JustSymbolEnum> -> List<EnumArraysJustSymbolEnum>
-            final String enumName = model.classname + property.enumName;
-            if (property.items != null) {
+            final String enumName = model.classname + property.getEnumName();
+            if (property.getItems() != null) {
                 // inner items e.g. enums in collections, only works for one level
                 // but same is the case for DefaultCodegen
-                property.setDatatypeWithEnum(property.datatypeWithEnum.replace(property.items.datatypeWithEnum, enumName));
+                property.setDatatypeWithEnum(property.getDatatypeWithEnum().replace(property.getItems().getDatatypeWithEnum(), enumName));
                 // Because properties are cached in org.openapitools.codegen.DefaultCodegen.fromProperty(java.lang.String, io.swagger.v3.oas.models.media.Schema, boolean, boolean)
                 // then the same object could be for multiple properties where the name of the inline enum is the same
                 // in 2 different classes and the following renaming will impact properties in other classes we
                 // therefore clone them before editing
-                property.items = property.items.clone();
-                property.mostInnerItems = property.items;
-                property.items.setDatatypeWithEnum(enumName);
-                property.items.setEnumName(enumName);
+                property.setItems(property.getItems().clone());
+                property.setMostInnerItems(property.getItems());
+                property.getItems().setDatatypeWithEnum(enumName);
+                property.getItems().setEnumName(enumName);
             } else {
                 // plain enum property
-                property.setDatatypeWithEnum(property.datatypeWithEnum.replace(property.enumName, enumName));
+                property.setDatatypeWithEnum(property.getDatatypeWithEnum().replace(property.getEnumName(), enumName));
             }
             property.setEnumName(enumName);
         }
@@ -737,8 +737,8 @@ public abstract class AbstractDartCodegen extends DefaultCodegen {
                         .map(ModelUtils::getSimpleRef)
                         .map(ref -> ModelUtils.getSchemas(this.openAPI).get(ref))
                         .ifPresent(schema -> {
-                            property.isEnum = schema.getEnum() != null;
-                            property.isModel = true;
+                            property.setIsEnum(schema.getEnum() != null);
+                            property.setIsModel(true);
                         });
 
             }

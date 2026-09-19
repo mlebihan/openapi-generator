@@ -724,7 +724,7 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
             return null;
         }
 
-        Object example = getSchemaExample(cp.jsonSchema);
+        Object example = getSchemaExample(cp.getJsonSchema());
         if (example != null) {
             return toPythonLiteral(example);
         }
@@ -1052,7 +1052,7 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
                 int index = 0;
                 List<CodegenProperty> oneOfs = model.getComposedSchemas().getOneOf();
                 for (CodegenProperty oneOf : oneOfs) {
-                    if ("none_type".equals(oneOf.dataType)) {
+                    if ("none_type".equals(oneOf.getDataType())) {
                         oneOfs.remove(index);
                         break; // return earlier assuming there's only 1 null type defined
                     }
@@ -1087,9 +1087,9 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
 
             if (hasAllOf(model)) {
                 for (CodegenProperty cp : model.allVars) {
-                    if (!cp.isPrimitiveType || cp.isModel) {
-                        if (cp.isArray || cp.isMap) { // if array or map
-                            modelImports.add(cp.items.dataType);
+                    if (!cp.getIsPrimitiveType() || cp.getIsModel()) {
+                        if (cp.getIsArray() || cp.getIsMap()) { // if array or map
+                            modelImports.add(cp.getItems().getDataType());
                         } else { // if model
                             modelImports.add(cp.getDataType());
                         }
@@ -1115,18 +1115,18 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
             //loop through properties/schemas to set up typing, pydantic
             for (CodegenProperty cp : codegenProperties) {
                 // is readOnly?
-                if (cp.isReadOnly) {
-                    readOnlyFields.add(cp.name);
+                if (cp.isReadOnly()) {
+                    readOnlyFields.add(cp.getName());
                 }
 
                 String typing = pydantic.generatePythonType(cp);
-                cp.vendorExtensions.put(X_PY_TYPING, typing);
+                cp.getExts().put(X_PY_TYPING, typing);
 
                 // setup x-py-name for each oneOf/anyOf schema
                 if (hasOneOf(model)) {
-                    cp.vendorExtensions.put(X_PY_NAME, String.format(Locale.ROOT, "oneof_schema_%d_validator", property_count++));
+                    cp.getExts().put(X_PY_NAME, String.format(Locale.ROOT, "oneof_schema_%d_validator", property_count++));
                 } else if (hasAnyOf(model)) {
-                    cp.vendorExtensions.put(X_PY_NAME, String.format(Locale.ROOT, "anyof_schema_%d_validator", property_count++));
+                    cp.getExts().put(X_PY_NAME, String.format(Locale.ROOT, "anyof_schema_%d_validator", property_count++));
                 }
             }
 
@@ -1329,11 +1329,11 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
      * @return model name
      */
     private String getModelNameFromDataType(CodegenProperty cp) {
-        if (cp.isArray) {
-            return getModelNameFromDataType(cp.items);
-        } else if (cp.isMap) {
-            return getModelNameFromDataType(cp.items);
-        } else if (!cp.isPrimitiveType || cp.isModel) {
+        if (cp.getIsArray()) {
+            return getModelNameFromDataType(cp.getItems());
+        } else if (cp.getIsMap()) {
+            return getModelNameFromDataType(cp.getItems());
+        } else if (!cp.getIsPrimitiveType() || cp.getIsModel()) {
             return cp.getDataType();
         } else {
             return null;
@@ -1517,13 +1517,13 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
 
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
-        property.vendorExtensions.put(
+        property.getExts().put(
                 X_PY_WIRE_NAME_LITERAL,
-                toPythonStringLiteral(property.baseName));
-        postProcessPattern(property.pattern, property.vendorExtensions);
+                toPythonStringLiteral(property.getBaseName()));
+        postProcessPattern(property.getPattern(), property.getExts());
 
-        if (property.isArray) {
-            postProcessPattern(property.items.pattern, property.items.vendorExtensions);
+        if (property.getIsArray()) {
+            postProcessPattern(property.getItems().getPattern(), property.getItems().getExts());
         }
     }
 
@@ -1606,11 +1606,11 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
 
     @Override
     public String toEnumDefaultValue(CodegenProperty property, String value) {
-        if (property.isEnumRef) {
+        if (property.isEnumRef()) {
             // Determine if it's a string by checking if the value has already been encapsulated in single quotes.
             String dataType = (value.startsWith("'") && value.endsWith("'")) ? "string" : "int";
             // If the property is an enum reference, then use the fully qualified name with the data type.
-            return property.dataType + "." + toEnumVariableName(value, dataType);
+            return property.getDataType() + "." + toEnumVariableName(value, dataType);
         }
         return value;
     }
@@ -1978,7 +1978,7 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
 
         protected PythonType collectionItemType(CodegenProperty itemCp) {
             PythonType itemPt = getType(itemCp);
-            if (itemCp != null && !itemPt.type.equals("Any") && itemCp.isNullable) {
+            if (itemCp != null && !itemPt.type.equals("Any") && itemCp.isNullable()) {
                 moduleImports.add(TYPING, "Optional");
                 PythonType opt = new PythonType("Optional");
                 opt.addTypeParam(itemPt);
@@ -2230,14 +2230,14 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
 
         public String generatePythonType(CodegenProperty cp) {
             PythonType pt = this.getType(cp);
-            if (!cp.required || cp.isNullable) {
+            if (!cp.getRequired() || cp.isNullable()) {
                 moduleImports.add(TYPING, "Optional");
                 PythonType opt = new PythonType("Optional");
                 opt.addTypeParam(pt);
                 pt = opt;
             }
-            if (cp.vendorExtensions.containsKey(X_PY_PUBLIC_NAME_DIFFERS_FROM_STORAGE)) {
-                cp.vendorExtensions.put(X_PY_PUBLIC_NAME_TYPING,
+            if (cp.getExts().containsKey(X_PY_PUBLIC_NAME_DIFFERS_FROM_STORAGE)) {
+                cp.getExts().put(X_PY_PUBLIC_NAME_TYPING,
                         pt.asTypeConstraint(moduleImports));
             }
             return this.finalizeType(cp, pt);
@@ -2263,7 +2263,7 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
 
             if (result == null) {
                 // TODO: Cleanup
-                if (!cp.isPrimitiveType || cp.isModel) { // model
+                if (!cp.getIsPrimitiveType() || cp.getIsModel()) { // model
                     // skip import if it's a circular reference
                     if (classname == null) {
                         // for parameter model, import directly
@@ -2298,28 +2298,28 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
         }
 
         private String finalizeType(CodegenProperty cp, PythonType pt) {
-            if (!StringUtils.isEmpty(cp.description)) { // has description
-                pt.annotate("description", cp.description);
+            if (!StringUtils.isEmpty(cp.getDescription())) { // has description
+                pt.annotate("description", cp.getDescription());
             }
 
             // field
-            String publicName = (String) cp.vendorExtensions.get(X_PY_PUBLIC_NAME);
+            String publicName = (String) cp.getExts().get(X_PY_PUBLIC_NAME);
             if (publicName != null) {
-                String aliasName = cp.vendorExtensions.containsKey(X_PY_EXPLICIT_PUBLIC_NAME)
-                        || cp.vendorExtensions.containsKey(X_PY_LEGACY_PUBLIC_NAME)
+                String aliasName = cp.getExts().containsKey(X_PY_EXPLICIT_PUBLIC_NAME)
+                        || cp.getExts().containsKey(X_PY_LEGACY_PUBLIC_NAME)
                         ? publicName
-                        : cp.baseName;
-                if (!aliasName.equals(cp.name)) {
+                        : cp.getBaseName();
+                if (!aliasName.equals(cp.getName())) {
                     pt.annotate("alias", toPythonStringLiteral(aliasName), false);
                 }
-                if (!publicName.equals(cp.baseName)) {
+                if (!publicName.equals(cp.getBaseName())) {
                     moduleImports.add(PYDANTIC, "AliasChoices");
                     pt.annotate("validation_alias", String.format(Locale.ROOT, "AliasChoices(%s, %s)",
-                            toPythonStringLiteral(cp.baseName), toPythonStringLiteral(publicName)), false);
-                    pt.annotate("serialization_alias", toPythonStringLiteral(cp.baseName), false);
+                            toPythonStringLiteral(cp.getBaseName()), toPythonStringLiteral(publicName)), false);
+                    pt.annotate("serialization_alias", toPythonStringLiteral(cp.getBaseName()), false);
                 }
-            } else if (cp.baseName != null && !cp.baseName.equals(cp.name)) {
-                pt.annotate("alias", toPythonStringLiteral(cp.baseName), false);
+            } else if (cp.getBaseName() != null && !cp.getBaseName().equals(cp.getName())) {
+                pt.annotate("alias", toPythonStringLiteral(cp.getBaseName()), false);
             }
 
             String example = toPythonExample(cp);
@@ -2328,16 +2328,16 @@ public abstract class AbstractPythonCodegen extends DefaultCodegen implements Co
             }
 
             //String defaultValue = null;
-            if (!cp.required) { //optional
-                if (cp.defaultValue == null) {
+            if (!cp.getRequired()) { //optional
+                if (cp.getDefaultValue() == null) {
                     pt.setDefaultValue("None");
                 } else {
-                    if (cp.isArray || cp.isMap) {
+                    if (cp.getIsArray() || cp.getIsMap()) {
                         // TODO handle default value for array/map
                         pt.setDefaultValue("None");
                     } else {
                         //defaultValue = ;
-                        pt.setDefaultValue(cp.defaultValue);
+                        pt.setDefaultValue(cp.getDefaultValue());
                     }
                 }
             }

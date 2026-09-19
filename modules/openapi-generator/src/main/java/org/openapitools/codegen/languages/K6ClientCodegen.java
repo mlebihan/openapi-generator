@@ -741,7 +741,7 @@ public class K6ClientCodegen extends DefaultCodegen implements CodegenConfig {
         StringBuilder reference = new StringBuilder();
         int modelEntrySetSize = model.getAllVars().size();
         for (CodegenProperty property : model.getAllVars()) {
-            reference.append(getDoubleQuotedString(property.name)).append(": ").append(getDoubleQuotedString(property.dataType.toLowerCase(Locale.ROOT)));
+            reference.append(getDoubleQuotedString(property.getName())).append(": ").append(getDoubleQuotedString(property.getDataType().toLowerCase(Locale.ROOT)));
             if (modelEntrySetSize > 1)
                 reference.append(", ");
         }

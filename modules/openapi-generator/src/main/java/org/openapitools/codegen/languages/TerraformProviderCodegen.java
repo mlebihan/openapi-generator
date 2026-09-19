@@ -351,27 +351,27 @@ public class TerraformProviderCodegen extends AbstractGoCodegen {
                     boolean hasListAttributes = false;
                     for (CodegenProperty prop : model.vars) {
                         Map<String, Object> attr = new HashMap<>();
-                        attr.put("name", prop.baseName);
-                        attr.put("terraformName", underscore(prop.baseName).toLowerCase(Locale.ROOT));
-                        attr.put("goName", camelize(prop.baseName));
-                        attr.put("goType", prop.dataType);
-                        attr.put("terraformType", goTypeToTerraformType(prop.dataType));
-                        attr.put("terraformAttrType", goTypeToTerraformAttrType(prop.dataType, prop));
-                        attr.put("isRequired", prop.required);
-                        attr.put("isComputed", prop.isReadOnly);
-                        attr.put("isOptional", !prop.required && !prop.isReadOnly);
-                        attr.put("description", prop.description != null ? prop.description : "");
-                        attr.put("isSensitive", prop.isWriteOnly || getBooleanVendorExtension(prop, "x-terraform-sensitive"));
-                        attr.put("isString", "string".equals(prop.dataType));
-                        attr.put("isInt64", "int64".equals(prop.dataType) || "int32".equals(prop.dataType));
-                        attr.put("isFloat64", "float64".equals(prop.dataType) || "float32".equals(prop.dataType));
-                        attr.put("isBool", "bool".equals(prop.dataType));
-                        attr.put("isList", prop.isArray);
-                        attr.put("isObject", prop.isModel && !prop.isArray);
-                        if (prop.isArray) {
+                        attr.put("name", prop.getBaseName());
+                        attr.put("terraformName", underscore(prop.getBaseName()).toLowerCase(Locale.ROOT));
+                        attr.put("goName", camelize(prop.getBaseName()));
+                        attr.put("goType", prop.getDataType());
+                        attr.put("terraformType", goTypeToTerraformType(prop.getDataType()));
+                        attr.put("terraformAttrType", goTypeToTerraformAttrType(prop.getDataType(), prop));
+                        attr.put("isRequired", prop.getRequired());
+                        attr.put("isComputed", prop.isReadOnly());
+                        attr.put("isOptional", !prop.getRequired() && !prop.isReadOnly());
+                        attr.put("description", prop.getDescription() != null ? prop.getDescription() : "");
+                        attr.put("isSensitive", prop.isWriteOnly() || getBooleanVendorExtension(prop, "x-terraform-sensitive"));
+                        attr.put("isString", "string".equals(prop.getDataType()));
+                        attr.put("isInt64", "int64".equals(prop.getDataType()) || "int32".equals(prop.getDataType()));
+                        attr.put("isFloat64", "float64".equals(prop.getDataType()) || "float32".equals(prop.getDataType()));
+                        attr.put("isBool", "bool".equals(prop.getDataType()));
+                        attr.put("isList", prop.getIsArray());
+                        attr.put("isObject", prop.getIsModel() && !prop.getIsArray());
+                        if (prop.getIsArray()) {
                             hasListAttributes = true;
-                            if (prop.items != null) {
-                                attr.put("listElementType", goTypeToTerraformElementType(prop.items.dataType));
+                            if (prop.getItems() != null) {
+                                attr.put("listElementType", goTypeToTerraformElementType(prop.getItems().getDataType()));
                             }
                         }
                         tfAttributes.add(attr);
@@ -383,9 +383,9 @@ public class TerraformProviderCodegen extends AbstractGoCodegen {
                     boolean idResolved = false;
                     // Try exact match on baseName (case-insensitive)
                     for (CodegenProperty prop : model.vars) {
-                        if (prop.baseName.equalsIgnoreCase(idField)) {
-                            idModelGoName = camelize(prop.baseName);
-                            idModelGoType = prop.dataType;
+                        if (prop.getBaseName().equalsIgnoreCase(idField)) {
+                            idModelGoName = camelize(prop.getBaseName());
+                            idModelGoType = prop.getDataType();
                             idResolved = true;
                             break;
                         }
@@ -395,9 +395,9 @@ public class TerraformProviderCodegen extends AbstractGoCodegen {
                         String strippedId = idField.replaceFirst("(?i)^" + resourceName, "");
                         if (!strippedId.isEmpty()) {
                             for (CodegenProperty prop : model.vars) {
-                                if (prop.baseName.equalsIgnoreCase(strippedId)) {
-                                    idModelGoName = camelize(prop.baseName);
-                                    idModelGoType = prop.dataType;
+                                if (prop.getBaseName().equalsIgnoreCase(strippedId)) {
+                                    idModelGoName = camelize(prop.getBaseName());
+                                    idModelGoType = prop.getDataType();
                                     idResolved = true;
                                     break;
                                 }
@@ -407,9 +407,9 @@ public class TerraformProviderCodegen extends AbstractGoCodegen {
                     // Fall back to "id" property
                     if (!idResolved) {
                         for (CodegenProperty prop : model.vars) {
-                            if ("id".equalsIgnoreCase(prop.baseName)) {
-                                idModelGoName = camelize(prop.baseName);
-                                idModelGoType = prop.dataType;
+                            if ("id".equalsIgnoreCase(prop.getBaseName())) {
+                                idModelGoName = camelize(prop.getBaseName());
+                                idModelGoType = prop.getDataType();
                                 break;
                             }
                         }
@@ -452,33 +452,33 @@ public class TerraformProviderCodegen extends AbstractGoCodegen {
                 // inheritedProperties (oneOf/anyOf entries) when the model has
                 // composed schemas without allOf, leaving model.vars without
                 // json tags. We fix this by generating the tag here when missing.
-                if (!prop.vendorExtensions.containsKey("x-go-datatag")) {
-                    String goDataTag = "json:\"" + prop.baseName;
-                    if (!prop.required) {
+                if (!prop.getExts().containsKey("x-go-datatag")) {
+                    String goDataTag = "json:\"" + prop.getBaseName();
+                    if (!prop.getRequired()) {
                         goDataTag += ",omitempty";
                     }
                     goDataTag += "\"";
                     goDataTag = " `" + goDataTag + "`";
-                    prop.vendorExtensions.put("x-go-datatag", goDataTag);
+                    prop.getExts().put("x-go-datatag", goDataTag);
                 }
 
                 // Add Terraform-specific vendor extensions
-                if (prop.isReadOnly) {
-                    prop.vendorExtensions.put("x-terraform-computed", true);
+                if (prop.isReadOnly()) {
+                    prop.getExts().put("x-terraform-computed", true);
                 }
-                if (prop.required) {
-                    prop.vendorExtensions.put("x-terraform-required", true);
+                if (prop.getRequired()) {
+                    prop.getExts().put("x-terraform-required", true);
                 }
-                if (!prop.required && !prop.isReadOnly) {
-                    prop.vendorExtensions.put("x-terraform-optional", true);
+                if (!prop.getRequired() && !prop.isReadOnly()) {
+                    prop.getExts().put("x-terraform-optional", true);
                 }
-                if (prop.isWriteOnly) {
-                    prop.vendorExtensions.put("x-terraform-sensitive", true);
+                if (prop.isWriteOnly()) {
+                    prop.getExts().put("x-terraform-sensitive", true);
                 }
 
                 // Map Go types to Terraform types
-                prop.vendorExtensions.put("x-terraform-type", goTypeToTerraformType(prop.dataType));
-                prop.vendorExtensions.put("x-terraform-attr-type", goTypeToTerraformAttrType(prop.dataType, prop));
+                prop.getExts().put("x-terraform-type", goTypeToTerraformType(prop.getDataType()));
+                prop.getExts().put("x-terraform-attr-type", goTypeToTerraformAttrType(prop.getDataType(), prop));
             }
         }
 
@@ -554,6 +554,6 @@ public class TerraformProviderCodegen extends AbstractGoCodegen {
     }
 
     private boolean getBooleanVendorExtension(CodegenProperty prop, String key) {
-        return prop.vendorExtensions.containsKey(key) && Boolean.TRUE.equals(prop.vendorExtensions.get(key));
+        return prop.getExts().containsKey(key) && Boolean.TRUE.equals(prop.getExts().get(key));
     }
 }

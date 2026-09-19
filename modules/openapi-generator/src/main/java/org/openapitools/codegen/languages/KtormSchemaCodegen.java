@@ -449,7 +449,7 @@ public class KtormSchemaCodegen extends AbstractKotlinCodegen {
         boolean exclusiveMinimum = property.getExclusiveMinimum();
         boolean exclusiveMaximum = property.getIExclusiveMaximum();
         boolean unsigned = false;
-        Boolean isUuid = property.isUuid;
+        Boolean isUuid = property.getIsUuid();
 
         Long cmin = (minimum != null) ? Long.parseLong(minimum) : null;
         Long cmax = (maximum != null) ? Long.parseLong(maximum) : null;
@@ -729,11 +729,11 @@ public class KtormSchemaCodegen extends AbstractKotlinCodegen {
      */
     public boolean processForeignKey(CodegenModel model, CodegenProperty property, Map<String, Object> relationDefinition) {
         String dataType = property.getDataType();
-        if (!property.isArray && !isRelation(dataType)) return false;
+        if (!property.getIsArray() && !isRelation(dataType)) return false;
 
         String modelName = model.getName();
-        String tryDataType = property.isArray ? property.items.dataType : property.dataType;
-        String tryDataFormat = property.isArray ? property.items.dataFormat : property.dataFormat;
+        String tryDataType = property.getIsArray() ? property.getItems().getDataType() : property.getDataType();
+        String tryDataFormat = property.getIsArray() ? property.getItems().getDataFormat() : property.getDataFormat();
         Boolean isPrimitive = (tryDataType.startsWith("kotlin.") || tryDataType.startsWith("java."));
         String propName = isPrimitive ? property.getName() : tryDataType;
 

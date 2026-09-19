@@ -548,12 +548,12 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
         allVarsMap.keySet()
                 .removeAll(m.vars.stream().map(CodegenProperty::getBaseName).collect(Collectors.toSet()));
         // Update the allVars
-        allVarsMap.values().forEach(p -> p.isInherited = true);
+        allVarsMap.values().forEach(p -> p.isInherited(true));
         // Update any other vars (requiredVars, optionalVars)
         Stream.of(m.requiredVars, m.optionalVars)
                 .flatMap(List::stream)
-                .filter(p -> allVarsMap.containsKey(p.baseName))
-                .forEach(p -> p.isInherited = true);
+                .filter(p -> allVarsMap.containsKey(p.getBaseName()))
+                .forEach(p -> p.isInherited(true));
         return m;
     }
 
@@ -633,18 +633,18 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        if (enumNameMapping.containsKey(property.name)) {
-            return enumNameMapping.get(property.name);
+        if (enumNameMapping.containsKey(property.getName())) {
+            return enumNameMapping.get(property.getName());
         }
 
-        String enumName = toModelName(property.name);
+        String enumName = toModelName(property.getName());
 
         // Ensure that the enum type doesn't match a reserved word or
         // the variable name doesn't match the generated enum type or the
         // Swift compiler will generate an error
-        if (isReservedWord(property.datatypeWithEnum)
-                || toVarName(property.name).equals(property.datatypeWithEnum)) {
-            enumName = property.datatypeWithEnum + "Enum";
+        if (isReservedWord(property.getDatatypeWithEnum())
+                || toVarName(property.getName()).equals(property.getDatatypeWithEnum())) {
+            enumName = property.getDatatypeWithEnum() + "Enum";
         }
 
         // TODO: toModelName already does something for names starting with number,
@@ -665,14 +665,14 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
             CodegenModel cm = (CodegenModel) mo.get("model");
             boolean modelHasPropertyWithEscapedName = false;
             for (CodegenProperty prop : cm.allVars) {
-                if (!prop.name.equals(prop.baseName)) {
-                    prop.vendorExtensions.put("x-codegen-escaped-property-name", true);
+                if (!prop.getName().equals(prop.getBaseName())) {
+                    prop.getExts().put("x-codegen-escaped-property-name", true);
                     modelHasPropertyWithEscapedName = true;
                 }
-                if (notCodableTypes.contains(prop.dataType) || notCodableTypes.contains(prop.baseType)) {
-                    prop.vendorExtensions.put("x-swift-is-not-codable", true);
+                if (notCodableTypes.contains(prop.getDataType()) || notCodableTypes.contains(prop.getBaseType())) {
+                    prop.getExts().put("x-swift-is-not-codable", true);
                 }
-                if (modelHasPropertyWithEscapedName || notCodableTypes.contains(prop.dataType) || notCodableTypes.contains(prop.baseType)) {
+                if (modelHasPropertyWithEscapedName || notCodableTypes.contains(prop.getDataType()) || notCodableTypes.contains(prop.getBaseType())) {
                     cm.vendorExtensions.put("x-swift-contains-not-codable", true);
                     addAnyDecoderIfNeeded();
                 }
@@ -746,13 +746,13 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
         CodegenModel model = modelMaps.get(cp.dataType);
         cp.vendorExtensions.put("x-swift-use-encoder", cp.isModel);
         if (cp.isArray && cp.items != null) {
-            CodegenModel baseModel = modelMaps.get(cp.items.dataType);
-            boolean isBaseTypeEnum = cp.items.isEnum || cp.isEnum || (baseModel != null && baseModel.isEnum);
+            CodegenModel baseModel = modelMaps.get(cp.items.getDataType());
+            boolean isBaseTypeEnum = cp.items.getIsEnum() || cp.isEnum || (baseModel != null && baseModel.isEnum);
             cp.vendorExtensions.put("x-swift-is-base-type-enum", isBaseTypeEnum);
-            boolean isBaseTypeUuid = cp.items.isUuid || cp.isUuid;
+            boolean isBaseTypeUuid = cp.items.getIsUuid() || cp.isUuid;
             cp.vendorExtensions.put("x-swift-is-base-type-uuid", isBaseTypeUuid);
 
-            boolean useEncoder = !isBaseTypeEnum && !cp.items.isString || (baseModel != null && !baseModel.isString);
+            boolean useEncoder = !isBaseTypeEnum && !cp.items.getIsString() || (baseModel != null && !baseModel.isString);
             cp.vendorExtensions.put("x-swift-use-encoder", useEncoder);
         }
         if (cp.isEnum || (model != null && model.isEnum)) {
@@ -776,7 +776,7 @@ public class SwiftCombineClientCodegen extends DefaultCodegen implements Codegen
 
     protected void addFormVendorExtensions(CodegenParameter cp, CodegenOperation operation, HashMap<String, CodegenModel> modelMaps) {
         addVendorExtensions(cp, operation, modelMaps);
-        if (operation.isMultipart && cp.isArray && cp.items.isFile) {
+        if (operation.isMultipart && cp.isArray && cp.items.isFile()) {
             cp.vendorExtensions.put("x-swift-enumerate-multipart", true);
         }
     }

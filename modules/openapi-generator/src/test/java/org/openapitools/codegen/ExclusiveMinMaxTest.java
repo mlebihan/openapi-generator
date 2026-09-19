@@ -154,7 +154,7 @@ public class ExclusiveMinMaxTest {
         final CodegenProperty historyPrice2Prop = cm
                 .getVars()
                 .stream()
-                .filter(p -> "historyPrice2".equals(p.baseName))
+                .filter(p -> "historyPrice2".equals(p.getBaseName()))
                 .findFirst()
                 .orElse(null);
 
@@ -185,7 +185,7 @@ public class ExclusiveMinMaxTest {
         final CodegenProperty historyPrice2Prop = cm
                 .getVars()
                 .stream()
-                .filter(p -> "historyPrice2".equals(p.baseName))
+                .filter(p -> "historyPrice2".equals(p.getBaseName()))
                 .findFirst()
                 .orElse(null);
 

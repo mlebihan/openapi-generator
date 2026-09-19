@@ -536,11 +536,11 @@ public class TypeScriptAngularClientCodegen extends AbstractTypeScriptClientCode
         ) {
 
             for (CodegenProperty prop : child.allVars) {
-                if (prop.baseName.equals(parent.discriminator.getPropertyName())) {
+                if (prop.getBaseName().equals(parent.discriminator.getPropertyName())) {
 
                     for (CodegenDiscriminator.MappedModel mappedModel : parent.discriminator.getMappedModels()) {
                         if (mappedModel.getModelName().equals(child.classname)) {
-                            prop.discriminatorValue = mappedModel.getMappingName();
+                            prop.setDiscriminatorValue(mappedModel.getMappingName());
                         }
                     }
                 }

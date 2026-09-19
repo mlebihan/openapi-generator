@@ -466,7 +466,7 @@ public abstract class AbstractScalaCodegen extends DefaultCodegen {
         CodegenProperty prop = super.fromProperty(name, p, required);
         if (ModelUtils.isArraySchema(p)) {
             if (ModelUtils.isSet(p)) {
-                prop.containerType = "set";
+                prop.setContainerType("set");
             }
         }
 

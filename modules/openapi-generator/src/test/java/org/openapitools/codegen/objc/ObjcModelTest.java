@@ -51,13 +51,13 @@ public class ObjcModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "translations");
-        Assert.assertEquals(property1.dataType, "NSDictionary<NSString*, NSDictionary<NSString*, NSString*>*>*");
-        Assert.assertEquals(property1.name, "translations");
-        Assert.assertEquals(property1.baseType, "NSDictionary");
-        Assert.assertEquals(property1.containerType, "map");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "translations");
+        Assert.assertEquals(property1.getDataType(), "NSDictionary<NSString*, NSDictionary<NSString*, NSString*>*>*");
+        Assert.assertEquals(property1.getName(), "translations");
+        Assert.assertEquals(property1.getBaseType(), "NSDictionary");
+        Assert.assertEquals(property1.getContainerType(), "map");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert a simple java model")
@@ -80,33 +80,33 @@ public class ObjcModelTest {
         Assert.assertEquals(cm.vars.size(), 3);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "NSNumber*");
-        Assert.assertEquals(property1.name, "_id");
-        Assert.assertNull(property1.defaultValue);
-        Assert.assertEquals(property1.baseType, "NSNumber");
-        Assert.assertTrue(property1.required);
-        Assert.assertTrue(property1.isPrimitiveType);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "NSNumber*");
+        Assert.assertEquals(property1.getName(), "_id");
+        Assert.assertNull(property1.getDefaultValue());
+        Assert.assertEquals(property1.getBaseType(), "NSNumber");
+        Assert.assertTrue(property1.getRequired());
+        Assert.assertTrue(property1.getIsPrimitiveType());
+        Assert.assertFalse(property1.isContainer());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "name");
-        Assert.assertEquals(property2.dataType, "NSString*");
-        Assert.assertEquals(property2.name, "name");
-        Assert.assertNull(property2.defaultValue);
-        Assert.assertEquals(property2.baseType, "NSString");
-        Assert.assertTrue(property2.required);
-        Assert.assertTrue(property2.isPrimitiveType);
-        Assert.assertFalse(property2.isContainer);
+        Assert.assertEquals(property2.getBaseName(), "name");
+        Assert.assertEquals(property2.getDataType(), "NSString*");
+        Assert.assertEquals(property2.getName(), "name");
+        Assert.assertNull(property2.getDefaultValue());
+        Assert.assertEquals(property2.getBaseType(), "NSString");
+        Assert.assertTrue(property2.getRequired());
+        Assert.assertTrue(property2.getIsPrimitiveType());
+        Assert.assertFalse(property2.isContainer());
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.dataType, "NSDate*");
-        Assert.assertEquals(property3.name, "createdAt");
-        Assert.assertNull(property3.defaultValue);
-        Assert.assertEquals(property3.baseType, "NSDate");
-        Assert.assertFalse(property3.required);
-        Assert.assertFalse(property3.isContainer);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getDataType(), "NSDate*");
+        Assert.assertEquals(property3.getName(), "createdAt");
+        Assert.assertNull(property3.getDefaultValue());
+        Assert.assertEquals(property3.getBaseType(), "NSDate");
+        Assert.assertFalse(property3.getRequired());
+        Assert.assertFalse(property3.isContainer());
     }
 
     @Test(description = "convert a model with list property")
@@ -128,25 +128,25 @@ public class ObjcModelTest {
         Assert.assertEquals(cm.vars.size(), 2);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "NSNumber*");
-        Assert.assertEquals(property1.name, "_id");
-        Assert.assertNull(property1.defaultValue);
-        Assert.assertEquals(property1.baseType, "NSNumber");
-        Assert.assertTrue(property1.required);
-        Assert.assertTrue(property1.isPrimitiveType);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "NSNumber*");
+        Assert.assertEquals(property1.getName(), "_id");
+        Assert.assertNull(property1.getDefaultValue());
+        Assert.assertEquals(property1.getBaseType(), "NSNumber");
+        Assert.assertTrue(property1.getRequired());
+        Assert.assertTrue(property1.getIsPrimitiveType());
+        Assert.assertFalse(property1.isContainer());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "urls");
-        Assert.assertEquals(property2.dataType, "NSArray<NSString*>*");
-        Assert.assertEquals(property2.name, "urls");
-        Assert.assertNull(property2.defaultValue);
-        Assert.assertEquals(property2.baseType, "NSArray");
-        Assert.assertEquals(property2.containerType, "array");
-        Assert.assertFalse(property2.required);
-        Assert.assertTrue(property2.isPrimitiveType);
-        Assert.assertTrue(property2.isContainer);
+        Assert.assertEquals(property2.getBaseName(), "urls");
+        Assert.assertEquals(property2.getDataType(), "NSArray<NSString*>*");
+        Assert.assertEquals(property2.getName(), "urls");
+        Assert.assertNull(property2.getDefaultValue());
+        Assert.assertEquals(property2.getBaseType(), "NSArray");
+        Assert.assertEquals(property2.getContainerType(), "array");
+        Assert.assertFalse(property2.getRequired());
+        Assert.assertTrue(property2.getIsPrimitiveType());
+        Assert.assertTrue(property2.isContainer());
     }
 
     @Test(description = "convert a model with a map property")
@@ -167,14 +167,14 @@ public class ObjcModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "translations");
-        Assert.assertEquals(property1.dataType, "NSDictionary<NSString*, NSString*>*");
-        Assert.assertEquals(property1.name, "translations");
-        Assert.assertEquals(property1.baseType, "NSDictionary");
-        Assert.assertEquals(property1.containerType, "map");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
-        Assert.assertTrue(property1.isPrimitiveType);
+        Assert.assertEquals(property1.getBaseName(), "translations");
+        Assert.assertEquals(property1.getDataType(), "NSDictionary<NSString*, NSString*>*");
+        Assert.assertEquals(property1.getName(), "translations");
+        Assert.assertEquals(property1.getBaseType(), "NSDictionary");
+        Assert.assertEquals(property1.getContainerType(), "map");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
+        Assert.assertTrue(property1.getIsPrimitiveType());
     }
 
 
@@ -194,12 +194,12 @@ public class ObjcModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.dataType, "OAIChildren*");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.baseType, "OAIChildren");
-        Assert.assertFalse(property1.required);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getDataType(), "OAIChildren*");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getBaseType(), "OAIChildren");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertFalse(property1.isContainer());
     }
 
     @Test(description = "convert a model with complex list property")
@@ -219,14 +219,14 @@ public class ObjcModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.complexType, "OAIChildren");
-        Assert.assertEquals(property1.dataType, "NSArray<OAIChildren>*");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.baseType, "NSArray");
-        Assert.assertEquals(property1.containerType, "array");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getComplexType(), "OAIChildren");
+        Assert.assertEquals(property1.getDataType(), "NSArray<OAIChildren>*");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getBaseType(), "NSArray");
+        Assert.assertEquals(property1.getContainerType(), "array");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert a model with complex map property")
@@ -247,14 +247,14 @@ public class ObjcModelTest {
         Assert.assertEquals(Sets.intersection(cm.imports, Sets.newHashSet("OAIChildren")).size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.complexType, "OAIChildren");
-        Assert.assertEquals(property1.dataType, "NSDictionary<OAIChildren>*");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.baseType, "NSDictionary");
-        Assert.assertEquals(property1.containerType, "map");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getComplexType(), "OAIChildren");
+        Assert.assertEquals(property1.getDataType(), "NSDictionary<OAIChildren>*");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getBaseType(), "NSDictionary");
+        Assert.assertEquals(property1.getContainerType(), "map");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert an array model")
@@ -304,10 +304,10 @@ public class ObjcModelTest {
 
         Schema property = ((Map<String, Schema>) definition.getProperties()).get("uuid");
         CodegenProperty prope = codegen.fromProperty("uuid", property);
-        Assert.assertEquals(prope.baseType, "NSString");
+        Assert.assertEquals(prope.getBaseType(), "NSString");
 
         prope = codegen.fromProperty("password", property);
-        Assert.assertEquals(prope.baseType, "NSString");
+        Assert.assertEquals(prope.getBaseType(), "NSString");
     }
 
     @Test(description = "test mixedProperties")
@@ -319,7 +319,7 @@ public class ObjcModelTest {
 
         Schema property = ((Map<String, Schema>) definition.getProperties()).get("map");
         CodegenProperty prope = codegen.fromProperty("map", property);
-        Assert.assertEquals(prope.baseType, "NSDictionary");
+        Assert.assertEquals(prope.getBaseType(), "NSDictionary");
     }
 
     @Test(description = "test isArray")

@@ -663,7 +663,7 @@ public class CompositionNormalizationTest extends CppBoostBeastNormalizerTestSup
         timestampProperty.addAllOfItem(
                 new Schema().$ref("#/components/schemas/BetaTimestamp"));
         CodegenProperty property = new CodegenProperty();
-        property.dataType = "std::string";
+        property.setDatatype("std::string");
 
         Assert.assertEquals(codegen.toDefaultValue(property, timestampProperty), "\"\"");
     }

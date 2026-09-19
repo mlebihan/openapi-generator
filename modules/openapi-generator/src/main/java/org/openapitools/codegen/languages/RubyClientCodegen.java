@@ -542,11 +542,11 @@ public class RubyClientCodegen extends AbstractRubyCodegen {
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        if (enumNameMapping.containsKey(property.name)) {
-            return enumNameMapping.get(property.name);
+        if (enumNameMapping.containsKey(property.getName())) {
+            return enumNameMapping.get(property.getName());
         }
 
-        String enumName = underscore(toModelName(property.name)).toUpperCase(Locale.ROOT);
+        String enumName = underscore(toModelName(property.getName())).toUpperCase(Locale.ROOT);
         enumName = enumName.replaceFirst("^_", "");
         enumName = enumName.replaceFirst("_$", "");
 
@@ -700,72 +700,72 @@ public class RubyClientCodegen extends AbstractRubyCodegen {
     }
 
     private String constructExampleCode(CodegenProperty codegenProperty, HashMap<String, CodegenModel> modelMaps, HashMap<String, Integer> processedModelMap) {
-        if (codegenProperty.isArray) { // array
-            if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                String value = codegenProperty.example;
+        if (codegenProperty.getIsArray()) { // array
+            if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                String value = codegenProperty.getExample();
                 value = value.replace(",", ", ");
                 value = value.replace(":", ": ");
                 return value;
             }
-            return "[" + constructExampleCode(codegenProperty.items, modelMaps, processedModelMap) + "]";
-        } else if (codegenProperty.isMap) {
-            if (codegenProperty.items != null) {
-                return "{ key: " + constructExampleCode(codegenProperty.items, modelMaps, processedModelMap) + "}";
+            return "[" + constructExampleCode(codegenProperty.getItems(), modelMaps, processedModelMap) + "]";
+        } else if (codegenProperty.getIsMap()) {
+            if (codegenProperty.getItems() != null) {
+                return "{ key: " + constructExampleCode(codegenProperty.getItems(), modelMaps, processedModelMap) + "}";
             } else {
                 return "{ ... }";
             }
-        } else if (codegenProperty.isPrimitiveType) { // primitive type
-            if (codegenProperty.isEnum) {
+        } else if (codegenProperty.getIsPrimitiveType()) { // primitive type
+            if (codegenProperty.getIsEnum()) {
                 // When inline enum, set example to first allowable value
-                List<Object> values = getEnumValues(codegenProperty.allowableValues);
-                codegenProperty.example = String.valueOf(values.get(0));
+                List<Object> values = getEnumValues(codegenProperty.getAllowableValues());
+                codegenProperty.setExample(String.valueOf(values.get(0)));
             }
-            if (codegenProperty.isString || "String".equalsIgnoreCase(codegenProperty.baseType)) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return "'" + codegenProperty.example + "'";
+            if (codegenProperty.getIsString() || "String".equalsIgnoreCase(codegenProperty.getBaseType())) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return "'" + codegenProperty.getExample() + "'";
                 } else {
-                    return "'" + codegenProperty.name + "_example'";
+                    return "'" + codegenProperty.getName() + "_example'";
                 }
-            } else if (codegenProperty.isBoolean) { // boolean
-                if (Boolean.parseBoolean(codegenProperty.example)) {
+            } else if (codegenProperty.getIsBoolean()) { // boolean
+                if (Boolean.parseBoolean(codegenProperty.getExample())) {
                     return "true";
                 } else {
                     return "false";
                 }
-            } else if (codegenProperty.isUri) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return "'" + codegenProperty.example + "'";
+            } else if (codegenProperty.isUri()) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return "'" + codegenProperty.getExample() + "'";
                 }
                 return "'https://example.com'";
-            } else if (codegenProperty.isDateTime) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return "Time.parse('" + codegenProperty.example + "')";
+            } else if (codegenProperty.getIsDateTime()) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return "Time.parse('" + codegenProperty.getExample() + "')";
                 }
                 return "Time.now";
-            } else if (codegenProperty.isDate) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return "Date.parse('" + codegenProperty.example + "')";
+            } else if (codegenProperty.getIsDate()) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return "Date.parse('" + codegenProperty.getExample() + "')";
                 }
                 return "Date.today";
-            } else if (codegenProperty.isFile) {
+            } else if (codegenProperty.isFile()) {
                 return "File.new('/path/to/some/file')";
-            } else if (codegenProperty.isInteger) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return codegenProperty.example;
+            } else if (codegenProperty.getIsInteger()) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return codegenProperty.getExample();
                 }
                 return "37";
             } else { // number
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return codegenProperty.example;
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return codegenProperty.getExample();
                 }
                 return "3.56";
             }
         } else { // model
             // look up the model
-            if (modelMaps.containsKey(codegenProperty.dataType)) {
-                return constructExampleCode(modelMaps.get(codegenProperty.dataType), modelMaps, processedModelMap);
+            if (modelMaps.containsKey(codegenProperty.getDataType())) {
+                return constructExampleCode(modelMaps.get(codegenProperty.getDataType()), modelMaps, processedModelMap);
             } else {
-                LOGGER.debug("Error in constructing examples. Failed to look up the model " + codegenProperty.dataType);
+                LOGGER.debug("Error in constructing examples. Failed to look up the model " + codegenProperty.getDataType());
                 return "TODO";
             }
         }
@@ -802,7 +802,7 @@ public class RubyClientCodegen extends AbstractRubyCodegen {
 
         List<String> propertyExamples = new ArrayList<>();
         for (CodegenProperty codegenProperty : codegenModel.requiredVars) {
-            propertyExamples.add(codegenProperty.name + ": " + constructExampleCode(codegenProperty, modelMaps, processedModelMap));
+            propertyExamples.add(codegenProperty.getName() + ": " + constructExampleCode(codegenProperty, modelMaps, processedModelMap));
         }
         String example = moduleName + "::" + toModelName(model) + ".new";
         if (!propertyExamples.isEmpty()) {

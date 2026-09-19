@@ -1126,11 +1126,11 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
                     }
 
                     for (CodegenProperty var : allProperties) {
-                        if (var.dataType != null) {
-                            if (!hasOptional && var.dataType.contains("std::optional<")) {
+                        if (var.getDataType() != null) {
+                            if (!hasOptional && var.getDataType().contains("std::optional<")) {
                                 hasOptional = true;
                             }
-                            if (!needsVariant && var.dataType.contains("std::variant<")) {
+                            if (!needsVariant && var.getDataType().contains("std::variant<")) {
                                 needsVariant = true;
                             }
                         }
@@ -1161,224 +1161,224 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
      */
     private void processModelVariable(CodegenProperty var, CodegenModel model) {
         // Ensure baseName is set for JSON serialization
-        if (var.baseName == null || var.baseName.isEmpty()) {
-            var.baseName = var.name;
+        if (var.getBaseName() == null || var.getBaseName().isEmpty()) {
+            var.setBaseName(var.getName());
         }
         String modelClassName = model.vendorExtensions.get("modelClassName").toString();
-        String varName = toPascalCase(var.name);
+        String varName = toPascalCase(var.getName());
 
         // Convert inline model names in dataType to PascalCase
-        if (var.dataType != null && !var.isPrimitiveType && !var.isContainer) {
+        if (var.getDataType() != null && !var.getIsPrimitiveType() && !var.isContainer()) {
             // Check if dataType contains underscore or hyphen (likely inline model)
-            if (var.dataType.contains("_") || var.dataType.contains("-")) {
+            if (var.getDataType().contains("_") || var.getDataType().contains("-")) {
                 // Don't process if it's a C++ standard library type
-                if (!var.dataType.startsWith("std::")) {
-                    var.dataType = toPascalCase(var.dataType);
+                if (!var.getDataType().startsWith("std::")) {
+                    var.setDatatype(toPascalCase(var.getDataType()));
                 }
             }
         }
-        if (var.datatypeWithEnum != null && !var.isPrimitiveType && !var.isContainer) {
-            if (var.datatypeWithEnum.contains("_") || var.datatypeWithEnum.contains("-")) {
-                if (!var.datatypeWithEnum.startsWith("std::")) {
-                    var.datatypeWithEnum = toPascalCase(var.datatypeWithEnum);
+        if (var.getDatatypeWithEnum() != null && !var.getIsPrimitiveType() && !var.isContainer()) {
+            if (var.getDatatypeWithEnum().contains("_") || var.getDatatypeWithEnum().contains("-")) {
+                if (!var.getDatatypeWithEnum().startsWith("std::")) {
+                    var.setDatatypeWithEnum(toPascalCase(var.getDatatypeWithEnum()));
                 }
             }
         }
 
         // Replace oas_any_type_not_mapped placeholder with nlohmann::json
-        if ("oas_any_type_not_mapped".equals(var.dataType)) {
-            var.dataType = "nlohmann::json";
+        if ("oas_any_type_not_mapped".equals(var.getDataType())) {
+            var.setDatatype("nlohmann::json");
         }
-        if ("oas_any_type_not_mapped".equals(var.datatypeWithEnum)) {
-            var.datatypeWithEnum = "nlohmann::json";
+        if ("oas_any_type_not_mapped".equals(var.getDatatypeWithEnum())) {
+            var.setDatatypeWithEnum("nlohmann::json");
         }
-        if (var.items != null && "oas_any_type_not_mapped".equals(var.items.dataType)) {
-            var.items.dataType = "nlohmann::json";
+        if (var.getItems() != null && "oas_any_type_not_mapped".equals(var.getItems().getDataType())) {
+            var.getItems().setDatatype("nlohmann::json");
         }
-        if (var.items != null && "oas_any_type_not_mapped".equals(var.items.datatypeWithEnum)) {
-            var.items.datatypeWithEnum = "nlohmann::json";
+        if (var.getItems() != null && "oas_any_type_not_mapped".equals(var.getItems().getDatatypeWithEnum())) {
+            var.getItems().setDatatypeWithEnum("nlohmann::json");
         }
 
         // Handle anyOf/oneOf union types (std::variant)
-        if (var.dataType != null && var.dataType.startsWith("std::variant<")) {
-            var.vendorExtensions.put("isUnionType", true);
+        if (var.getDataType() != null && var.getDataType().startsWith("std::variant<")) {
+            var.getExts().put("isUnionType", true);
 
             // Generate union type alias name from property name
-            String unionTypeName = toPascalCase(var.name);
-            var.vendorExtensions.put("unionTypeName", unionTypeName);
+            String unionTypeName = toPascalCase(var.getName());
+            var.getExts().put("unionTypeName", unionTypeName);
 
             // Extract individual types from the variant declaration
-            String variantContent = var.dataType.substring(13, var.dataType.length() - 1);
+            String variantContent = var.getDataType().substring(13, var.getDataType().length() - 1);
             List<String> unionTypes = Arrays.asList(variantContent.split(",\\s*")); // Split by comma and optional whitespace
-            var.vendorExtensions.put("unionTypes", unionTypes);
+            var.getExts().put("unionTypes", unionTypes);
 
             // Mark that model needs variant include
             model.vendorExtensions.put("hasVariant", true);
         } else {
-            var.vendorExtensions.put("isUnionType", false);
+            var.getExts().put("isUnionType", false);
         }
 
         // Handle nullable types
-        if (var.isNullable) {
-            var.vendorExtensions.put("isOptional", true);
+        if (var.isNullable()) {
+            var.getExts().put("isOptional", true);
             // Don't wrap again if already wrapped
-            if (!var.dataType.startsWith("std::optional<")) {
+            if (!var.getDataType().startsWith("std::optional<")) {
                 // Store the inner type for the template
-                var.vendorExtensions.put("innerType", var.dataType);
-                var.dataType = "std::optional<" + var.dataType + ">";
+                var.getExts().put("innerType", var.getDataType());
+                var.setDatatype("std::optional<" + var.getDataType() + ">");
             }
         } else {
-            var.vendorExtensions.put("isOptional", false);
+            var.getExts().put("isOptional", false);
         }
 
         // Remove namespace prefixes from enum names in array items
         // Enums are defined within the class scope and don't need prefixes
-        if (var.isArray && var.items != null && var.items.isEnum) {
-            if (var.items.dataType != null && var.items.dataType.contains("::")) {
-                String[] parts = var.items.dataType.split("::");
-                var.items.dataType = parts[parts.length - 1];
+        if (var.getIsArray() && var.getItems() != null && var.getItems().getIsEnum()) {
+            if (var.getItems().getDataType() != null && var.getItems().getDataType().contains("::")) {
+                String[] parts = var.getItems().getDataType().split("::");
+                var.getItems().setDatatype(parts[parts.length - 1]);
             }
-            if (var.items.datatypeWithEnum != null && var.items.datatypeWithEnum.contains("::")) {
-                String[] parts = var.items.datatypeWithEnum.split("::");
-                var.items.datatypeWithEnum = parts[parts.length - 1];
+            if (var.getItems().getDatatypeWithEnum() != null && var.getItems().getDatatypeWithEnum().contains("::")) {
+                String[] parts = var.getItems().getDatatypeWithEnum().split("::");
+                var.getItems().setDatatypeWithEnum(parts[parts.length - 1]);
             }
         }
 
         // Handle container types
-        if (var.isArray && var.dataType.startsWith("std::vector<")) {
+        if (var.getIsArray() && var.getDataType().startsWith("std::vector<")) {
             // Use datatypeWithEnum for enums to preserve enum type names before they're stripped
-            String itemType = var.items != null ?
-                    (var.items.datatypeWithEnum != null ? var.items.datatypeWithEnum : var.items.dataType) :
+            String itemType = var.getItems() != null ?
+                    (var.getItems().getDatatypeWithEnum() != null ? var.getItems().getDatatypeWithEnum() : var.getItems().getDataType()) :
                     "std::string";
 
             // For inline enums in arrays, qualify with the model class name if not already qualified
-            if (var.items != null && var.items.isEnum && !itemType.contains("::")) {
+            if (var.getItems() != null && var.getItems().getIsEnum() && !itemType.contains("::")) {
                 itemType = modelClassName + "::" + itemType;
             }
 
             // Use property name and item type for better naming
-            String arrayTypeName = toPascalCase(var.name) + "VectorOf" + toPascalCase(itemType);
-            var.vendorExtensions.put("arrayTypeName", arrayTypeName);
-            var.dataType = "std::vector<" + itemType + ">";
-            var.datatypeWithEnum = var.dataType; // Keep them in sync
+            String arrayTypeName = toPascalCase(var.getName()) + "VectorOf" + toPascalCase(itemType);
+            var.getExts().put("arrayTypeName", arrayTypeName);
+            var.setDatatype("std::vector<" + itemType + ">");
+            var.setDatatypeWithEnum(var.getDataType()); // Keep them in sync
         }
 
-        if (var.isMap && var.dataType.startsWith("std::map<")) {
-            String itemType = var.items != null ? var.items.dataType : "std::string";
-            var.dataType = "std::map<std::string, " + itemType + ">";
+        if (var.getIsMap() && var.getDataType().startsWith("std::map<")) {
+            String itemType = var.getItems() != null ? var.getItems().getDataType() : "std::string";
+            var.setDatatype("std::map<std::string, " + itemType + ">");
         }
 
-        if (var.items != null && "string".equals(var.items.dataType)) {
-            var.items.dataType = "std::string";
-            var.items.isPrimitiveType = true;
+        if (var.getItems() != null && "string".equals(var.getItems().getDataType())) {
+            var.getItems().setDatatype("std::string");
+            var.getItems().setIsPrimitiveType(true);
         }
 
         // Handle arrays
-        if (var.isArray) {
+        if (var.getIsArray()) {
             model.vendorExtensions.put("hasArrays", true);
             setArrayVendorExtensions(var, varName, modelClassName, model);
 
             // Set default value for arrays - use datatypeWithEnum for correct enum type
-            if (var.defaultValue == null) {
+            if (var.getDefaultValue() == null) {
                 // Use datatypeWithEnum which has the correct type (including enum types)
-                var.defaultValue = var.datatypeWithEnum + "()";
+                var.setDefaultValue(var.getDatatypeWithEnum() + "()");
             }
         } else {
             //Handle enums
-            if (var.isEnum) {
+            if (var.getIsEnum()) {
                 setEnumVendorExtensions(var, model);
 
                 // Check for explicit default values in schema
                 // Base generator may auto-generate defaults which should be ignored for enums
-                boolean hasExplicitDefault = var.defaultValue != null
-                        && !var.defaultValue.equals("\"\"")
-                        && !var.defaultValue.equals("null")
-                        && !var.defaultValue.equals("0");  // Base generator default for integer types
+                boolean hasExplicitDefault = var.getDefaultValue() != null
+                        && !var.getDefaultValue().equals("\"\"")
+                        && !var.getDefaultValue().equals("null")
+                        && !var.getDefaultValue().equals("0");  // Base generator default for integer types
 
                 // Handle enum default values based on required status and schema default
                 if (!hasExplicitDefault) {
-                    if (!var.required) {
+                    if (!var.getRequired()) {
                         // Optional enum: wrap in std::optional and default to std::nullopt
-                        if (!var.dataType.startsWith("std::optional<")) {
-                            var.dataType = "std::optional<" + var.datatypeWithEnum + ">";
-                            var.datatypeWithEnum = var.dataType;
+                        if (!var.getDataType().startsWith("std::optional<")) {
+                            var.setDatatype("std::optional<" + var.getDatatypeWithEnum() + ">");
+                            var.setDatatypeWithEnum(var.getDataType());
                         }
-                        var.defaultValue = "std::nullopt";
+                        var.setDefaultValue("std::nullopt");
                         // Mark that this enum is wrapped in std::optional (for template conditionals)
-                        var.vendorExtensions.put("isOptionalEnum", true);
+                        var.getExts().put("isOptionalEnum", true);
                     } else {
                         // Required enum: Use first value which is always UNSPECIFIED (added by setEnumVendorExtensions)
-                        if (hasEnumValues(var.allowableValues)) {
-                            List<Object> values = getEnumValues(var.allowableValues);
+                        if (hasEnumValues(var.getAllowableValues())) {
+                            List<Object> values = getEnumValues(var.getAllowableValues());
                             if (values != null && !values.isEmpty()) {
                                 // First value is always safe (UNSPECIFIED) after setEnumVendorExtensions
                                 String enumIdentifier = values.get(0).toString();
-                                var.defaultValue = var.datatypeWithEnum + "::" + enumIdentifier;
+                                var.setDefaultValue(var.getDatatypeWithEnum() + "::" + enumIdentifier);
                             }
                         }
                     }
                 } else {
                     // Explicit default value from schema - use qualified enum name
-                    String defaultVal = var.defaultValue.replaceAll("\"", "");
+                    String defaultVal = var.getDefaultValue().replaceAll("\"", "");
                     // Convert numeric enum values (e.g., "100" -> "_100")
                     if (defaultVal.matches("^[0-9]+$")) {
                         defaultVal = "_" + defaultVal;
                     }
                     // Convert to UPPERCASE to match enum definition
                     defaultVal = defaultVal.toUpperCase(Locale.ROOT);
-                    var.defaultValue = var.datatypeWithEnum + "::" + defaultVal;
+                    var.setDefaultValue(var.getDatatypeWithEnum() + "::" + defaultVal);
                 }
             }
             // Handle Date types
-            if ("Date".equals(var.baseType) || "DateTime".equals(var.baseType)) {
-                var.dataType = "std::string";
-                var.datatypeWithEnum = "std::string";
+            if ("Date".equals(var.getBaseType()) || "DateTime".equals(var.getBaseType())) {
+                var.setDatatype("std::string");
+                var.setDatatypeWithEnum("std::string");
             }
             // Set default values
-            if (var.defaultValue == null) {
-                var.defaultValue = getDefaultValueForType(var.dataType, var.isNullable);
+            if (var.getDefaultValue() == null) {
+                var.setDefaultValue(getDefaultValueForType(var.getDataType(), var.isNullable()));
             }
             // Set primitive flags for mustache
-            if (var.dataType.equals("int") || var.dataType.equals("int32_t") || var.dataType.equals("int64_t")
-                    || var.dataType.equals("integer")) {
-                var.vendorExtensions.put("isInt", true);
-                var.vendorExtensions.put("isPrimitive", true);
+            if (var.getDataType().equals("int") || var.getDataType().equals("int32_t") || var.getDataType().equals("int64_t")
+                    || var.getDataType().equals("integer")) {
+                var.getExts().put("isInt", true);
+                var.getExts().put("isPrimitive", true);
             }
-            if (var.dataType.equals("long")) {
-                var.vendorExtensions.put("isLong", true);
-                var.vendorExtensions.put("isPrimitive", true);
+            if (var.getDataType().equals("long")) {
+                var.getExts().put("isLong", true);
+                var.getExts().put("isPrimitive", true);
             }
-            if (var.dataType.equals("float")) {
-                var.vendorExtensions.put("isFloat", true);
-                var.vendorExtensions.put("isPrimitive", true);
+            if (var.getDataType().equals("float")) {
+                var.getExts().put("isFloat", true);
+                var.getExts().put("isPrimitive", true);
             }
-            if (var.dataType.equals("double") || var.dataType.equals("number")) {
-                var.vendorExtensions.put("isDouble", true);
-                var.vendorExtensions.put("isPrimitive", true);
+            if (var.getDataType().equals("double") || var.getDataType().equals("number")) {
+                var.getExts().put("isDouble", true);
+                var.getExts().put("isPrimitive", true);
             }
-            if (var.dataType.equals("bool") || var.dataType.equals("boolean")) {
-                var.vendorExtensions.put("isBool", true);
-                var.vendorExtensions.put("isPrimitive", true);
+            if (var.getDataType().equals("bool") || var.getDataType().equals("boolean")) {
+                var.getExts().put("isBool", true);
+                var.getExts().put("isPrimitive", true);
             }
-            if (var.dataType.equals("std::string") || var.dataType.equals("string")) {
-                var.vendorExtensions.put("isString", true);
-                var.vendorExtensions.put("isPrimitive", true);
+            if (var.getDataType().equals("std::string") || var.getDataType().equals("string")) {
+                var.getExts().put("isString", true);
+                var.getExts().put("isPrimitive", true);
             }
-            if (var.isModel) {
-                var.vendorExtensions.put("isModel", true);
-                if (var.defaultValue != null && var.defaultValue.startsWith("std::make_shared<")) {
-                    var.defaultValue = var.datatypeWithEnum + "()";
+            if (var.getIsModel()) {
+                var.getExts().put("isModel", true);
+                if (var.getDefaultValue() != null && var.getDefaultValue().startsWith("std::make_shared<")) {
+                    var.setDefaultValue(var.getDatatypeWithEnum() + "()");
                 }
             }
         }
         //Handle getters and setters
-        if (var.getter != null) {
-            var.vendorExtensions.put("getter", var.getter);
-            var.vendorExtensions.put("getterType", var.datatypeWithEnum);
+        if (var.getGetter() != null) {
+            var.getExts().put("getter", var.getGetter());
+            var.getExts().put("getterType", var.getDatatypeWithEnum());
         }
-        if (var.setter != null) {
-            var.vendorExtensions.put("setter", var.setter);
-            var.vendorExtensions.put("setterType", var.datatypeWithEnum);
+        if (var.getSetter() != null) {
+            var.getExts().put("setter", var.getSetter());
+            var.getExts().put("setterType", var.getDatatypeWithEnum());
         }
     }
 
@@ -1577,7 +1577,7 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
                         CodegenModel parentModel = super.fromModel(parentRef, parentSchema);
                         if (parentModel != null && parentModel.vars != null) {
                             for (CodegenProperty var : parentModel.vars) {
-                                parentPropertyNames.add(var.name);
+                                parentPropertyNames.add(var.getName());
                             }
                             // Only merge if we have multiple parents
                             if (schema.getAllOf().size() > 1) {
@@ -1601,7 +1601,7 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
                     // Filter out inherited properties from child
                     List<CodegenProperty> childOnlyVars = new ArrayList<>();
                     for (CodegenProperty var : model.vars) {
-                        if (!parentPropertyNames.contains(var.name)) {
+                        if (!parentPropertyNames.contains(var.getName())) {
                             childOnlyVars.add(var);
                         }
                     }
@@ -1612,10 +1612,10 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
                     // Avoid duplicates
                     Map<String, CodegenProperty> uniqueVars = new LinkedHashMap<>();
                     for (CodegenProperty var : mergedVars) {
-                        uniqueVars.put(var.name, var);
+                        uniqueVars.put(var.getName(), var);
                     }
                     for (CodegenProperty var : model.vars) {
-                        uniqueVars.put(var.name, var);
+                        uniqueVars.put(var.getName(), var);
                     }
                     model.vars = new ArrayList<>(uniqueVars.values());
                     model.parent = null; // No inheritance for multiple parents
@@ -1689,58 +1689,58 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
         super.postProcessModelProperty(model, property);
 
         // Convert Date/DateTime types to std::string
-        if ("Date".equals(property.baseType) || "DateTime".equals(property.baseType)) {
-            property.dataType = "std::string";
-            property.datatypeWithEnum = "std::string";
+        if ("Date".equals(property.getBaseType()) || "DateTime".equals(property.getBaseType())) {
+            property.setDatatype("std::string");
+            property.setDatatypeWithEnum("std::string");
         }
 
         // Set vendor extensions for array properties
-        if (property.isArray) {
-            property.vendorExtensions.put("isArray", true);
+        if (property.getIsArray()) {
+            property.getExts().put("isArray", true);
 
             // Check if it's an array of enums
-            if (property.items != null && property.items.isEnum) {
-                property.vendorExtensions.put("isArrayOfEnum", true);
+            if (property.getItems() != null && property.getItems().getIsEnum()) {
+                property.getExts().put("isArrayOfEnum", true);
 
-                if (property.datatypeWithEnum != null && property.datatypeWithEnum.contains("std::")) {
-                    String enumName = property.items.datatypeWithEnum;
+                if (property.getDatatypeWithEnum() != null && property.getDatatypeWithEnum().contains("std::")) {
+                    String enumName = property.getItems().getDatatypeWithEnum();
                     if (enumName != null && !enumName.contains("::")) {
                         // Replace std::EnumName with ClassName::EnumName
-                        property.datatypeWithEnum = property.datatypeWithEnum.replace(
-                                "std::" + enumName,
-                                model.classname + "::" + enumName
-                        );
-                        property.dataType = property.datatypeWithEnum;
+                        property.setDatatypeWithEnum(property.getDatatypeWithEnum().replace(
+                           "std::" + enumName,
+                           model.classname + "::" + enumName
+                        ));
+                        property.setDatatype(property.getDatatypeWithEnum());
                     }
                 }
             } else {
-                property.vendorExtensions.put("isArrayOfEnum", false);
+                property.getExts().put("isArrayOfEnum", false);
             }
         } else {
-            property.vendorExtensions.put("isArray", false);
-            property.vendorExtensions.put("isArrayOfEnum", false);
+            property.getExts().put("isArray", false);
+            property.getExts().put("isArrayOfEnum", false);
         }
 
         // Set vendor extensions for map properties
-        if (property.isMap) {
-            property.vendorExtensions.put("isContainer", true);
-        } else if (property.isArray) {
-            property.vendorExtensions.put("isContainer", true);
+        if (property.getIsMap()) {
+            property.getExts().put("isContainer", true);
+        } else if (property.getIsArray()) {
+            property.getExts().put("isContainer", true);
         } else {
-            property.vendorExtensions.put("isContainer", false);
+            property.getExts().put("isContainer", false);
         }
 
         // Set vendor extensions for enum properties
         // Note: enum identifier derivation (numeric prefixing, upper-casing) for
         // (de)serialization happens later, in setEnumVendorExtensions(), which is the
         // single place that builds both the C++ identifier and the original spec value.
-        property.vendorExtensions.put("isEnum", property.isEnum);
+        property.getExts().put("isEnum", property.getIsEnum());
 
         // Set vendor extension for nullable/optional properties
-        if (property.isNullable) {
-            property.vendorExtensions.put("isOptional", true);
+        if (property.isNullable()) {
+            property.getExts().put("isOptional", true);
         } else {
-            property.vendorExtensions.put("isOptional", false);
+            property.getExts().put("isOptional", false);
         }
     }
 
@@ -2221,9 +2221,9 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
 
         if (varObj instanceof CodegenProperty) {
             CodegenProperty var = (CodegenProperty) varObj;
-            vendorExtensions = var.vendorExtensions;
-            items = var.items;
-            isContainer = var.isContainer;
+            vendorExtensions = var.getExts();
+            items = var.getItems();
+            isContainer = var.isContainer();
         } else if (varObj instanceof CodegenParameter) {
             CodegenParameter var = (CodegenParameter) varObj;
             vendorExtensions = var.vendorExtensions;
@@ -2234,7 +2234,7 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
         }
 
         vendorExtensions.put("isArray", true);
-        String itemType = (items != null && items.dataType != null) ? items.dataType : "std::string";
+        String itemType = (items != null && items.getDataType() != null) ? items.getDataType() : "std::string";
         // Improved array item type naming
         String arrayTypeName = toPascalCase(varName) + "VectorOf" + toPascalCase(itemType);
         vendorExtensions.put("arrayTypeName", arrayTypeName);
@@ -2243,7 +2243,7 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
             // ALWAYS set primitive type flags for items (needed for type conversion in templates)
             setPrimitiveTypes(items);
 
-            if (items.isEnum) {
+            if (items.getIsEnum()) {
                 // Set up enum vendor extensions for items (needed for enumCases and conversion helpers)
                 // Only call if model is available (not for parameters)
                 if (model != null) {
@@ -2258,25 +2258,25 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
                 }
                 // Remove namespace prefixes from enum datatypes in array items
                 // Enums are defined inside the class, so namespace qualifiers are not needed
-                if (items.datatypeWithEnum != null && items.datatypeWithEnum.contains("::")) {
+                if (items.getDatatypeWithEnum() != null && items.getDatatypeWithEnum().contains("::")) {
                     // Remove any namespace prefix (like "std::" or "ModelClass::")
-                    String[] parts = items.datatypeWithEnum.split("::");
-                    items.datatypeWithEnum = parts[parts.length - 1];
+                    String[] parts = items.getDatatypeWithEnum().split("::");
+                    items.setDatatypeWithEnum(parts[parts.length - 1]);
                 }
                 // Also fix items.dataType which is used to construct parent's datatypeWithEnum for arrays
-                if (items.dataType != null && items.dataType.contains("::")) {
-                    String[] parts = items.dataType.split("::");
-                    items.dataType = parts[parts.length - 1];
+                if (items.getDataType() != null && items.getDataType().contains("::")) {
+                    String[] parts = items.getDataType().split("::");
+                    items.setDatatype(parts[parts.length - 1]);
                 }
-            } else if (items.isModel) {
+            } else if (items.getIsModel()) {
                 vendorExtensions.put("isArrayOfModel", true);
                 vendorExtensions.put("vectorFromJsonHelper", varName + "VectorFromJson");
                 vendorExtensions.put("vectorToJsonHelper", varName + "VectorToJson");
-            } else if (items.isPrimitiveType) {
+            } else if (items.getIsPrimitiveType()) {
                 vendorExtensions.put("isArrayOfPrimitive", true);
                 vendorExtensions.put("vectorFromStringHelper", varName + "VectorFromString");
                 vendorExtensions.put("vectorToStringHelper", varName + "VectorToString");
-            } else if (items.isContainer) {
+            } else if (items.isContainer()) {
                 vendorExtensions.put("isArrayOfContainer", true);
                 vendorExtensions.put("vectorFromStringHelper", varName + "VectorFromString");
                 vendorExtensions.put("vectorToStringHelper", varName + "VectorToString");
@@ -2299,9 +2299,9 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
 
         if (varObj instanceof CodegenProperty) {
             CodegenProperty prop = (CodegenProperty) varObj;
-            type = (prop.dataType != null) ? prop.dataType : "";
-            vendorExtensions = prop.vendorExtensions;
-            isObject = prop.isModel || (!prop.isPrimitiveType && !prop.isArray && !prop.isEnum);
+            type = (prop.getDataType() != null) ? prop.getDataType() : "";
+            vendorExtensions = prop.getExts();
+            isObject = prop.getIsModel() || (!prop.getIsPrimitiveType() && !prop.getIsArray() && !prop.getIsEnum());
         } else if (varObj instanceof CodegenParameter) {
             CodegenParameter param = (CodegenParameter) varObj;
             type = (param.dataType != null) ? param.dataType : "";
@@ -2375,31 +2375,31 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
             return;
         }
 
-        var.vendorExtensions.put("isEnum", true);
-        var.vendorExtensions.put("enumType", toPascalCase(var.baseType) + "Enum");
+        var.getExts().put("isEnum", true);
+        var.getExts().put("enumType", toPascalCase(var.getBaseType()) + "Enum");
 
         // Use SHORT enum name that will be scoped to the class
         // e.g., "CardTypeEnum" not "CreditCardCardTypeEnum"
         // Use centralized toPascalCase for consistent naming
-        String shortEnumName = toPascalCase(var.baseName) + "Enum";
-        var.vendorExtensions.put("enumName", shortEnumName);
-        var.enumName = shortEnumName;  // Also set the direct property
-        var.vendorExtensions.put("enumToStringHelper", var.name + ENUM_TO_STRING);
+        String shortEnumName = toPascalCase(var.getBaseName()) + "Enum";
+        var.getExts().put("enumName", shortEnumName);
+        var.setEnumName(shortEnumName);  // Also set the direct property
+        var.getExts().put("enumToStringHelper", var.getName() + ENUM_TO_STRING);
 
         // Convert numeric enum values to valid C++ enum names
         List<String> convertedValues = new ArrayList<>();
 
         // Try to get enum values from var._enum, allowableValues, or var.allowableValues
-        List<String> enumValues = var._enum;
-        if ((enumValues == null || enumValues.isEmpty()) && var.allowableValues != null) {
+        List<String> enumValues = var.get_enum();
+        if ((enumValues == null || enumValues.isEmpty()) && var.getAllowableValues() != null) {
             enumValues = new ArrayList<>();
-            for (Object val : var.allowableValues.values()) {
+            for (Object val : var.getAllowableValues().values()) {
                 enumValues.add(val != null ? val.toString() : "");
             }
         }
 
         LOGGER.debug("Processing enum for variable {}: isEnum={}, _enum={}, allowableValues={}",
-                var.name, var.isEnum, var._enum, var.allowableValues);
+           var.getName(), var.getIsEnum(), var.get_enum(), var.getAllowableValues());
 
         // Check if enum has UNKNOWN/UNSPECIFIED value, if not add it at the beginning
         boolean hasUnknownValue = false;
@@ -2419,7 +2419,7 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
                 enumValues = new ArrayList<>();
             }
             enumValues.add(0, "UNSPECIFIED");
-            LOGGER.debug("Added UNSPECIFIED value to enum {} (needed for safe initialization)", var.name);
+            LOGGER.debug("Added UNSPECIFIED value to enum {} (needed for safe initialization)", var.getName());
         }
 
         if (enumValues != null && !enumValues.isEmpty()) {
@@ -2439,12 +2439,12 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
                 convertedValues.add(convertedVal);
             }
         } else {
-            LOGGER.warn("No enum values found for variable {} in model {}", var.name, model.classname);
+            LOGGER.warn("No enum values found for variable {} in model {}", var.getName(), model.classname);
         }
 
-        var.vendorExtensions.put(ENUM_VALUES, convertedValues);
-        var._enum = convertedValues;  // Also set it on the var itself for Mustache access
-        var.allowableValues.put(ENUM_VALUES, convertedValues);  // Also update allowableValues for template
+        var.getExts().put(ENUM_VALUES, convertedValues);
+        var.set_enum(convertedValues);  // Also set it on the var itself for Mustache access
+        var.getAllowableValues().put(ENUM_VALUES, convertedValues);  // Also update allowableValues for template
 
         // Create enumCases for use in helper functions
         List<Map<String, String>> enumCases = new ArrayList<>();
@@ -2460,14 +2460,14 @@ public class CppHttplibServerCodegen extends AbstractCppCodegen {
                 enumCases.add(caseMap);
             }
         }
-        var.vendorExtensions.put("enumCases", enumCases);
+        var.getExts().put("enumCases", enumCases);
 
-        LOGGER.debug("Set enum values for {}: {}", var.name, convertedValues);
-        var.vendorExtensions.put("enumFromStringHelper", var.name + ENUM_FROM_STRING);
+        LOGGER.debug("Set enum values for {}: {}", var.getName(), convertedValues);
+        var.getExts().put("enumFromStringHelper", var.getName() + ENUM_FROM_STRING);
         // Use the short enum name (e.g., "CardTypeEnum") for the datatype
         // When used in containers, it will be scoped to the class (e.g., "CreditCard::CardTypeEnum")
-        var.vendorExtensions.put("shortEnumName", shortEnumName);
-        var.datatypeWithEnum = shortEnumName;
+        var.getExts().put("shortEnumName", shortEnumName);
+        var.setDatatypeWithEnum(shortEnumName);
     }
 
     /**

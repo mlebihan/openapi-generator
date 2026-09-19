@@ -570,14 +570,14 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
             for (CodegenParameter param : operation.allParams) {
                 // import "os" if the operation uses files
                 if (!addedOSImport && ("*os.File".equals(param.dataType) ||
-                        (param.items != null && "*os.File".equals(param.items.dataType)))) {
+                        (param.items != null && "*os.File".equals(param.items.getDataType())))) {
                     imports.add(createMapping("import", "os"));
                     addedOSImport = true;
                 }
 
                 // import "time" if the operation has a time parameter.
                 if (!addedTimeImport && ("time.Time".equals(param.dataType) ||
-                        (param.items != null && "time.Time".equals(param.items.dataType)))) {
+                        (param.items != null && "time.Time".equals(param.items.getDataType())))) {
                     imports.add(createMapping("import", "time"));
                     addedTimeImport = true;
                 }
@@ -673,14 +673,14 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
             for (CodegenParameter param : operation.allParams) {
                 // import "os" if the operation uses files
                 if (!addedOSImport && ("*os.File".equals(param.dataType) ||
-                        (param.items != null && "*os.File".equals(param.items.dataType)))) {
+                        (param.items != null && "*os.File".equals(param.items.getDataType())))) {
                     imports.add(createMapping("import", "os"));
                     addedOSImport = true;
                 }
 
                 // import "time" if the operation has a time parameter.
                 if (!addedTimeImport && ("time.Time".equals(param.dataType) ||
-                        (param.items != null && "time.Time".equals(param.items.dataType)))) {
+                        (param.items != null && "time.Time".equals(param.items.getDataType())))) {
                     imports.add(createMapping("import", "time"));
                     addedTimeImport = true;
                 }
@@ -753,9 +753,9 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
         // For primitive types and custom types (e.g. interface{}, map[string]interface{}...),
         // the generated code has a wrapper type and a Get() function to access the underlying type.
         // For containers (e.g. Array, Map), the generated code returns the type directly.
-        if (property.isContainer || property.isFreeFormObject
-                || (property.isAnyType && !property.isModel)) {
-            property.vendorExtensions.put("x-golang-is-container", true);
+        if (property.isContainer() || property.getIsFreeFormObject()
+                || (property.getIsAnyType() && !property.getIsModel())) {
+            property.getExts().put("x-golang-is-container", true);
         }
     }
 
@@ -798,19 +798,19 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
             }
 
             for (CodegenProperty cp : codegenProperties) {
-                if (!addedTimeImport && ("time.Time".equals(cp.dataType) || (cp.items != null && "time.Time".equals(cp.items.complexType)))) {
+                if (!addedTimeImport && ("time.Time".equals(cp.getDataType()) || (cp.getItems() != null && "time.Time".equals(cp.getItems().getComplexType())))) {
                     imports.add(createMapping("import", "time"));
                     addedTimeImport = true;
                 }
 
-                if (!addedOSImport && ("*os.File".equals(cp.dataType) ||
-                        (cp.items != null && "*os.File".equals(cp.items.dataType)))) {
+                if (!addedOSImport && ("*os.File".equals(cp.getDataType()) ||
+                        (cp.getItems() != null && "*os.File".equals(cp.getItems().getDataType())))) {
                     imports.add(createMapping("import", "os"));
                     addedOSImport = true;
                 }
 
-                if (cp.pattern != null) {
-                    String regexp = String.format(Locale.getDefault(), "regexp=%s", cp.pattern);
+                if (cp.getPattern() != null) {
+                    String regexp = String.format(Locale.getDefault(), "regexp=%s", cp.getPattern());
 
                     // Replace backtick by \\x60, if found
                     if (regexp.contains("`")) {
@@ -823,24 +823,24 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
                     }
 
                     String validate = String.format(Locale.getDefault(), "validate:\"%s\"", regexp);
-                    cp.vendorExtensions.put(X_GO_CUSTOM_TAG, validate);
+                    cp.getExts().put(X_GO_CUSTOM_TAG, validate);
                 }
 
                 // construct data tag in the template: x-go-datatag
                 // original template
                 // `json:"{{{baseName}}}{{^required}},omitempty{{/required}}"{{#withXml}} xml:"{{{baseName}}}{{#isXmlAttribute}},attr{{/isXmlAttribute}}"{{/withXml}}{{#withValidate}} validate:"{{validate}}"{{/withValidate}}{{#vendorExtensions.x-go-custom-tag}} {{{.}}}{{/vendorExtensions.x-go-custom-tag}}`
-                String goDataTag = "json:\"" + cp.baseName;
-                if (!cp.required) {
+                String goDataTag = "json:\"" + cp.getBaseName();
+                if (!cp.getRequired()) {
                     goDataTag += ",omitempty";
                 }
                 goDataTag += "\"";
 
                 if (withXml) {
-                    goDataTag += " xml:" + "\"" + cp.baseName;
-                    if (cp.isXmlWrapped) {
-                        goDataTag += ">" + ("".equals(cp.xmlName) ? cp.baseName : cp.xmlName);
+                    goDataTag += " xml:" + "\"" + cp.getBaseName();
+                    if (cp.isXmlWrapped()) {
+                        goDataTag += ">" + ("".equals(cp.getXmlName()) ? cp.getBaseName() : cp.getXmlName());
                     }
-                    if (cp.isXmlAttribute) {
+                    if (cp.isXmlAttribute()) {
                         goDataTag += ",attr";
                     }
                     goDataTag += "\"";
@@ -852,8 +852,8 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
                 }
 
                 // {{#vendorExtensions.x-go-custom-tag}} {{{.}}}{{/vendorExtensions.x-go-custom-tag}}
-                if (StringUtils.isNotEmpty(String.valueOf(cp.vendorExtensions.getOrDefault(X_GO_CUSTOM_TAG, "")))) {
-                    goDataTag += " " + cp.vendorExtensions.get(X_GO_CUSTOM_TAG);
+                if (StringUtils.isNotEmpty(String.valueOf(cp.getExts().getOrDefault(X_GO_CUSTOM_TAG, "")))) {
+                    goDataTag += " " + cp.getExts().get(X_GO_CUSTOM_TAG);
                 }
 
                 // if it contains backtick, wrap with " instead
@@ -862,7 +862,7 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
                 } else {
                     goDataTag = " `" + goDataTag + "`";
                 }
-                cp.vendorExtensions.put("x-go-datatag", goDataTag);
+                cp.getExts().put("x-go-datatag", goDataTag);
             }
 
             if (this instanceof GoClientCodegen && model.isEnum) {
@@ -1010,11 +1010,11 @@ public abstract class AbstractGoCodegen extends DefaultCodegen implements Codege
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        if (enumNameMapping.containsKey(property.name)) {
-            return enumNameMapping.get(property.name);
+        if (enumNameMapping.containsKey(property.getName())) {
+            return enumNameMapping.get(property.getName());
         }
 
-        String enumName = underscore(toModelName(property.name)).toUpperCase(Locale.ROOT);
+        String enumName = underscore(toModelName(property.getName())).toUpperCase(Locale.ROOT);
 
         // remove [] for array or map of enum
         enumName = enumName.replace("[]", "");

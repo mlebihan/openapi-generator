@@ -362,8 +362,8 @@ public class MysqlSchemaCodegen extends DefaultCodegen implements CodegenConfig 
         String defaultValue = property.getDefaultValue();
         Boolean required = property.getRequired();
         boolean unsigned = false;
-        Boolean isUuid = property.isUuid;
-        Boolean isEnum = property.isEnum;
+        Boolean isUuid = property.getIsUuid();
+        Boolean isEnum = property.getIsEnum();
 
         if (vendorExtensions.containsKey(VENDOR_EXTENSION_MYSQL_SCHEMA)) {
             // user already specified schema values
@@ -454,7 +454,7 @@ public class MysqlSchemaCodegen extends DefaultCodegen implements CodegenConfig 
         String defaultValue = property.getDefaultValue();
         Boolean required = property.getRequired();
         boolean unsigned = false;
-        Boolean isEnum = property.isEnum;
+        Boolean isEnum = property.getIsEnum();
 
         if (vendorExtensions.containsKey(VENDOR_EXTENSION_MYSQL_SCHEMA)) {
             // user already specified schema values
@@ -595,7 +595,7 @@ public class MysqlSchemaCodegen extends DefaultCodegen implements CodegenConfig 
         Integer maxLength = property.getMaxLength();
         String defaultValue = property.getDefaultValue();
         Boolean required = property.getRequired();
-        Boolean isEnum = property.isEnum;
+        Boolean isEnum = property.getIsEnum();
 
         if (vendorExtensions.containsKey(VENDOR_EXTENSION_MYSQL_SCHEMA)) {
             // user already specified schema values

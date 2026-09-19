@@ -483,8 +483,8 @@ public class CppRestbedServerDeprecatedCodegen extends AbstractCppCodegen {
     @Override
     public void updateCodegenPropertyEnum(CodegenProperty var) {
         // Remove prefix added by DefaultCodegen
-        String originalDefaultValue = var.defaultValue;
+        String originalDefaultValue = var.getDefaultValue();
         super.updateCodegenPropertyEnum(var);
-        var.defaultValue = originalDefaultValue;
+        var.setDefaultValue(originalDefaultValue);
     }
 }

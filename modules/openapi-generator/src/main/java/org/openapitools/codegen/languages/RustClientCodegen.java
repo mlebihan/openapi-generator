@@ -309,11 +309,11 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
                         oneOf.setName(modelName);
                         oneOf.setBaseName(refName);
                     }
-                } else if (oneOf.isArray) {
+                } else if (oneOf.getIsArray()) {
                     // If the type is an array, extend the name with the inner type to prevent name collisions
                     // in case multiple arrays with different types are defined. If the user has manually specified
                     // a name, use that name instead.
-                    String collectionWithTypeName = toModelName(schema.getType()) + oneOf.containerTypeMapped + oneOf.items.baseType;
+                    String collectionWithTypeName = toModelName(schema.getType()) + oneOf.getContainerTypeMapped() + oneOf.getItems().getBaseType();
                     String oneOfName = Optional.ofNullable(schema.getTitle()).orElse(collectionWithTypeName);
                     oneOf.setName(oneOfName);
                 }
@@ -341,7 +341,7 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
                 String reserved_var_name = cm.discriminator.getPropertyBaseName();
 
                 for (CodegenProperty cp : cm.vars) {
-                    if (cp.baseName.equals(reserved_var_name)) {
+                    if (cp.getBaseName().equals(reserved_var_name)) {
                         cm.vars.remove(cp);
                         break;
                     }
@@ -376,7 +376,7 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
 
             // Flag structs with byteArrays in them so that we can annotate them with the serde_as macro
             for (CodegenProperty cp : cm.vars) {
-                if (cp.isByteArray) {
+                if (cp.getIsByteArray()) {
                     cm.vendorExtensions.put("x-rust-has-byte-array", true);
                     break;
                 }
@@ -385,7 +385,7 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
             // Flag structs with integer-enum properties so the template can emit serde_repr import once
             if (!cm.isEnum) {
                 for (CodegenProperty cp : cm.vars) {
-                    if (cp.isEnum && cp.isInteger) {
+                    if (cp.getIsEnum() && cp.getIsInteger()) {
                         cm.vendorExtensions.put("x-rust-has-integer-property-enum", true);
                         break;
                     }
@@ -397,12 +397,12 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
             for (CodegenProperty cp : cm.vars) {
                 String docType;
 
-                if (cp.datatypeWithEnum != null && !cp.datatypeWithEnum.isEmpty()) {
+                if (cp.getDatatypeWithEnum() != null && !cp.getDatatypeWithEnum().isEmpty()) {
                     // Use enum type if available (e.g., Vec<UniqueItemArray> instead of Vec<String>)
-                    docType = cp.datatypeWithEnum;
+                    docType = cp.getDatatypeWithEnum();
                 } else {
                     // Use regular dataType
-                    docType = cp.dataType;
+                    docType = cp.getDataType();
                 }
 
                 // Apply uniqueItems logic (matching model.mustache lines 139, 161)
@@ -411,24 +411,24 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
                     docType = docType.replace("Vec<", "HashSet<");
                 }
 
-                cp.vendorExtensions.put("x-doc-type", docType);
+                cp.getExts().put("x-doc-type", docType);
 
                 // Determine if this type should have a doc link
                 // Only local models should link, not external types from std lib or crates
                 boolean shouldLink = false;
-                if (cp.complexType != null && !cp.complexType.isEmpty()) {
+                if (cp.getComplexType() != null && !cp.getComplexType().isEmpty()) {
                     // Check if it's an external type by looking for known prefixes
                     String[] externalPrefixes = {"std::", "serde_json::", "uuid::", "chrono::", "url::"};
                     boolean isExternal = false;
                     for (String prefix : externalPrefixes) {
-                        if (cp.complexType.startsWith(prefix)) {
+                        if (cp.getComplexType().startsWith(prefix)) {
                             isExternal = true;
                             break;
                         }
                     }
                     shouldLink = !isExternal;
                 }
-                cp.vendorExtensions.put("x-should-link", shouldLink);
+                cp.getExts().put("x-should-link", shouldLink);
             }
         }
         // process enum in models
@@ -714,20 +714,20 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
         // If a property is both nullable and non-required then we represent this using a double Option
         // which requires the `serde_with` extension crate for deserialization.
         // See: https://docs.rs/serde_with/latest/serde_with/rust/double_option/index.html
-        if (property.isNullable && !property.required) {
+        if (property.isNullable() && !property.getRequired()) {
             additionalProperties.put("serdeWith", true);
         }
 
         // Add a field for checking if a field is with optional or required in templates.
         // This is useful in Mustache templates as it's not possible to do OR logic between variables.
-        property.vendorExtensions.put("isMandatory", !property.isNullable && property.required);
+        property.getExts().put("isMandatory", !property.isNullable() && property.getRequired());
 
         // If a property is a base64-encoded byte array, use `serde_with` for deserialization.
-        if (property.isByteArray) {
+        if (property.getIsByteArray()) {
             additionalProperties.put("serdeWith", true);
             // If a byte array is both nullable and not required we need to include our own
             // custom double option as serde_as does not work with serde_with's double_option.
-            if (property.isNullable && !property.required) {
+            if (property.isNullable() && !property.getRequired()) {
                 additionalProperties.put("serdeAsDoubleOption", true);
             }
         }
@@ -938,14 +938,14 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
      * Recursively searches for a model's properties for a UUID type field.
      */
     private boolean hasUuidInProperties(List<CodegenProperty> properties) {
-        return checkForPropertiesRecursively(properties, (property) -> property.isUuid);
+        return checkForPropertiesRecursively(properties, (property) -> property.getIsUuid());
     }
 
     /**
      * Recursively searches for a model's properties for a Date or DateTime type field.
      */
     private boolean hasChronoTypeInProperties(List<CodegenProperty> properties) {
-        return checkForPropertiesRecursively(properties, (property) -> property.isDate || property.isDateTime);
+        return checkForPropertiesRecursively(properties, (property) -> property.getIsDate() || property.getIsDateTime());
     }
 
     /**
@@ -960,13 +960,13 @@ public class RustClientCodegen extends AbstractRustCodegen implements CodegenCon
                 return true;
             }
             // Check nested properties
-            if (property.items != null && checkForPropertiesRecursively(Collections.singletonList(property.items), propertyCheck)) {
+            if (property.getItems() != null && checkForPropertiesRecursively(Collections.singletonList(property.getItems()), propertyCheck)) {
                 return true;
             }
-            if (property.additionalProperties != null && checkForPropertiesRecursively(Collections.singletonList(property.additionalProperties), propertyCheck)) {
+            if (property.getAdditionalProperties() != null && checkForPropertiesRecursively(Collections.singletonList(property.getAdditionalProperties()), propertyCheck)) {
                 return true;
             }
-            if (property.vars != null && checkForPropertiesRecursively(property.vars, propertyCheck)) {
+            if (property.getVars() != null && checkForPropertiesRecursively(property.getVars(), propertyCheck)) {
                 return true;
             }
         }

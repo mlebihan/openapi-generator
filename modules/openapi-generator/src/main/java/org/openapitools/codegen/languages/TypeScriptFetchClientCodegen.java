@@ -471,7 +471,7 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
             cm.vendorExtensions.put(X_HAS_DATE_VARS, cm.vars.stream()
                     .filter(ExtendedCodegenProperty.class::isInstance)
                     .map(ExtendedCodegenProperty.class::cast)
-                    .anyMatch(v -> v.isPrimitiveType && !v.isArray && (v.isDateType() || v.isDateTimeType())));
+                    .anyMatch(v -> v.getIsPrimitiveType() && !v.getIsArray() && (v.isDateType() || v.isDateTimeType())));
         }
 
         // Add supporting file only if we plan to generate files in /models
@@ -600,10 +600,10 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
 
             for (CodegenProperty cpVar : rootModel.vars) {
                 ExtendedCodegenProperty var = (ExtendedCodegenProperty) cpVar;
-                if (var.isModel && entityModelClassnames.indexOf(var.dataType) != -1) {
+                if (var.getIsModel() && entityModelClassnames.indexOf(var.getDataType()) != -1) {
                     var.isEntity = true;
-                } else if (var.isArray && var.items.isModel && entityModelClassnames.indexOf(var.items.dataType) != -1) {
-                    ((ExtendedCodegenProperty) var.items).isEntity = true;
+                } else if (var.getIsArray() && var.getItems().getIsModel() && entityModelClassnames.indexOf(var.getItems().getDataType()) != -1) {
+                    ((ExtendedCodegenProperty) var.getItems()).isEntity = true;
                 }
             }
         }
@@ -643,22 +643,22 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
     }
 
     private void autoSetDefaultValueForProperty(ExtendedCodegenProperty var) {
-        if (var.isArray || var.isModel) {
-            var.defaultValue = var.dataTypeAlternate + "()";
+        if (var.getIsArray() || var.getIsModel()) {
+            var.setDefaultValue(var.dataTypeAlternate + "()");
         } else if (var.isUniqueId) {
-            var.defaultValue = "\"-1\"";
-        } else if (var.isEnum) {
-            var.defaultValue = "'" + var._enum.get(0) + "'";
+            var.setDefaultValue("\"-1\"");
+        } else if (var.getIsEnum()) {
+            var.setDefaultValue("'" + var.get_enum().get(0) + "'");
             updateCodegenPropertyEnum(var);
-        } else if (var.dataType.equalsIgnoreCase("string")) {
-            var.defaultValue = "\"\"";
-        } else if (var.dataType.equalsIgnoreCase("number")) {
-            var.defaultValue = "0";
-        } else if (var.dataType.equalsIgnoreCase("boolean")) {
-            var.defaultValue = "false";
+        } else if (var.getDataType().equalsIgnoreCase("string")) {
+            var.setDefaultValue("\"\"");
+        } else if (var.getDataType().equalsIgnoreCase("number")) {
+            var.setDefaultValue("0");
+        } else if (var.getDataType().equalsIgnoreCase("boolean")) {
+            var.setDefaultValue("false");
         } else {
-            if (var.allowableValues != null && var.allowableValues.get(ENUM_VARS) instanceof ArrayList && ((ArrayList<?>) var.allowableValues.get(ENUM_VARS)).get(0) instanceof HashMap) {
-                var.defaultValue = var.dataTypeAlternate + "." + getEnumVars(var.allowableValues).get(0).getEnumName();
+            if (var.getAllowableValues() != null && var.getAllowableValues().get(ENUM_VARS) instanceof ArrayList && ((ArrayList<?>) var.getAllowableValues().get(ENUM_VARS)).get(0) instanceof HashMap) {
+                var.setDefaultValue(var.dataTypeAlternate + "." + getEnumVars(var.getAllowableValues()).get(0).getEnumName());
             }
         }
     }
@@ -747,7 +747,7 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
                         } else {
                             boolean foundMatch = false;
                             for (CodegenProperty var : cm.vars) {
-                                if (var.name.equals(returnPassthrough)) {
+                                if (var.getName().equals(returnPassthrough)) {
                                     foundMatch = true;
                                     break;
                                 }
@@ -762,7 +762,7 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
                     } else if (this.getDetectPassthroughModelsWithSuffixAndField() != null && op.returnBaseType.length() > this.getPassthroughSuffix().length() && op.returnBaseType.endsWith(this.getPassthroughSuffix())) {
                         boolean foundMatch = false;
                         for (CodegenProperty var : cm.vars) {
-                            if (var.name.equals(this.getPassthroughField())) {
+                            if (var.getName().equals(this.getPassthroughField())) {
                                 foundMatch = true;
                                 break;
                             }
@@ -789,19 +789,19 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
                     op.returnBaseTypeAlternate = null;
                     if (cp != null) {
                         op.returnTypeAlternate = cp.dataTypeAlternate;
-                        op.returnTypeIsModel = cp.isModel;
-                        op.returnTypeIsArray = cp.isArray;
-                        if (cp.isArray) {
-                            if (cp.items.isModel) {
+                        op.returnTypeIsModel = cp.getIsModel();
+                        op.returnTypeIsArray = cp.getIsArray();
+                        if (cp.getIsArray()) {
+                            if (cp.getItems().getIsModel()) {
                                 op.returnTypeSupportsEntities = true;
-                                op.returnBaseTypeAlternate = cp.items.dataType + "Record";
-                            } else if (cp.items.allowableValues != null) {
-                                op.returnBaseTypeAlternate = cp.items.dataType;
+                                op.returnBaseTypeAlternate = cp.getItems().getDataType() + "Record";
+                            } else if (cp.getItems().getAllowableValues() != null) {
+                                op.returnBaseTypeAlternate = cp.getItems().getDataType();
                             }
-                        } else if (cp.isModel) {
+                        } else if (cp.getIsModel()) {
                             op.returnTypeSupportsEntities = true;
                             op.returnBaseTypeAlternate = cp.dataTypeAlternate;
-                        } else if (cp.allowableValues != null) {
+                        } else if (cp.getAllowableValues() != null) {
                             op.returnBaseTypeAlternate = cp.dataTypeAlternate;
                         }
 
@@ -884,7 +884,7 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
 
             for (CodegenProperty cpVar : cm.vars) {
                 ExtendedCodegenProperty var = (ExtendedCodegenProperty) cpVar;
-                if (propertiesToKeepAsJSObject != null && Arrays.asList(propertiesToKeepAsJSObject).contains(var.name)) {
+                if (propertiesToKeepAsJSObject != null && Arrays.asList(propertiesToKeepAsJSObject).contains(var.getName())) {
                     var.keepAsJSObject = true;
                 }
                 boolean parentIsEntity = this.processCodegenProperty(var, cm.classname, xEntityId);
@@ -901,7 +901,7 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
                 } else {
                     boolean foundMatch = false;
                     for (CodegenProperty var : cm.vars) {
-                        if (var.name.equals(returnPassthrough)) {
+                        if (var.getName().equals(returnPassthrough)) {
                             foundMatch = true;
                             break;
                         }
@@ -916,7 +916,7 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
             } else if (this.getDetectPassthroughModelsWithSuffixAndField() != null && cm.name.length() > this.getPassthroughSuffix().length() && cm.name.endsWith(this.getPassthroughSuffix())) {
                 boolean foundMatch = false;
                 for (CodegenProperty var : cm.vars) {
-                    if (var.name.equals(this.getPassthroughField())) {
+                    if (var.getName().equals(this.getPassthroughField())) {
                         foundMatch = true;
                         break;
                     }
@@ -940,9 +940,9 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
                 ExtendedCodegenProperty var = (ExtendedCodegenProperty) cpVar;
 
                 // Handle both direct enum properties and inner enums (maps/arrays of enums)
-                if (Boolean.TRUE.equals(var.isEnum) || Boolean.TRUE.equals(var.isInnerEnum)) {
-                    var.datatypeWithEnum = var.datatypeWithEnum
-                            .replace(var.enumName, cm.classname + var.enumName);
+                if (Boolean.TRUE.equals(var.getIsEnum()) || Boolean.TRUE.equals(var.isInnerEnum())) {
+                    var.setDatatypeWithEnum(var.getDatatypeWithEnum()
+                       .replace(var.getEnumName(), cm.classname + var.getEnumName()));
                 }
             }
         }
@@ -987,56 +987,56 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
         // name enum with model name, e.g. StatusEnum => PetStatusEnum
         // This applies to both direct enum properties (isEnum) and properties containing
         // inner enums (isInnerEnum) like maps or arrays of enums.
-        if (Boolean.TRUE.equals(var.isEnum) || Boolean.TRUE.equals(var.isInnerEnum)) {
+        if (Boolean.TRUE.equals(var.getIsEnum()) || Boolean.TRUE.equals(var.isInnerEnum())) {
             // behaviour for enum names is specific for Typescript Fetch, not using namespaces
-            var.datatypeWithEnum = var.datatypeWithEnum.replace(var.enumName, parentClassName + var.enumName);
+            var.setDatatypeWithEnum(var.getDatatypeWithEnum().replace(var.getEnumName(), parentClassName + var.getEnumName()));
 
             // need to post-process defaultValue, was computed with previous var.datatypeWithEnum
-            if (var.defaultValue != null && !var.defaultValue.equals("undefined")) {
-                int dotPos = var.defaultValue.indexOf(".");
+            if (var.getDefaultValue() != null && !var.getDefaultValue().equals("undefined")) {
+                int dotPos = var.getDefaultValue().indexOf(".");
                 if (dotPos != -1) {
-                    var.defaultValue = var.datatypeWithEnum + var.defaultValue.substring(dotPos);
+                    var.setDefaultValue(var.getDatatypeWithEnum() + var.getDefaultValue().substring(dotPos));
                 }
             }
         }
 
         boolean parentIsEntity = false;
         if (this.getSagasAndRecords()) {
-            if (var.vendorExtensions.get(X_IS_UNIQUE_ID) instanceof Boolean) {
-                var.isUniqueId = Boolean.TRUE.equals(var.vendorExtensions.get(X_IS_UNIQUE_ID));
-            } else if (this.getInferUniqueIdFromNameSuffix() && (var.isArray && "number".equals(var.items.dataType)) || ("number".equals(var.dataType))) {
-                var.isUniqueId = this.isUniqueIdAccordingToNameSuffix(var.name);
+            if (var.getExts().get(X_IS_UNIQUE_ID) instanceof Boolean) {
+                var.isUniqueId = Boolean.TRUE.equals(var.getExts().get(X_IS_UNIQUE_ID));
+            } else if (this.getInferUniqueIdFromNameSuffix() && (var.getIsArray() && "number".equals(var.getItems().getDataType())) || ("number".equals(var.getDataType()))) {
+                var.isUniqueId = this.isUniqueIdAccordingToNameSuffix(var.getName());
             }
-            if (var.isUniqueId && xEntityId != null && xEntityId.equals(var.name)) {
+            if (var.isUniqueId && xEntityId != null && xEntityId.equals(var.getName())) {
                 parentIsEntity = true;
             }
 
-            var.dataTypeAlternate = var.dataType;
-            if (var.isArray) {
+            var.dataTypeAlternate = var.getDataType();
+            if (var.getIsArray()) {
                 var.isUniqueId = var.isUniqueId || var.itemsAreUniqueId();
-                var.dataTypeAlternate = var.dataType.replace("Array<", "List<");
+                var.dataTypeAlternate = var.getDataType().replace("Array<", "List<");
                 String newItemsDataType = var.getItemsDataType();
-                if (var.items.isModel) {
-                    newItemsDataType = var.items.dataType + "Record";
-                    var.dataTypeAlternate = var.dataTypeAlternate.replace(var.items.dataType, newItemsDataType);
-                } else if (var.items.isEnum) {
-                    newItemsDataType = var.items.datatypeWithEnum;
-                    var.dataTypeAlternate = var.dataTypeAlternate.replace(var.items.dataType, newItemsDataType);
+                if (var.getItems().getIsModel()) {
+                    newItemsDataType = var.getItems().getDataType() + "Record";
+                    var.dataTypeAlternate = var.dataTypeAlternate.replace(var.getItems().getDataType(), newItemsDataType);
+                } else if (var.getItems().getIsEnum()) {
+                    newItemsDataType = var.getItems().getDatatypeWithEnum();
+                    var.dataTypeAlternate = var.dataTypeAlternate.replace(var.getItems().getDataType(), newItemsDataType);
                 } else if (var.isUniqueId) {
                     newItemsDataType = "string";
                     var.dataTypeAlternate = var.dataTypeAlternate.replace("number", newItemsDataType);
                 }
-            } else if (var.isEnum) {
-                var.dataTypeAlternate = var.datatypeWithEnum;
-            } else if (var.isModel) {
-                var.dataTypeAlternate = var.dataType + "Record";
+            } else if (var.getIsEnum()) {
+                var.dataTypeAlternate = var.getDatatypeWithEnum();
+            } else if (var.getIsModel()) {
+                var.dataTypeAlternate = var.getDataType() + "Record";
             } else if (var.isUniqueId) {
                 var.dataTypeAlternate = "string";
-                if (var.isNullable) {
+                if (var.isNullable()) {
                     var.dataTypeAlternate = var.dataTypeAlternate + " | null";
                 }
             }
-            if (var.defaultValue == null || var.defaultValue.equals("undefined")) {
+            if (var.getDefaultValue() == null || var.getDefaultValue().equals("undefined")) {
                 this.autoSetDefaultValueForProperty(var);
             }
         }
@@ -1391,7 +1391,7 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
 
                 if (param.vendorExtensions.get(X_IS_UNIQUE_ID) instanceof Boolean) {
                     param.isUniqueId = Boolean.TRUE.equals(param.vendorExtensions.get(X_IS_UNIQUE_ID));
-                } else if (this.getInferUniqueIdFromNameSuffix() && (param.isArray && "number".equals(param.items.dataType)) || ("number".equals(param.dataType))) {
+                } else if (this.getInferUniqueIdFromNameSuffix() && (param.isArray && "number".equals(param.items.getDataType())) || ("number".equals(param.dataType))) {
                     param.isUniqueId = this.isUniqueIdAccordingToNameSuffix(param.paramName);
                 }
 
@@ -1401,10 +1401,10 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
                     param.isUniqueId = param.isUniqueId || param.itemsAreUniqueId();
                     param.dataTypeAlternate = param.dataType.replace("Array<", "List<");
                     String newItemsDataType = param.getItemsDataType();
-                    if (param.items.isModel) {
-                        newItemsDataType = param.items.dataType + "Record";
-                        param.dataTypeAlternate = param.dataTypeAlternate.replace(param.items.dataType, newItemsDataType);
-                    } else if (param.items.isEnum) {
+                    if (param.items.getIsModel()) {
+                        newItemsDataType = param.items.getDataType() + "Record";
+                        param.dataTypeAlternate = param.dataTypeAlternate.replace(param.items.getDataType(), newItemsDataType);
+                    } else if (param.items.getIsEnum()) {
                         newItemsDataType = param.datatypeWithEnum.substring(param.datatypeWithEnum.lastIndexOf("<") + 1, param.datatypeWithEnum.indexOf(">"));
                         param.dataTypeAlternate = param.datatypeWithEnum.replace("Array<", "List<");
                     } else if (param.isUniqueId) {
@@ -1503,11 +1503,11 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
     }
 
     private static boolean itemsAreUniqueId(CodegenProperty items) {
-        if (items != null && items.items != null) {
-            return itemsAreUniqueId(items.items);
+        if (items != null && items.getItems() != null) {
+            return itemsAreUniqueId(items.getItems());
         }
-        if (items != null && items.vendorExtensions.get(X_IS_UNIQUE_ID) instanceof Boolean) {
-            return Boolean.TRUE.equals(items.vendorExtensions.get(X_IS_UNIQUE_ID));
+        if (items != null && items.getExts().get(X_IS_UNIQUE_ID) instanceof Boolean) {
+            return Boolean.TRUE.equals(items.getExts().get(X_IS_UNIQUE_ID));
         }
         return false;
     }
@@ -1516,10 +1516,10 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
         if (items == null) {
             return null;
         }
-        if (items.items != null) {
-            return getItemsDataType(items.items);
+        if (items.getItems() != null) {
+            return getItemsDataType(items.getItems());
         }
-        return items.dataType;
+        return items.getDataType();
     }
 
     public class ExtendedCodegenParameter extends CodegenParameter {
@@ -1667,7 +1667,7 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
         }
 
         private void setReadOnlyVars() {
-            readOnlyVars = vars.stream().filter(v -> v.isReadOnly).collect(Collectors.toList());
+            readOnlyVars = vars.stream().filter(v -> v.isReadOnly()).collect(Collectors.toList());
             hasReadOnly = !readOnlyVars.isEmpty();
         }
     }
@@ -1680,111 +1680,111 @@ public class TypeScriptFetchClientCodegen extends AbstractTypeScriptClientCodege
         public boolean isReservedRecordField;
 
         public boolean itemsAreUniqueId() {
-            return TypeScriptFetchClientCodegen.itemsAreUniqueId(this.items);
+            return TypeScriptFetchClientCodegen.itemsAreUniqueId(this.getItems());
         }
 
         public String getItemsDataType() {
-            return TypeScriptFetchClientCodegen.getItemsDataType(this.items);
+            return TypeScriptFetchClientCodegen.getItemsDataType(this.getItems());
         }
 
         public boolean isDateType() {
-            return isDate && TypeScriptFetchClientCodegen.isDateType(dataType);
+            return getIsDate() && TypeScriptFetchClientCodegen.isDateType(getDataType());
         }
 
         public boolean isDateTimeType() {
-            return isDateTime && TypeScriptFetchClientCodegen.isDateTimeType(dataType);
+            return getIsDateTime() && TypeScriptFetchClientCodegen.isDateTimeType(getDataType());
         }
 
         public ExtendedCodegenProperty(CodegenProperty cp) {
             super();
 
-            this.openApiType = cp.openApiType;
-            this.baseName = cp.baseName;
-            this.complexType = cp.complexType;
-            this.getter = cp.getter;
-            this.setter = cp.setter;
-            this.description = cp.description;
-            this.dataType = cp.dataType;
-            this.datatypeWithEnum = cp.datatypeWithEnum;
-            this.dataFormat = cp.dataFormat;
-            this.name = cp.name;
-            this.min = cp.min;
-            this.max = cp.max;
-            this.defaultValue = cp.defaultValue;
-            this.defaultValueWithParam = cp.defaultValueWithParam;
-            this.baseType = cp.baseType;
-            this.containerType = cp.containerType;
-            this.title = cp.title;
-            this.unescapedDescription = cp.unescapedDescription;
-            this.maxLength = cp.maxLength;
-            this.minLength = cp.minLength;
-            this.pattern = cp.pattern;
-            this.example = cp.example;
-            this.jsonSchema = cp.jsonSchema;
-            this.minimum = cp.minimum;
-            this.maximum = cp.maximum;
-            this.multipleOf = cp.multipleOf;
-            this.exclusiveMinimum = cp.exclusiveMinimum;
-            this.exclusiveMaximum = cp.exclusiveMaximum;
-            this.required = cp.required;
-            this.deprecated = cp.deprecated;
-            this.isPrimitiveType = cp.isPrimitiveType;
-            this.isModel = cp.isModel;
-            this.isContainer = cp.isContainer;
-            this.isString = cp.isString;
-            this.isNumeric = cp.isNumeric;
-            this.isInteger = cp.isInteger;
-            this.isLong = cp.isLong;
-            this.isNumber = cp.isNumber;
-            this.isFloat = cp.isFloat;
-            this.isDouble = cp.isDouble;
-            this.isDecimal = cp.isDecimal;
-            this.isByteArray = cp.isByteArray;
-            this.isBinary = cp.isBinary;
-            this.isFile = cp.isFile;
-            this.isBoolean = cp.isBoolean;
-            this.isDate = cp.isDate; // full-date notation as defined by RFC 3339, section 5.6, for example, 2017-07-21
-            this.isDateTime = cp.isDateTime; // the date-time notation as defined by RFC 3339, section 5.6, for example, 2017-07-21T17:32:28Z
-            this.isUuid = cp.isUuid;
-            this.isUri = cp.isUri;
-            this.isEmail = cp.isEmail;
-            this.isFreeFormObject = cp.isFreeFormObject;
-            this.isAnyType = cp.isAnyType;
-            this.isArray = cp.isArray;
-            this.isMap = cp.isMap;
-            this.isEnum = cp.isEnum;
-            this.isEnumRef = cp.isEnumRef;
-            this.isReadOnly = cp.isReadOnly;
-            this.isWriteOnly = cp.isWriteOnly;
-            this.isNullable = cp.isNullable;
-            this.isSelfReference = cp.isSelfReference;
-            this.isCircularReference = cp.isCircularReference;
-            this.isDiscriminator = cp.isDiscriminator;
-            this._enum = cp._enum;
-            this.allowableValues = cp.allowableValues;
-            this.items = cp.items;
-            this.additionalProperties = cp.additionalProperties;
-            this.vars = cp.vars;
-            this.requiredVars = cp.requiredVars;
-            this.mostInnerItems = cp.mostInnerItems;
-            this.vendorExtensions = cp.vendorExtensions;
-            this.hasValidation = cp.hasValidation;
-            this.isInherited = cp.isInherited;
-            this.discriminatorValue = cp.discriminatorValue;
-            this.nameInLowerCase = cp.nameInLowerCase;
-            this.nameInPascalCase = cp.nameInPascalCase;
-            this.nameInSnakeCase = cp.nameInSnakeCase;
-            this.enumName = cp.enumName;
-            this.maxItems = cp.maxItems;
-            this.minItems = cp.minItems;
+            this.setOpenApiType(cp.getOpenApiType());
+            this.setBaseName(cp.getBaseName());
+            this.setComplexType(cp.getComplexType());
+            this.setGetter(cp.getGetter());
+            this.setSetter(cp.getSetter());
+            this.setDescription(cp.getDescription());
+            this.setDatatype(cp.getDataType());
+            this.setDatatypeWithEnum(cp.getDatatypeWithEnum());
+            this.setDataFormat(cp.getDataFormat());
+            this.setName(cp.getName());
+            this.setMin(cp.getMin());
+            this.setMax(cp.getMax());
+            this.setDefaultValue(cp.getDefaultValue());
+            this.setDefaultValueWithParam(cp.getDefaultValueWithParam());
+            this.setBaseType(cp.getBaseType());
+            this.setContainerType(cp.getContainerType());
+            this.setTitle(cp.getTitle());
+            this.setUnescapedDescription(cp.getUnescapedDescription());
+            this.setMaxLength(cp.getMaxLength());
+            this.setMinLength(cp.getMinLength());
+            this.setPattern(cp.getPattern());
+            this.setExample(cp.getExample());
+            this.setJsonSchema(cp.getJsonSchema());
+            this.setMinimum(cp.getMinimum());
+            this.setMaximum(cp.getMaximum());
+            this.setMultipleOf(cp.getMultipleOf());
+            this.setExclusiveMinimum(cp.getExclusiveMinimum());
+            this.setExclusiveMaximum(cp.getExclusiveMaximum());
+            this.setRequired(cp.getRequired());
+            this.isDeprecated(cp.isDeprecated());
+            this.setIsPrimitiveType(cp.getIsPrimitiveType());
+            this.setIsModel(cp.getIsModel());
+            this.isContainer(cp.isContainer());
+            this.setIsString(cp.getIsString());
+            this.isNumeric(cp.isNumeric());
+            this.setIsInteger(cp.getIsInteger());
+            this.setIsLong(cp.getIsLong());
+            this.setIsNumber(cp.getIsNumber());
+            this.setIsFloat(cp.getIsFloat());
+            this.setIsDouble(cp.getIsDouble());
+            this.setIsDecimal(cp.getIsDecimal());
+            this.setIsByteArray(cp.getIsByteArray());
+            this.setIsBinary(cp.getIsBinary());
+            this.isFile(cp.isFile());
+            this.setIsBoolean(cp.getIsBoolean());
+            this.setIsDate(cp.getIsDate()); // full-date notation as defined by RFC 3339, section 5.6, for example, 2017-07-21
+            this.setIsDateTime(cp.getIsDateTime()); // the date-time notation as defined by RFC 3339, section 5.6, for example, 2017-07-21T17:32:28Z
+            this.setIsUuid(cp.getIsUuid());
+            this.isUri(cp.isUri());
+            this.isEmail(cp.isEmail());
+            this.setIsFreeFormObject(cp.getIsFreeFormObject());
+            this.setIsAnyType(cp.getIsAnyType());
+            this.setIsArray(cp.getIsArray());
+            this.setIsMap(cp.getIsMap());
+            this.setIsEnum(cp.getIsEnum());
+            this.isEnumRef(cp.isEnumRef());
+            this.isReadOnly(cp.isReadOnly());
+            this.isWriteOnly(cp.isWriteOnly());
+            this.isNullable(cp.isNullable());
+            this.isSelfReference(cp.isSelfReference());
+            this.isCircularReference(cp.isCircularReference());
+            this.setIsDiscriminator(cp.getIsDiscriminator());
+            this.set_enum(cp.get_enum());
+            this.setAllowableValues(cp.getAllowableValues());
+            this.setItems(cp.getItems());
+            this.setAdditionalProperties(cp.getAdditionalProperties());
+            this.setVars(cp.getVars());
+            this.setRequiredVars(cp.getRequiredVars());
+            this.setMostInnerItems(cp.getMostInnerItems());
+            this.setVendorExtensions(cp.getExts());
+            this.setHasValidation(cp.getHasValidation());
+            this.isInherited(cp.isInherited());
+            this.setDiscriminatorValue(cp.getDiscriminatorValue());
+            this.setNameInLowerCase(cp.getNameInLowerCase());
+            this.setNameInPascalCase(cp.getNameInPascalCase());
+            this.setNameInSnakeCase(cp.getNameInSnakeCase());
+            this.setEnumName(cp.getEnumName());
+            this.setMaxItems(cp.getMaxItems());
+            this.setMinItems(cp.getMinItems());
             this.setMaxProperties(cp.getMaxProperties());
             this.setMinProperties(cp.getMinProperties());
             this.setUniqueItems(cp.getUniqueItems());
-            this.isXmlAttribute = cp.isXmlAttribute;
-            this.xmlPrefix = cp.xmlPrefix;
-            this.xmlName = cp.xmlName;
-            this.xmlNamespace = cp.xmlNamespace;
-            this.isXmlWrapped = cp.isXmlWrapped;
+            this.isXmlAttribute(cp.isXmlAttribute());
+            this.setXmlPrefix(cp.getXmlPrefix());
+            this.setXmlName(cp.getXmlName());
+            this.setXmlNamespace(cp.getXmlNamespace());
+            this.isXmlWrapped(cp.isXmlWrapped());
             this.setHasSanitizedName(cp.getHasSanitizedName());
         }
 

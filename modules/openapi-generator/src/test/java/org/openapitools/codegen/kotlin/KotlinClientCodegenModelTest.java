@@ -97,33 +97,33 @@ public class KotlinClientCodegenModelTest {
         Assert.assertEquals(cm.vars.size(), 3);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.dataType, "kotlin.Long");
-        Assert.assertEquals(property1.name, "id");
-        Assert.assertEquals(property1.defaultValue, null);
-        Assert.assertEquals(property1.baseType, "kotlin.Long");
-        Assert.assertTrue(property1.required);
-        Assert.assertTrue(property1.isPrimitiveType);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getDataType(), "kotlin.Long");
+        Assert.assertEquals(property1.getName(), "id");
+        Assert.assertEquals(property1.getDefaultValue(), null);
+        Assert.assertEquals(property1.getBaseType(), "kotlin.Long");
+        Assert.assertTrue(property1.getRequired());
+        Assert.assertTrue(property1.getIsPrimitiveType());
+        Assert.assertFalse(property1.isContainer());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "name");
-        Assert.assertEquals(property2.dataType, "kotlin.String");
-        Assert.assertEquals(property2.name, "name");
-        Assert.assertEquals(property2.defaultValue, null);
-        Assert.assertEquals(property2.baseType, "kotlin.String");
-        Assert.assertTrue(property2.required);
-        Assert.assertTrue(property2.isPrimitiveType);
-        Assert.assertFalse(property2.isContainer);
+        Assert.assertEquals(property2.getBaseName(), "name");
+        Assert.assertEquals(property2.getDataType(), "kotlin.String");
+        Assert.assertEquals(property2.getName(), "name");
+        Assert.assertEquals(property2.getDefaultValue(), null);
+        Assert.assertEquals(property2.getBaseType(), "kotlin.String");
+        Assert.assertTrue(property2.getRequired());
+        Assert.assertTrue(property2.getIsPrimitiveType());
+        Assert.assertFalse(property2.isContainer());
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.dataType, "java.time.OffsetDateTime");
-        Assert.assertEquals(property3.name, "createdAt");
-        Assert.assertEquals(property3.defaultValue, null);
-        Assert.assertEquals(property3.baseType, "java.time.OffsetDateTime");
-        Assert.assertFalse(property3.required);
-        Assert.assertFalse(property3.isContainer);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getDataType(), "java.time.OffsetDateTime");
+        Assert.assertEquals(property3.getName(), "createdAt");
+        Assert.assertEquals(property3.getDefaultValue(), null);
+        Assert.assertEquals(property3.getBaseType(), "java.time.OffsetDateTime");
+        Assert.assertFalse(property3.getRequired());
+        Assert.assertFalse(property3.isContainer());
     }
 
     @Test(description = "convert a simple model: threetenbp")
@@ -138,13 +138,13 @@ public class KotlinClientCodegenModelTest {
         final CodegenModel cm = codegen.fromModel("sample", schema);
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.dataType, "org.threeten.bp.OffsetDateTime");
-        Assert.assertEquals(property3.name, "createdAt");
-        Assert.assertEquals(property3.defaultValue, null);
-        Assert.assertEquals(property3.baseType, "org.threeten.bp.OffsetDateTime");
-        Assert.assertFalse(property3.required);
-        Assert.assertFalse(property3.isContainer);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getDataType(), "org.threeten.bp.OffsetDateTime");
+        Assert.assertEquals(property3.getName(), "createdAt");
+        Assert.assertEquals(property3.getDefaultValue(), null);
+        Assert.assertEquals(property3.getBaseType(), "org.threeten.bp.OffsetDateTime");
+        Assert.assertFalse(property3.getRequired());
+        Assert.assertFalse(property3.isContainer());
     }
 
     @Test(description = "convert a simple model: threetenbp-localdatetime")
@@ -161,13 +161,13 @@ public class KotlinClientCodegenModelTest {
         final CodegenModel cm = codegen.fromModel("sample", schema);
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.dataType, "org.threeten.bp.LocalDateTime");
-        Assert.assertEquals(property3.name, "createdAt");
-        Assert.assertEquals(property3.defaultValue, null);
-        Assert.assertEquals(property3.baseType, "org.threeten.bp.LocalDateTime");
-        Assert.assertFalse(property3.required);
-        Assert.assertFalse(property3.isContainer);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getDataType(), "org.threeten.bp.LocalDateTime");
+        Assert.assertEquals(property3.getName(), "createdAt");
+        Assert.assertEquals(property3.getDefaultValue(), null);
+        Assert.assertEquals(property3.getBaseType(), "org.threeten.bp.LocalDateTime");
+        Assert.assertFalse(property3.getRequired());
+        Assert.assertFalse(property3.isContainer());
     }
 
     @Test(description = "convert a simple model: date string")
@@ -182,13 +182,13 @@ public class KotlinClientCodegenModelTest {
         final CodegenModel cm = codegen.fromModel("sample", schema);
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.dataType, "kotlin.String");
-        Assert.assertEquals(property3.name, "createdAt");
-        Assert.assertEquals(property3.defaultValue, null);
-        Assert.assertEquals(property3.baseType, "kotlin.String");
-        Assert.assertFalse(property3.required);
-        Assert.assertFalse(property3.isContainer);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getDataType(), "kotlin.String");
+        Assert.assertEquals(property3.getName(), "createdAt");
+        Assert.assertEquals(property3.getDefaultValue(), null);
+        Assert.assertEquals(property3.getBaseType(), "kotlin.String");
+        Assert.assertFalse(property3.getRequired());
+        Assert.assertFalse(property3.isContainer());
     }
 
     @Test(description = "convert a simple model: date java8")
@@ -203,13 +203,13 @@ public class KotlinClientCodegenModelTest {
         final CodegenModel cm = codegen.fromModel("sample", schema);
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.dataType, "java.time.OffsetDateTime");
-        Assert.assertEquals(property3.name, "createdAt");
-        Assert.assertEquals(property3.defaultValue, null);
-        Assert.assertEquals(property3.baseType, "java.time.OffsetDateTime");
-        Assert.assertFalse(property3.required);
-        Assert.assertFalse(property3.isContainer);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getDataType(), "java.time.OffsetDateTime");
+        Assert.assertEquals(property3.getName(), "createdAt");
+        Assert.assertEquals(property3.getDefaultValue(), null);
+        Assert.assertEquals(property3.getBaseType(), "java.time.OffsetDateTime");
+        Assert.assertFalse(property3.getRequired());
+        Assert.assertFalse(property3.isContainer());
     }
 
     @Test(description = "convert a simple model: date java8-localdatetime")
@@ -226,13 +226,13 @@ public class KotlinClientCodegenModelTest {
         final CodegenModel cm = codegen.fromModel("sample", schema);
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.dataType, "java.time.LocalDateTime");
-        Assert.assertEquals(property3.name, "createdAt");
-        Assert.assertEquals(property3.defaultValue, null);
-        Assert.assertEquals(property3.baseType, "java.time.LocalDateTime");
-        Assert.assertFalse(property3.required);
-        Assert.assertFalse(property3.isContainer);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getDataType(), "java.time.LocalDateTime");
+        Assert.assertEquals(property3.getName(), "createdAt");
+        Assert.assertEquals(property3.getDefaultValue(), null);
+        Assert.assertEquals(property3.getBaseType(), "java.time.LocalDateTime");
+        Assert.assertFalse(property3.getRequired());
+        Assert.assertFalse(property3.isContainer());
     }
 
     @Test(description = "convert a model with array property to default kotlin.Array")
@@ -250,16 +250,16 @@ public class KotlinClientCodegenModelTest {
         Assert.assertEquals(generated.vars.size(), 2);
 
         final CodegenProperty property = generated.vars.get(1);
-        Assert.assertEquals(property.baseName, "examples");
-        Assert.assertEquals(property.getter, "getExamples");
-        Assert.assertEquals(property.setter, "setExamples");
-        Assert.assertEquals(property.dataType, "kotlin.Array<kotlin.String>");
-        Assert.assertEquals(property.name, "examples");
-        Assert.assertEquals(property.defaultValue, null);
-        Assert.assertEquals(property.baseType, "kotlin.Array");
-        Assert.assertEquals(property.containerType, "array");
-        Assert.assertFalse(property.required);
-        Assert.assertTrue(property.isContainer);
+        Assert.assertEquals(property.getBaseName(), "examples");
+        Assert.assertEquals(property.getGetter(), "getExamples");
+        Assert.assertEquals(property.getSetter(), "setExamples");
+        Assert.assertEquals(property.getDataType(), "kotlin.Array<kotlin.String>");
+        Assert.assertEquals(property.getName(), "examples");
+        Assert.assertEquals(property.getDefaultValue(), null);
+        Assert.assertEquals(property.getBaseType(), "kotlin.Array");
+        Assert.assertEquals(property.getContainerType(), "array");
+        Assert.assertFalse(property.getRequired());
+        Assert.assertTrue(property.isContainer());
     }
 
     @Test(description = "convert a model with array property to a kotlin.collections.List")
@@ -279,16 +279,16 @@ public class KotlinClientCodegenModelTest {
         Assert.assertEquals(generated.vars.size(), 2);
 
         final CodegenProperty property = generated.vars.get(1);
-        Assert.assertEquals(property.baseName, "examples");
-        Assert.assertEquals(property.getter, "getExamples");
-        Assert.assertEquals(property.setter, "setExamples");
-        Assert.assertEquals(property.dataType, "kotlin.collections.List<kotlin.String>");
-        Assert.assertEquals(property.name, "examples");
-        Assert.assertEquals(property.defaultValue, null);
-        Assert.assertEquals(property.baseType, "kotlin.collections.List");
-        Assert.assertEquals(property.containerType, "array");
-        Assert.assertFalse(property.required);
-        Assert.assertTrue(property.isContainer);
+        Assert.assertEquals(property.getBaseName(), "examples");
+        Assert.assertEquals(property.getGetter(), "getExamples");
+        Assert.assertEquals(property.getSetter(), "setExamples");
+        Assert.assertEquals(property.getDataType(), "kotlin.collections.List<kotlin.String>");
+        Assert.assertEquals(property.getName(), "examples");
+        Assert.assertEquals(property.getDefaultValue(), null);
+        Assert.assertEquals(property.getBaseType(), "kotlin.collections.List");
+        Assert.assertEquals(property.getContainerType(), "array");
+        Assert.assertFalse(property.getRequired());
+        Assert.assertTrue(property.isContainer());
     }
 
     @Test(description = "convert a model with a map property")
@@ -305,14 +305,14 @@ public class KotlinClientCodegenModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "mapping");
-        Assert.assertEquals(property1.dataType, "kotlin.collections.Map<kotlin.String, kotlin.String>");
-        Assert.assertEquals(property1.name, "mapping");
-        Assert.assertEquals(property1.baseType, "kotlin.collections.Map");
-        Assert.assertEquals(property1.containerType, "map");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
-        Assert.assertTrue(property1.isPrimitiveType);
+        Assert.assertEquals(property1.getBaseName(), "mapping");
+        Assert.assertEquals(property1.getDataType(), "kotlin.collections.Map<kotlin.String, kotlin.String>");
+        Assert.assertEquals(property1.getName(), "mapping");
+        Assert.assertEquals(property1.getBaseType(), "kotlin.collections.Map");
+        Assert.assertEquals(property1.getContainerType(), "map");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
+        Assert.assertTrue(property1.getIsPrimitiveType());
     }
 
     @Test(description = "convert a model with complex property")
@@ -329,12 +329,12 @@ public class KotlinClientCodegenModelTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "child");
-        Assert.assertEquals(property1.dataType, "Child");
-        Assert.assertEquals(property1.name, "child");
-        Assert.assertEquals(property1.baseType, "Child");
-        Assert.assertFalse(property1.required);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "child");
+        Assert.assertEquals(property1.getDataType(), "Child");
+        Assert.assertEquals(property1.getName(), "child");
+        Assert.assertEquals(property1.getBaseType(), "Child");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertFalse(property1.isContainer());
     }
 
     @DataProvider(name = "modelNames")

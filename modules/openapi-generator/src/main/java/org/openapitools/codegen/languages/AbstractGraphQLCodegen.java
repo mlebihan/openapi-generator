@@ -396,7 +396,7 @@ public abstract class AbstractGraphQLCodegen extends DefaultCodegen implements C
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        String enumName = toModelName(property.name);
+        String enumName = toModelName(property.getName());
 
         // remove [] for array or map of enum
         enumName = enumName.replace("[]", "");

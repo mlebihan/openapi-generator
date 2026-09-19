@@ -829,20 +829,20 @@ public class ElixirClientCodegen extends DefaultCodegen {
             if (property == null) {
                 LOGGER.error(
                         "CodegenProperty cannot be null. Please report the issue to https://github.com/openapitools/openapi-generator with the spec");
-            } else if (property.isAnyType) {
+            } else if (property.getIsAnyType()) {
                 sb.append("any()");
-            } else if(property.isFreeFormObject) {
+            } else if(property.getIsFreeFormObject()) {
                 sb.append("%{optional(String.t) => any()}");
-            } else if (property.isArray) {
+            } else if (property.getIsArray()) {
                 sb.append("list(");
-                buildTypespec(property.items, sb);
+                buildTypespec(property.getItems(), sb);
                 sb.append(")");
-            } else if (property.isMap) {
+            } else if (property.getIsMap()) {
                 sb.append("%{optional(String.t) => ");
-                buildTypespec(property.items, sb);
+                buildTypespec(property.getItems(), sb);
                 sb.append("}");
             } else {
-                sb.append(normalizeTypeName(property.dataType, property.isPrimitiveType));
+                sb.append(normalizeTypeName(property.getDataType(), property.getIsPrimitiveType()));
             }
         }
 
@@ -923,7 +923,7 @@ public class ElixirClientCodegen extends DefaultCodegen {
 
         public boolean hasComplexVars() {
             for (CodegenProperty p : vars) {
-                if (!p.isPrimitiveType) {
+                if (!p.getIsPrimitiveType()) {
                     return true;
                 }
             }

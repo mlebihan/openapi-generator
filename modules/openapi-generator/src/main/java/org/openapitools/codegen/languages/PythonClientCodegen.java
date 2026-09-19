@@ -681,7 +681,7 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
                 }
                 List<CodegenProperty> generatedProperties = generatedProperties(model);
                 boolean hidesStorageNames = generatedProperties.stream().anyMatch(property ->
-                        property.vendorExtensions.containsKey(
+                        property.getExts().containsKey(
                                 CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_STORAGE));
                 if (hidesStorageNames) {
                     configurePublicNameInputs(model.vars);
@@ -692,10 +692,10 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
                 List<CodegenProperty> inputNameProperties = new ArrayList<>();
                 boolean validatesInputNames = hidesStorageNames;
                 for (CodegenProperty property : generatedProperties) {
-                    if (property.vendorExtensions.containsKey(
+                    if (property.getExts().containsKey(
                             CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_WIRE)) {
                         inputNameProperties.add(property);
-                        if (property.vendorExtensions.containsKey(
+                        if (property.getExts().containsKey(
                                 CodegenConstants.X_PY_EXPLICIT_PUBLIC_NAME)) {
                             validatesInputNames = true;
                         }
@@ -721,7 +721,7 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
                 CodegenModel model = modelMap.getModel();
                 if (model != null && model.oneOf.isEmpty() && model.anyOf.isEmpty()) {
                     for (CodegenProperty property : model.vars) {
-                        if (property.vendorExtensions.containsKey(
+                        if (property.getExts().containsKey(
                                 CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_STORAGE)) {
                             model.vendorExtensions.put(
                                     CodegenConstants.X_PY_HAS_PUBLIC_NAME_PROPERTIES, true);
@@ -731,7 +731,7 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
                     List<CodegenProperty> generatedProperties = generatedProperties(model);
                     if (compatibleWithPythonLegacy
                             || generatedProperties.stream().anyMatch(property ->
-                                    property.vendorExtensions.containsKey(
+                                    property.getExts().containsKey(
                                             CodegenConstants.X_PY_EXPLICIT_PUBLIC_NAME))) {
                         validateModelPropertyNames(model, generatedProperties);
                     }
@@ -743,14 +743,14 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
 
     private void configurePublicNameInputs(List<CodegenProperty> properties) {
         for (CodegenProperty property : properties) {
-            String publicName = (String) property.vendorExtensions.getOrDefault(
-                    CodegenConstants.X_PY_PUBLIC_NAME, property.name);
-            property.vendorExtensions.put(CodegenConstants.X_PY_PUBLIC_NAME, publicName);
-            property.vendorExtensions.put(
+            String publicName = (String) property.getExts().getOrDefault(
+                    CodegenConstants.X_PY_PUBLIC_NAME, property.getName());
+            property.getExts().put(CodegenConstants.X_PY_PUBLIC_NAME, publicName);
+            property.getExts().put(
                     CodegenConstants.X_PY_PUBLIC_NAME_LITERAL,
                     toPythonStringLiteral(publicName));
-            if (!publicName.equals(property.baseName)) {
-                property.vendorExtensions.put(
+            if (!publicName.equals(property.getBaseName())) {
+                property.getExts().put(
                         CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_WIRE, true);
             }
         }
@@ -762,13 +762,13 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
         Set<String> generatedPropertyBaseNames = new HashSet<>();
         for (CodegenModel ancestor = model; ancestor != null; ancestor = ancestor.parentModel) {
             for (CodegenProperty property : ancestor.vars) {
-                generatedPropertyBaseNames.add(property.baseName);
+                generatedPropertyBaseNames.add(property.getBaseName());
             }
         }
 
         List<CodegenProperty> properties = new ArrayList<>();
         for (CodegenProperty property : model.allVars) {
-            if (generatedPropertyBaseNames.contains(property.baseName)) {
+            if (generatedPropertyBaseNames.contains(property.getBaseName())) {
                 properties.add(property);
             }
         }
@@ -779,19 +779,19 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
             CodegenModel model, List<CodegenProperty> generatedProperties) {
         Set<String> inputNames = new HashSet<>();
         for (CodegenProperty property : model.allVars) {
-            inputNames.add(property.baseName);
-            inputNames.add((String) property.vendorExtensions.getOrDefault(
-                    CodegenConstants.X_PY_PUBLIC_NAME, property.name));
+            inputNames.add(property.getBaseName());
+            inputNames.add((String) property.getExts().getOrDefault(
+                    CodegenConstants.X_PY_PUBLIC_NAME, property.getName()));
         }
 
         Set<String> hiddenStorageNames = new HashSet<>();
         List<String> orderedHiddenStorageNames = new ArrayList<>();
         for (CodegenProperty property : generatedProperties) {
-            if (property.vendorExtensions.containsKey(
+            if (property.getExts().containsKey(
                             CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_STORAGE)
-                    && !inputNames.contains(property.name)
-                    && hiddenStorageNames.add(property.name)) {
-                orderedHiddenStorageNames.add(property.name);
+                    && !inputNames.contains(property.getName())
+                    && hiddenStorageNames.add(property.getName())) {
+                orderedHiddenStorageNames.add(property.getName());
             }
         }
         if (!orderedHiddenStorageNames.isEmpty()) {
@@ -811,28 +811,28 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
         Map<String, CodegenProperty> inputNameOwners = new HashMap<>();
         Map<String, CodegenProperty> memberNameOwners = new HashMap<>();
         for (CodegenProperty property : generatedProperties) {
-            String publicName = (String) property.vendorExtensions.getOrDefault(
-                    CodegenConstants.X_PY_PUBLIC_NAME, property.name);
-            boolean explicitPublicName = property.vendorExtensions.containsKey(
+            String publicName = (String) property.getExts().getOrDefault(
+                    CodegenConstants.X_PY_PUBLIC_NAME, property.getName());
+            boolean explicitPublicName = property.getExts().containsKey(
                     CodegenConstants.X_PY_EXPLICIT_PUBLIC_NAME);
             boolean legacyMetadataCollision = compatibleWithPythonLegacy
                     && (LEGACY_MODEL_METADATA_MEMBER_NAMES.contains(publicName)
-                    || LEGACY_MODEL_METADATA_MEMBER_NAMES.contains(property.name));
+                    || LEGACY_MODEL_METADATA_MEMBER_NAMES.contains(property.getName()));
             boolean publicNameCollision = generatedMembers.contains(publicName)
                     && (explicitPublicName
                     || legacyMetadataCollision
                     || nameMappingGeneratedMembers.contains(publicName));
-            boolean storageNameCollision = generatedMembers.contains(property.name)
+            boolean storageNameCollision = generatedMembers.contains(property.getName())
                     && (explicitPublicName
                     || legacyMetadataCollision
-                    || nameMappingGeneratedMembers.contains(property.name));
+                    || nameMappingGeneratedMembers.contains(property.getName()));
             if (publicNameCollision || storageNameCollision) {
                 String generatedMemberName = publicNameCollision
                         ? publicName
-                        : property.name;
+                        : property.getName();
                 throw new IllegalArgumentException(String.format(Locale.ROOT,
                         "property %s in model %s uses generated Python member name %s",
-                        property.baseName, model.name, generatedMemberName));
+                   property.getBaseName(), model.name, generatedMemberName));
             }
             if (explicitPublicName
                     && (!publicName.matches("[A-Za-z_][A-Za-z0-9_]*")
@@ -840,53 +840,53 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
                     || publicName.startsWith("__"))) {
                 throw new IllegalArgumentException(String.format(Locale.ROOT,
                         "property %s in model %s cannot use %s as its public Python name",
-                        property.baseName, model.name, publicName));
+                   property.getBaseName(), model.name, publicName));
             }
             if (explicitPublicName
-                    && (!property.name.matches("[A-Za-z][A-Za-z0-9_]*")
-                    || PYTHON_KEYWORDS.contains(property.name)
-                    || MODEL_FIELD_NAME_COLLISIONS.contains(property.name)
-                    || MODEL_CLASS_BODY_NAMES.contains(property.name)
-                    || PYDANTIC_PRIVATE_MEMBER_NAMES.contains(property.name))) {
+                    && (!property.getName().matches("[A-Za-z][A-Za-z0-9_]*")
+                    || PYTHON_KEYWORDS.contains(property.getName())
+                    || MODEL_FIELD_NAME_COLLISIONS.contains(property.getName())
+                    || MODEL_CLASS_BODY_NAMES.contains(property.getName())
+                    || PYDANTIC_PRIVATE_MEMBER_NAMES.contains(property.getName()))) {
                 throw new IllegalArgumentException(String.format(Locale.ROOT,
                         "property %s in model %s has invalid generated Python field name %s",
-                        property.baseName, model.name, property.name));
+                   property.getBaseName(), model.name, property.getName()));
             }
 
-            for (String inputName : List.of(property.baseName, publicName)) {
+            for (String inputName : List.of(property.getBaseName(), publicName)) {
                 CodegenProperty owner = inputNameOwners.putIfAbsent(inputName, property);
                 if (owner != null
-                        && !owner.baseName.equals(property.baseName)
-                        && (explicitPublicName || owner.vendorExtensions.containsKey(
+                        && !owner.getBaseName().equals(property.getBaseName())
+                        && (explicitPublicName || owner.getExts().containsKey(
                                 CodegenConstants.X_PY_EXPLICIT_PUBLIC_NAME))) {
                     throw new IllegalArgumentException(String.format(Locale.ROOT,
                             "properties %s and %s in model %s both accept input name %s",
-                            owner.baseName, property.baseName, model.name, inputName));
+                       owner.getBaseName(), property.getBaseName(), model.name, inputName));
                 }
             }
-            for (String memberName : List.of(property.name, publicName)) {
+            for (String memberName : List.of(property.getName(), publicName)) {
                 CodegenProperty owner = memberNameOwners.putIfAbsent(memberName, property);
                 if (owner != null
-                        && !owner.baseName.equals(property.baseName)
-                        && (explicitPublicName || owner.vendorExtensions.containsKey(
+                        && !owner.getBaseName().equals(property.getBaseName())
+                        && (explicitPublicName || owner.getExts().containsKey(
                                 CodegenConstants.X_PY_EXPLICIT_PUBLIC_NAME))) {
                     throw new IllegalArgumentException(String.format(Locale.ROOT,
                             "properties %s and %s in model %s both use Python member name %s",
-                            owner.baseName, property.baseName, model.name, memberName));
+                       owner.getBaseName(), property.getBaseName(), model.name, memberName));
                 }
             }
         }
         for (CodegenProperty property : generatedProperties) {
-            if (!property.vendorExtensions.containsKey(
+            if (!property.getExts().containsKey(
                     CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_STORAGE)) {
                 continue;
             }
-            CodegenProperty inputOwner = inputNameOwners.get(property.name);
-            if (inputOwner != null && !inputOwner.baseName.equals(property.baseName)) {
+            CodegenProperty inputOwner = inputNameOwners.get(property.getName());
+            if (inputOwner != null && !inputOwner.getBaseName().equals(property.getBaseName())) {
                 throw new IllegalArgumentException(String.format(Locale.ROOT,
                         "property %s in model %s uses generated storage name %s, "
                                 + "which is an input name for property %s",
-                        property.baseName, model.name, property.name, inputOwner.baseName));
+                   property.getBaseName(), model.name, property.getName(), inputOwner.getBaseName()));
             }
         }
     }
@@ -916,15 +916,15 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
                 addMangledMember(members, ancestor.classname, "__discriminator_value_class_map");
             }
             for (CodegenProperty property : ancestor.vars) {
-                if (property.isEnum) {
-                    members.add(property.name + "_validate_enum");
+                if (property.getIsEnum()) {
+                    members.add(property.getName() + "_validate_enum");
                 }
-                if (property.vendorExtensions.containsKey(CodegenConstants.X_REGEX)) {
-                    members.add(property.name + "_validate_regular_expression");
+                if (property.getExts().containsKey(CodegenConstants.X_REGEX)) {
+                    members.add(property.getName() + "_validate_regular_expression");
                 }
-                if (property.vendorExtensions.containsKey(
+                if (property.getExts().containsKey(
                         CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_STORAGE)) {
-                    members.add("_" + ancestor.classname + "_" + property.name + "_public_type");
+                    members.add("_" + ancestor.classname + "_" + property.getName() + "_public_type");
                 }
             }
         }
@@ -943,22 +943,22 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
                 addMangledMember(members, ancestor.classname, "__validate_input_names");
             }
             for (CodegenProperty property : ancestor.vars) {
-                if (!property.vendorExtensions.containsKey(
+                if (!property.getExts().containsKey(
                         CodegenConstants.X_PY_EXPLICIT_PUBLIC_NAME)) {
                     continue;
                 }
-                boolean changesStorageName = !property.name.equals(
-                        toVarNameWithoutNameMapping(property.baseName));
-                if (changesStorageName && property.isEnum) {
-                    members.add(property.name + "_validate_enum");
+                boolean changesStorageName = !property.getName().equals(
+                        toVarNameWithoutNameMapping(property.getBaseName()));
+                if (changesStorageName && property.getIsEnum()) {
+                    members.add(property.getName() + "_validate_enum");
                 }
                 if (changesStorageName
-                        && property.vendorExtensions.containsKey(CodegenConstants.X_REGEX)) {
-                    members.add(property.name + "_validate_regular_expression");
+                        && property.getExts().containsKey(CodegenConstants.X_REGEX)) {
+                    members.add(property.getName() + "_validate_regular_expression");
                 }
-                if (property.vendorExtensions.containsKey(
+                if (property.getExts().containsKey(
                         CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_STORAGE)) {
-                    members.add("_" + ancestor.classname + "_" + property.name + "_public_type");
+                    members.add("_" + ancestor.classname + "_" + property.getName() + "_public_type");
                 }
             }
         }
@@ -1005,31 +1005,31 @@ public class PythonClientCodegen extends AbstractPythonCodegen implements Codege
             return;
         }
 
-        String publicName = nameMapping.get(property.baseName);
+        String publicName = nameMapping.get(property.getBaseName());
         if (publicName == null) {
             if (!compatibleWithPythonLegacy) {
                 return;
             }
-            publicName = property.name;
-            property.vendorExtensions.put(CodegenConstants.X_PY_LEGACY_PUBLIC_NAME, true);
+            publicName = property.getName();
+            property.getExts().put(CodegenConstants.X_PY_LEGACY_PUBLIC_NAME, true);
         } else {
-            property.vendorExtensions.put(CodegenConstants.X_PY_EXPLICIT_PUBLIC_NAME, true);
+            property.getExts().put(CodegenConstants.X_PY_EXPLICIT_PUBLIC_NAME, true);
         }
-        property.vendorExtensions.put(CodegenConstants.X_PY_PUBLIC_NAME, publicName);
-        property.vendorExtensions.put(
+        property.getExts().put(CodegenConstants.X_PY_PUBLIC_NAME, publicName);
+        property.getExts().put(
                 CodegenConstants.X_PY_PUBLIC_NAME_LITERAL,
                 toPythonStringLiteral(publicName));
-        if (!publicName.equals(property.baseName)) {
-            property.vendorExtensions.put(CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_WIRE, true);
+        if (!publicName.equals(property.getBaseName())) {
+            property.getExts().put(CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_WIRE, true);
         }
-        if (!publicName.equals(property.name)) {
-            property.vendorExtensions.put(
+        if (!publicName.equals(property.getName())) {
+            property.getExts().put(
                     CodegenConstants.X_PY_PUBLIC_NAME_DIFFERS_FROM_STORAGE, true);
             // Pydantic 2 retains the deprecated BaseModel.schema() class method, so a
             // mapped schema property intentionally overrides its type signature:
             // https://github.com/pydantic/pydantic/blob/v2.11.0/pydantic/main.py
             if ("schema".equals(publicName)) {
-                property.vendorExtensions.put(
+                property.getExts().put(
                         CodegenConstants.X_PY_PUBLIC_NAME_OVERRIDES_BASE_MODEL, true);
             }
         }

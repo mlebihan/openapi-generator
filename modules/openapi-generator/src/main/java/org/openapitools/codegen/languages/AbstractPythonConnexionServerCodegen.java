@@ -621,10 +621,10 @@ public abstract class AbstractPythonConnexionServerCodegen extends AbstractPytho
 
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
-        if (StringUtils.isNotEmpty(property.pattern)) {
+        if (StringUtils.isNotEmpty(property.getPattern())) {
             addImport(model, "import re");
         }
-        postProcessPattern(property.pattern, property.vendorExtensions);
+        postProcessPattern(property.getPattern(), property.getExts());
     }
 
     @Override

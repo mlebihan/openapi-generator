@@ -364,10 +364,10 @@ public class JavaHelidonClientCodegen extends JavaHelidonCommonCodegen {
             model.imports.remove("ApiModel");
         }
 
-        if ("set".equals(property.containerType) && !JACKSON.equals(serializationLibrary)) {
+        if ("set".equals(property.getContainerType()) && !JACKSON.equals(serializationLibrary)) {
             // clean-up
             model.imports.remove("JsonDeserialize");
-            property.vendorExtensions.remove("x-setter-extra-annotation");
+            property.getExts().remove("x-setter-extra-annotation");
         }
     }
 
@@ -402,7 +402,7 @@ public class JavaHelidonClientCodegen extends JavaHelidonCommonCodegen {
 
                 for (CodegenProperty var : cm.vars) {
                     if (this.openApiNullable) {
-                        boolean isOptionalNullable = Boolean.FALSE.equals(var.required) && Boolean.TRUE.equals(var.isNullable);
+                        boolean isOptionalNullable = Boolean.FALSE.equals(var.getRequired()) && Boolean.TRUE.equals(var.isNullable());
                         // only add JsonNullable and related imports to optional and nullable values
                         addImports |= isOptionalNullable;
                         var.getVendorExtensions().put("x-is-jackson-optional-nullable", isOptionalNullable);
@@ -410,14 +410,14 @@ public class JavaHelidonClientCodegen extends JavaHelidonCommonCodegen {
 
                     if (Boolean.TRUE.equals(var.getVendorExtensions().get("x-enum-as-string"))) {
                         // treat enum string as just string
-                        var.datatypeWithEnum = var.dataType;
+                        var.setDatatypeWithEnum(var.getDataType());
 
-                        if (StringUtils.isNotEmpty(var.defaultValue)) { // has default value
-                            String defaultValue = var.defaultValue.substring(var.defaultValue.lastIndexOf('.') + 1);
+                        if (StringUtils.isNotEmpty(var.getDefaultValue())) { // has default value
+                            String defaultValue = var.getDefaultValue().substring(var.getDefaultValue().lastIndexOf('.') + 1);
                             for (EnumVarMap enumVars : EnumUtils.getEnumVars(var.getAllowableValues())) {
                                 if (defaultValue.equals(enumVars.getEnumName())) {
                                     // update default to use the string directly instead of enum string
-                                    var.defaultValue = (String) enumVars.getEnumValue();
+                                    var.setDefaultValue((String) enumVars.getEnumValue());
                                 }
                             }
                         }

@@ -216,9 +216,9 @@ public class ClojureClientCodegen extends DefaultCodegen implements CodegenConfi
         CodegenModel model = super.fromModel(name, mod);
         // If a var is a base spec we won't need to import it
         for (CodegenProperty var : model.vars) {
-            var.vendorExtensions.put(VENDOR_EXTENSION_X_BASE_SPEC, baseSpecs.contains(var.complexType));
-            if (var.items != null) {
-                var.items.vendorExtensions.put(VENDOR_EXTENSION_X_BASE_SPEC, baseSpecs.contains(var.items.complexType));
+            var.getExts().put(VENDOR_EXTENSION_X_BASE_SPEC, baseSpecs.contains(var.getComplexType()));
+            if (var.getItems() != null) {
+                var.getItems().getExts().put(VENDOR_EXTENSION_X_BASE_SPEC, baseSpecs.contains(var.getItems().getComplexType()));
             }
         }
 

@@ -430,12 +430,12 @@ public class GoClientCodegen extends AbstractGoCodegen {
     public void updateCodegenPropertyEnum(CodegenProperty var) {
         // make sure the inline enums have plain defaults (e.g. string, int, float)
         String enumDefault = null;
-        if (var.isEnum && var.defaultValue != null) {
-            enumDefault = var.defaultValue;
+        if (var.getIsEnum() && var.getDefaultValue() != null) {
+            enumDefault = var.getDefaultValue();
         }
         super.updateCodegenPropertyEnum(var);
-        if (var.isEnum && enumDefault != null) {
-            var.defaultValue = enumDefault;
+        if (var.getIsEnum() && enumDefault != null) {
+            var.setDefaultValue(enumDefault);
         }
     }
 
@@ -505,11 +505,11 @@ public class GoClientCodegen extends AbstractGoCodegen {
     @Override
     public CodegenProperty fromProperty(String name, Schema p, boolean required) {
         CodegenProperty prop = super.fromProperty(name, p, required);
-        String cc = camelize(prop.name, LOWERCASE_FIRST_LETTER);
+        String cc = camelize(prop.getName(), LOWERCASE_FIRST_LETTER);
         if (isReservedWord(cc)) {
             cc = escapeReservedWord(cc); // e.g. byte => byte_
         }
-        prop.nameInCamelCase = cc;
+        prop.setNameInCamelCase(cc);
         return prop;
     }
 
@@ -531,20 +531,20 @@ public class GoClientCodegen extends AbstractGoCodegen {
             }
 
             for (CodegenProperty param : Iterables.concat(model.vars, model.allVars, model.requiredVars, model.optionalVars)) {
-                param.vendorExtensions.put("x-go-base-type", param.dataType);
-                if (!param.isNullable || param.isContainer || param.isFreeFormObject
-                        || (param.isAnyType && !param.isModel)) {
+                param.getExts().put("x-go-base-type", param.getDataType());
+                if (!param.isNullable() || param.isContainer() || param.getIsFreeFormObject()
+                        || (param.getIsAnyType() && !param.getIsModel())) {
                     continue;
                 }
-                if (param.isDateTime) {
+                if (param.getIsDateTime()) {
                     // Note this could have been done by adding the following line in processOpts(),
                     // however, we only want to represent the DateTime object as NullableTime if
                     // it's marked as nullable in the spec.
                     //    typeMapping.put("DateTime", "NullableTime");
-                    param.dataType = "NullableTime";
+                    param.setDatatype("NullableTime");
                 } else {
-                    param.dataType = "Nullable" + Character.toUpperCase(param.dataType.charAt(0))
-                            + param.dataType.substring(1);
+                    param.setDatatype("Nullable" + Character.toUpperCase(param.getDataType().charAt(0))
+                       + param.getDataType().substring(1));
                 }
             }
 
@@ -722,68 +722,68 @@ public class GoClientCodegen extends AbstractGoCodegen {
     }
 
     private String constructExampleCode(CodegenProperty codegenProperty, HashMap<String, CodegenModel> modelMaps, HashMap<String, ArrayList<Integer>> processedModelMap, int depth) {
-        if (codegenProperty.isArray) { // array
-            String prefix = codegenProperty.dataType;
-            String dataType = StringUtils.removeStart(codegenProperty.dataType, "[]");
+        if (codegenProperty.getIsArray()) { // array
+            String prefix = codegenProperty.getDataType();
+            String dataType = StringUtils.removeStart(codegenProperty.getDataType(), "[]");
             if (modelMaps.containsKey(dataType)) {
                 prefix = "[]" + goImportAlias + "." + dataType;
             }
-            if (codegenProperty.items.isNullable) {
+            if (codegenProperty.getItems().isNullable()) {
                 // We can't easily generate a pointer inline, so just use nil in that case
                 return prefix + "{nil}";
             }
-            return prefix + "{" + constructExampleCode(codegenProperty.items, modelMaps, processedModelMap, depth + 1) + "}";
-        } else if (codegenProperty.isMap) { // map
-            String prefix = codegenProperty.dataType;
-            String dataType = StringUtils.removeStart(codegenProperty.dataType, "map[string][]");
+            return prefix + "{" + constructExampleCode(codegenProperty.getItems(), modelMaps, processedModelMap, depth + 1) + "}";
+        } else if (codegenProperty.getIsMap()) { // map
+            String prefix = codegenProperty.getDataType();
+            String dataType = StringUtils.removeStart(codegenProperty.getDataType(), "map[string][]");
             if (modelMaps.containsKey(dataType)) {
                 prefix = "map[string][]" + goImportAlias + "." + dataType;
             }
-            if (codegenProperty.items == null) {
+            if (codegenProperty.getItems() == null) {
                 return prefix + "{ ... }";
             }
-            return prefix + "{\"key\": " + constructExampleCode(codegenProperty.items, modelMaps, processedModelMap, depth + 1) + "}";
-        } else if (codegenProperty.isPrimitiveType) { // primitive type
-            if (codegenProperty.isString) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return "\"" + escapeText(codegenProperty.example) + "\"";
+            return prefix + "{\"key\": " + constructExampleCode(codegenProperty.getItems(), modelMaps, processedModelMap, depth + 1) + "}";
+        } else if (codegenProperty.getIsPrimitiveType()) { // primitive type
+            if (codegenProperty.getIsString()) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return "\"" + escapeText(codegenProperty.getExample()) + "\"";
                 } else {
-                    return "\"" + codegenProperty.name + "_example\"";
+                    return "\"" + codegenProperty.getName() + "_example\"";
                 }
-            } else if (codegenProperty.isBoolean) { // boolean
-                if (Boolean.parseBoolean(codegenProperty.example)) {
+            } else if (codegenProperty.getIsBoolean()) { // boolean
+                if (Boolean.parseBoolean(codegenProperty.getExample())) {
                     return "true";
                 } else {
                     return "false";
                 }
-            } else if (codegenProperty.isUri) { // URL
+            } else if (codegenProperty.isUri()) { // URL
                 return "\"https://example.com\"";
-            } else if (codegenProperty.isDateTime || codegenProperty.isDate) { // datetime or date
+            } else if (codegenProperty.getIsDateTime() || codegenProperty.getIsDate()) { // datetime or date
                 ArrayList<Integer> v = new ArrayList<>();
                 v.add(1);
                 processedModelMap.put("time.Time", v);
                 return "time.Now()";
             } else { // numeric
                 String example;
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    example = codegenProperty.example;
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    example = codegenProperty.getExample();
                 } else {
                     example = "123";
                 }
 
-                return codegenProperty.dataType + "(" + example + ")";
+                return codegenProperty.getDataType() + "(" + example + ")";
             }
         } else {
             // look up the model
-            if (modelMaps.containsKey(codegenProperty.dataType)) {
-                return constructExampleCode(modelMaps.get(codegenProperty.dataType), modelMaps, processedModelMap, depth + 1);
-            } else if (codegenProperty.isEmail) { // email
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return "\"" + escapeText(codegenProperty.example) + "\"";
+            if (modelMaps.containsKey(codegenProperty.getDataType())) {
+                return constructExampleCode(modelMaps.get(codegenProperty.getDataType()), modelMaps, processedModelMap, depth + 1);
+            } else if (codegenProperty.isEmail()) { // email
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return "\"" + escapeText(codegenProperty.getExample()) + "\"";
                 } else {
-                    return "\"" + codegenProperty.name + "@example.com\"";
+                    return "\"" + codegenProperty.getName() + "@example.com\"";
                 }
-            } else if (codegenProperty.isDateTime || codegenProperty.isDate) { // datetime or date
+            } else if (codegenProperty.getIsDateTime() || codegenProperty.getIsDate()) { // datetime or date
                 ArrayList<Integer> v = new ArrayList<>();
                 v.add(1);
                 processedModelMap.put("time.Time", v);

@@ -222,11 +222,11 @@ public class PhpFlightServerCodegen extends AbstractPhpCodegen {
 
         // Simplify model var type
         for (CodegenProperty var : model.vars) {
-            if (var.dataType != null) {
+            if (var.getDataType() != null) {
                 // Determine if the parameter type is supported as a type hint and make it available
                 // to the templating engine
-                var.vendorExtensions.put("x-parameter-type", var.required ? getTypeHint(var.dataType, false, true) : getTypeHintNullable(var.dataType, true));
-                var.vendorExtensions.put("x-comment-type", var.required ? getTypeHint(var.dataType, true, true) : getTypeHintNullableForComments(var.dataType, true));
+                var.getExts().put("x-parameter-type", var.getRequired() ? getTypeHint(var.getDataType(), false, true) : getTypeHintNullable(var.getDataType(), true));
+                var.getExts().put("x-comment-type", var.getRequired() ? getTypeHint(var.getDataType(), true, true) : getTypeHintNullableForComments(var.getDataType(), true));
             }
         }
 

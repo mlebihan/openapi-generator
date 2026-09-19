@@ -323,8 +323,8 @@ public abstract class AbstractFSharpCodegen extends DefaultCodegen implements Co
                 // check to see if model name is same as the property name
                 // which will result in compilation error
                 // if found, prepend with _ to workaround the limitation
-                if (var.name.equalsIgnoreCase(cm.name)) {
-                    var.name = "_" + var.name;
+                if (var.getName().equalsIgnoreCase(cm.name)) {
+                    var.setName("_" + var.getName());
                 }
             }
         }
@@ -413,16 +413,16 @@ public abstract class AbstractFSharpCodegen extends DefaultCodegen implements Co
             CodegenModel model = ModelUtils.getModelByName(openAPIName, models);
             if (model != null) {
                 for (CodegenProperty var : model.allVars) {
-                    if (enumRefs.containsKey(var.dataType)) {
+                    if (enumRefs.containsKey(var.getDataType())) {
                         // Handle any enum properties referred to by $ref.
                         // This is different in F# than most other generators, because enums in C# are compiled to integral types,
                         // while enums in many other languages are true objects.
-                        CodegenModel refModel = enumRefs.get(var.dataType);
-                        var.allowableValues = refModel.allowableValues;
-                        var.isEnum = true;
+                        CodegenModel refModel = enumRefs.get(var.getDataType());
+                        var.setAllowableValues(refModel.allowableValues);
+                        var.setIsEnum(true);
 
                         // We do these after updateCodegenPropertyEnum to avoid generalities that don't mesh with C#.
-                        var.isPrimitiveType = true;
+                        var.setIsPrimitiveType(true);
                     }
                 }
 
@@ -482,31 +482,31 @@ public abstract class AbstractFSharpCodegen extends DefaultCodegen implements Co
      */
     @Override
     public void updateCodegenPropertyEnum(CodegenProperty var) {
-        if (var.vendorExtensions == null) {
-            var.vendorExtensions = new HashMap<>();
+        if (var.getExts() == null) {
+            var.setVendorExtensions(new HashMap<>());
         }
 
         super.updateCodegenPropertyEnum(var);
 
         // Because C# uses nullable primitives for datatype, and datatype is used in DefaultCodegen for determining enum-ness, guard against weirdness here.
-        if (var.isEnum) {
-            if ("byte".equals(var.dataFormat)) {// C# Actually supports byte and short enums.
-                var.vendorExtensions.put(X_ENUM_BYTE, true);
-                var.isString = false;
-                var.isLong = false;
-                var.isInteger = false;
-            } else if ("int32".equals(var.dataFormat)) {
-                var.isInteger = true;
-                var.isString = false;
-                var.isLong = false;
-            } else if ("int64".equals(var.dataFormat)) {
-                var.isLong = true;
-                var.isString = false;
-                var.isInteger = false;
+        if (var.getIsEnum()) {
+            if ("byte".equals(var.getDataFormat())) {// C# Actually supports byte and short enums.
+                var.getExts().put(X_ENUM_BYTE, true);
+                var.setIsString(false);
+                var.setIsLong(false);
+                var.setIsInteger(false);
+            } else if ("int32".equals(var.getDataFormat())) {
+                var.setIsInteger(true);
+                var.setIsString(false);
+                var.setIsLong(false);
+            } else if ("int64".equals(var.getDataFormat())) {
+                var.setIsLong(true);
+                var.setIsString(false);
+                var.setIsInteger(false);
             } else {// C# doesn't support non-integral enums, so we need to treat everything else as strings (e.g. to not lose precision or data integrity)
-                var.isString = true;
-                var.isInteger = false;
-                var.isLong = false;
+                var.setIsString(true);
+                var.setIsInteger(false);
+                var.setIsLong(false);
             }
         }
     }
@@ -976,7 +976,7 @@ public abstract class AbstractFSharpCodegen extends DefaultCodegen implements Co
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return sanitizeName(camelize(property.name)) + "Enum";
+        return sanitizeName(camelize(property.getName())) + "Enum";
     }
 
     public String testPackageName() {

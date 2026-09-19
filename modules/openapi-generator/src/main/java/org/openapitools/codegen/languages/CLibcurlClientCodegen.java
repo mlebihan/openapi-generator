@@ -762,7 +762,7 @@ public class CLibcurlClientCodegen extends DefaultCodegen implements CodegenConf
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        String enumName = camelize(toModelName(property.name)).toUpperCase(Locale.ROOT);
+        String enumName = camelize(toModelName(property.getName())).toUpperCase(Locale.ROOT);
         enumName = enumName.replaceFirst("^_", "");
         enumName = enumName.replaceFirst("_$", "");
 
@@ -914,7 +914,7 @@ public class CLibcurlClientCodegen extends DefaultCodegen implements CodegenConf
         Schema ref = ModelUtils.getReferencedSchema(openAPI, p);
         if (ref != null) {
             if (ref.getEnum() != null) {
-                cm.isEnum = true;
+                cm.setIsEnum(true);
             }
         }
         return cm;

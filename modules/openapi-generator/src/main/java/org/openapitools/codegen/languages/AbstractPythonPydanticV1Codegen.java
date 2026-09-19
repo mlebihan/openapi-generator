@@ -844,7 +844,7 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
                 int index = 0;
                 List<CodegenProperty> oneOfs = model.getComposedSchemas().getOneOf();
                 for (CodegenProperty oneOf : oneOfs) {
-                    if ("none_type".equals(oneOf.dataType)) {
+                    if ("none_type".equals(oneOf.getDataType())) {
                         oneOfs.remove(index);
                         break; // return earlier assuming there's only 1 null type defined
                     }
@@ -878,11 +878,11 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
 
             if (hasAllOf(model)) {
                 for (CodegenProperty cp : model.allVars) {
-                    if (!cp.isPrimitiveType || cp.isModel) {
-                        if (cp.isArray || cp.isMap) { // if array or map
-                            modelImports.add(cp.items.dataType);
+                    if (!cp.getIsPrimitiveType() || cp.getIsModel()) {
+                        if (cp.getIsArray() || cp.getIsMap()) { // if array or map
+                            modelImports.add(cp.getItems().getDataType());
                         } else { // if model
-                            modelImports.add(cp.dataType);
+                            modelImports.add(cp.getDataType());
                         }
                     }
                 }
@@ -903,29 +903,29 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
                 String firstField = "";
 
                 // is readOnly?
-                if (cp.isReadOnly) {
-                    readOnlyFields.add(cp.name);
+                if (cp.isReadOnly()) {
+                    readOnlyFields.add(cp.getName());
                 }
 
-                if (!cp.required) { //optional
+                if (!cp.getRequired()) { //optional
                     firstField = "None";
                     typing = "Optional[" + typing + "]";
                     typingImports.add("Optional");
                 } else { // required
                     firstField = "...";
-                    if (cp.isNullable) {
+                    if (cp.isNullable()) {
                         typing = "Optional[" + typing + "]";
                         typingImports.add("Optional");
                     }
                 }
 
                 // field
-                if (cp.baseName != null && !cp.baseName.equals(cp.name)) { // base name not the same as name
-                    fields.add("alias=" + PythonStringUtils.toPythonStringLiteral(cp.baseName));
+                if (cp.getBaseName() != null && !cp.getBaseName().equals(cp.getName())) { // base name not the same as name
+                    fields.add("alias=" + PythonStringUtils.toPythonStringLiteral(cp.getBaseName()));
                 }
 
-                if (!StringUtils.isEmpty(cp.description)) { // has description
-                    fields.add(String.format(Locale.ROOT, "description=\"%s\"", cp.description));
+                if (!StringUtils.isEmpty(cp.getDescription())) { // has description
+                    fields.add(String.format(Locale.ROOT, "description=\"%s\"", cp.getDescription()));
                 }
 
                 /* TODO review as example may break the build
@@ -935,14 +935,14 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
 
                 String fieldCustomization;
                 if ("None".equals(firstField)) {
-                    if (cp.defaultValue == null) {
+                    if (cp.getDefaultValue() == null) {
                         fieldCustomization = "None";
                     } else {
-                        if (cp.isArray || cp.isMap) {
+                        if (cp.getIsArray() || cp.getIsMap()) {
                             // TODO handle default value for array/map
                             fieldCustomization = "None";
                         } else {
-                            fieldCustomization = cp.defaultValue;
+                            fieldCustomization = cp.getDefaultValue();
                         }
                     }
                 } else { // required field
@@ -961,13 +961,13 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
                     fieldCustomization = "Field(...)";
                 }
 
-                cp.vendorExtensions.put(X_PY_TYPING, typing + " = " + fieldCustomization);
+                cp.getExts().put(X_PY_TYPING, typing + " = " + fieldCustomization);
 
                 // setup x-py-name for each oneOf/anyOf schema
                 if (hasOneOf(model)) {
-                    cp.vendorExtensions.put(X_PY_NAME, String.format(Locale.ROOT, "oneof_schema_%d_validator", property_count++));
+                    cp.getExts().put(X_PY_NAME, String.format(Locale.ROOT, "oneof_schema_%d_validator", property_count++));
                 } else if (hasAnyOf(model)) {
-                    cp.vendorExtensions.put(X_PY_NAME, String.format(Locale.ROOT, "anyof_schema_%d_validator", property_count++));
+                    cp.getExts().put(X_PY_NAME, String.format(Locale.ROOT, "anyof_schema_%d_validator", property_count++));
                 }
             }
 
@@ -1334,7 +1334,7 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
             return "Any";
         }
 
-        if (cp.isEnum) {
+        if (cp.getIsEnum()) {
             pydanticImports.add("validator");
         }
 
@@ -1352,13 +1352,13 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
             }
             return String.format(Locale.ROOT, "%sEnum", cp.nameInPascalCase);
         } else*/
-        if (cp.isArray) {
+        if (cp.getIsArray()) {
             String constraints = "";
-            if (cp.maxItems != null) {
-                constraints += String.format(Locale.ROOT, ", max_items=%d", cp.maxItems);
+            if (cp.getMaxItems() != null) {
+                constraints += String.format(Locale.ROOT, ", max_items=%d", cp.getMaxItems());
             }
-            if (cp.minItems != null) {
-                constraints += String.format(Locale.ROOT, ", min_items=%d", cp.minItems);
+            if (cp.getMinItems() != null) {
+                constraints += String.format(Locale.ROOT, ", min_items=%d", cp.getMinItems());
             }
             if (cp.getUniqueItems()) {
                 constraints += ", unique_items=True";
@@ -1366,13 +1366,13 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
             pydanticImports.add("conlist");
             typingImports.add("List"); // for return type
             return String.format(Locale.ROOT, "conlist(%s%s)",
-                    getPydanticType(cp.items, typingImports, pydanticImports, datetimeImports, modelImports, exampleImports, postponedModelImports, postponedExampleImports, classname),
+                    getPydanticType(cp.getItems(), typingImports, pydanticImports, datetimeImports, modelImports, exampleImports, postponedModelImports, postponedExampleImports, classname),
                     constraints);
-        } else if (cp.isMap) {
+        } else if (cp.getIsMap()) {
             typingImports.add("Dict");
-            return String.format(Locale.ROOT, "Dict[str, %s]", getPydanticType(cp.items, typingImports, pydanticImports, datetimeImports, modelImports, exampleImports, postponedModelImports, postponedExampleImports, classname));
-        } else if (cp.isString) {
-            if (cp.hasValidation) {
+            return String.format(Locale.ROOT, "Dict[str, %s]", getPydanticType(cp.getItems(), typingImports, pydanticImports, datetimeImports, modelImports, exampleImports, postponedModelImports, postponedExampleImports, classname));
+        } else if (cp.getIsString()) {
+            if (cp.getHasValidation()) {
                 List<String> fieldCustomization = new ArrayList<>();
                 // e.g. constr(regex=r'/[a-z]/i', strict=True)
                 fieldCustomization.add("strict=True");
@@ -1398,8 +1398,8 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
                     return "StrictStr";
                 }
             }
-        } else if (cp.isNumber || cp.isFloat || cp.isDouble) {
-            if (cp.hasValidation) {
+        } else if (cp.getIsNumber() || cp.getIsFloat() || cp.getIsDouble()) {
+            if (cp.getHasValidation()) {
                 List<String> fieldCustomization = new ArrayList<>();
                 List<String> intFieldCustomization = new ArrayList<>();
 
@@ -1460,8 +1460,8 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
                     return "float";
                 }
             }
-        } else if (cp.isInteger || cp.isLong || cp.isShort || cp.isUnboundedInteger) {
-            if (cp.hasValidation) {
+        } else if (cp.getIsInteger() || cp.getIsLong() || cp.getIsShort() || cp.getIsUnboundedInteger()) {
+            if (cp.getHasValidation()) {
                 List<String> fieldCustomization = new ArrayList<>();
                 // e.g. conint(ge=10, le=100, strict=True)
                 fieldCustomization.add("strict=True");
@@ -1490,8 +1490,8 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
                 pydanticImports.add("StrictInt");
                 return "StrictInt";
             }
-        } else if (cp.isBinary || cp.isByteArray) {
-            if (cp.hasValidation) {
+        } else if (cp.getIsBinary() || cp.getIsByteArray()) {
+            if (cp.getHasValidation()) {
                 List<String> fieldCustomization = new ArrayList<>();
                 // e.g. conbytes(min_length=2, max_length=10)
                 fieldCustomization.add("strict=True");
@@ -1518,11 +1518,11 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
                 typingImports.add("Union");
                 return "Union[StrictBytes, StrictStr]";
             }
-        } else if (cp.isBoolean) {
+        } else if (cp.getIsBoolean()) {
             pydanticImports.add("StrictBool");
             return "StrictBool";
-        } else if (cp.isDecimal) {
-            if (cp.hasValidation) {
+        } else if (cp.getIsDecimal()) {
+            if (cp.getHasValidation()) {
                 List<String> fieldCustomization = new ArrayList<>();
                 // e.g. condecimal(ge=10, le=100, strict=True)
                 fieldCustomization.add("strict=True");
@@ -1552,46 +1552,46 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
         } else if (cp.getIsAnyType()) {
             typingImports.add("Any");
             return "Any";
-        } else if (cp.isDate || cp.isDateTime) {
-            if (cp.isDate) {
+        } else if (cp.getIsDate() || cp.getIsDateTime()) {
+            if (cp.getIsDate()) {
                 datetimeImports.add("date");
             }
-            if (cp.isDateTime) {
+            if (cp.getIsDateTime()) {
                 datetimeImports.add("datetime");
             }
-            return cp.dataType;
-        } else if (cp.isUuid) {
-            return cp.dataType;
-        } else if (cp.isFreeFormObject) { // type: object
+            return cp.getDataType();
+        } else if (cp.getIsUuid()) {
+            return cp.getDataType();
+        } else if (cp.getIsFreeFormObject()) { // type: object
             typingImports.add("Dict");
             typingImports.add("Any");
             return "Dict[str, Any]";
-        } else if (!cp.isPrimitiveType || cp.isModel) { // model
+        } else if (!cp.getIsPrimitiveType() || cp.getIsModel()) { // model
             // skip import if it's a circular reference
             if (classname == null) {
                 // for parameter model, import directly
                 hasModelsToImport = true;
-                modelImports.add(cp.dataType);
-                exampleImports.add(cp.dataType);
+                modelImports.add(cp.getDataType());
+                exampleImports.add(cp.getDataType());
             } else {
-                if (circularImports.containsKey(cp.dataType)) {
-                    if (circularImports.get(cp.dataType).contains(classname)) {
+                if (circularImports.containsKey(cp.getDataType())) {
+                    if (circularImports.get(cp.getDataType()).contains(classname)) {
                         hasModelsToImport = true;
-                        postponedModelImports.add(cp.dataType);
-                        postponedExampleImports.add(cp.dataType);
+                        postponedModelImports.add(cp.getDataType());
+                        postponedExampleImports.add(cp.getDataType());
                         // cp.dataType import map of set contains this model (classname), don't import
-                        LOGGER.debug("Skipped importing {} in {} due to circular import.", cp.dataType, classname);
+                        LOGGER.debug("Skipped importing {} in {} due to circular import.", cp.getDataType(), classname);
                     } else {
                         // not circular import, so ok to import it
                         hasModelsToImport = true;
-                        modelImports.add(cp.dataType);
-                        exampleImports.add(cp.dataType);
+                        modelImports.add(cp.getDataType());
+                        exampleImports.add(cp.getDataType());
                     }
                 } else {
-                    LOGGER.error("Failed to look up {} from the imports (map of set) of models.", cp.dataType);
+                    LOGGER.error("Failed to look up {} from the imports (map of set) of models.", cp.getDataType());
                 }
             }
-            return cp.dataType;
+            return cp.getDataType();
         } else {
             throw new RuntimeException("Error! Codegen Property not yet supported in getPydanticType: " + cp);
         }
@@ -1692,12 +1692,12 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
      * @return model name
      */
     private String getModelNameFromDataType(CodegenProperty cp) {
-        if (cp.isArray) {
-            return getModelNameFromDataType(cp.items);
-        } else if (cp.isMap) {
-            return getModelNameFromDataType(cp.items);
-        } else if (!cp.isPrimitiveType || cp.isModel) {
-            return cp.dataType;
+        if (cp.getIsArray()) {
+            return getModelNameFromDataType(cp.getItems());
+        } else if (cp.getIsMap()) {
+            return getModelNameFromDataType(cp.getItems());
+        } else if (!cp.getIsPrimitiveType() || cp.getIsModel()) {
+            return cp.getDataType();
         } else {
             return null;
         }
@@ -1894,10 +1894,10 @@ public abstract class AbstractPythonPydanticV1Codegen extends DefaultCodegen imp
 
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
-        property.vendorExtensions.put(
+        property.getExts().put(
                 X_PY_WIRE_NAME_LITERAL,
-                PythonStringUtils.toPythonStringLiteral(property.baseName));
-        postProcessPattern(property.pattern, property.vendorExtensions);
+                PythonStringUtils.toPythonStringLiteral(property.getBaseName()));
+        postProcessPattern(property.getPattern(), property.getExts());
     }
 
     /*

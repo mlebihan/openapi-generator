@@ -335,16 +335,16 @@ public class GoServerCodegen extends AbstractGoCodegen {
 
         Map<String, CodegenProperty> decodeVarsByBaseName = new LinkedHashMap<>();
         for (CodegenProperty v : model.allVars) {
-            decodeVarsByBaseName.put(v.baseName, v);
+            decodeVarsByBaseName.put(v.getBaseName(), v);
         }
         for (CodegenProperty v : model.vars) {
-            decodeVarsByBaseName.put(v.baseName, v);
+            decodeVarsByBaseName.put(v.getBaseName(), v);
         }
         List<CodegenProperty> decodeVars = new ArrayList<>(decodeVarsByBaseName.values());
         model.vendorExtensions.put("decodeVars", decodeVars);
 
         List<CodegenProperty> presenceCheckRequiredVars = decodeVars.stream()
-                .filter(v -> v.required && !v.isReadOnly)
+                .filter(v -> v.getRequired() && !v.isReadOnly())
                 .collect(Collectors.toList());
 
         model.vendorExtensions.put("presenceCheckRequiredVars", presenceCheckRequiredVars);
@@ -360,18 +360,18 @@ public class GoServerCodegen extends AbstractGoCodegen {
         }
 
         List<String> allowedJsonKeys = decodeVars.stream()
-                .map(v -> v.baseName)
+                .map(v -> v.getBaseName())
                 .collect(Collectors.toList());
         model.vendorExtensions.put("allowedJsonKeys", allowedJsonKeys);
 
         boolean hasRequiredAssertVars = model.vars.stream()
-                .anyMatch(v -> v.required && !v.isReadOnly && !v.isNullable
-                        && (v.isModel || v.isArray || v.isMap));
+                .anyMatch(v -> v.getRequired() && !v.isReadOnly() && !v.isNullable()
+                        && (v.getIsModel() || v.getIsArray() || v.getIsMap()));
         model.vendorExtensions.put("hasRequiredAssertVars", hasRequiredAssertVars);
         if (hasRequiredAssertVars) {
             List<CodegenProperty> assertRequiredVars = model.vars.stream()
-                    .filter(v -> v.required && !v.isReadOnly && !v.isNullable
-                            && (v.isModel || v.isArray || v.isMap))
+                    .filter(v -> v.getRequired() && !v.isReadOnly() && !v.isNullable()
+                            && (v.getIsModel() || v.getIsArray() || v.getIsMap()))
                     .collect(Collectors.toList());
             model.vendorExtensions.put("assertRequiredVars", assertRequiredVars);
         }
@@ -398,7 +398,7 @@ public class GoServerCodegen extends AbstractGoCodegen {
             Boolean importErrors = false;
 
             for (CodegenProperty param : Iterables.concat(model.vars, model.allVars, model.requiredVars, model.optionalVars)) {
-                if (param.isNumeric && (StringUtils.isNotEmpty(param.minimum) || StringUtils.isNotEmpty(param.maximum))) {
+                if (param.isNumeric() && (StringUtils.isNotEmpty(param.getMinimum()) || StringUtils.isNotEmpty(param.getMaximum()))) {
                     importErrors = true;
                 }
             }

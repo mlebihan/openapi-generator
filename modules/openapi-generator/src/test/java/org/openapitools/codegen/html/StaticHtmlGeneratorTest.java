@@ -67,7 +67,7 @@ public class StaticHtmlGeneratorTest {
 
         CodegenProperty property = codegen.fromProperty("favorite_food", (Schema) openAPI.getComponents().getSchemas().get("UnderscoreTest").getProperties().get("favorite_food"));
 
-        Assert.assertEquals(property.baseName, "favorite_food");
-        Assert.assertEquals(property.name, "favorite_food");
+        Assert.assertEquals(property.getBaseName(), "favorite_food");
+        Assert.assertEquals(property.getName(), "favorite_food");
     }
 }

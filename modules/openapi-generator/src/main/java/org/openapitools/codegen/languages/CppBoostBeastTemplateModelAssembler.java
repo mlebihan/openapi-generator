@@ -447,15 +447,15 @@ final class CppBoostBeastTemplateModelAssembler {
     }
 
     private static boolean isBooleanProperty(CodegenProperty property) {
-        return property.isBoolean
-                || "bool".equals(property.dataType)
-                || "boolean".equalsIgnoreCase(property.baseType);
+        return property.getIsBoolean()
+                || "bool".equals(property.getDataType())
+                || "boolean".equalsIgnoreCase(property.getBaseType());
     }
 
     private static boolean propertyMatches(CodegenProperty property,
             String propertyName) {
-        return propertyName.equals(property.baseName)
-                || propertyName.equals(property.name);
+        return propertyName.equals(property.getBaseName())
+                || propertyName.equals(property.getName());
     }
 
     private static CodegenProperty findBooleanRequestProperty(CodegenOperation operation,
@@ -499,8 +499,8 @@ final class CppBoostBeastTemplateModelAssembler {
         if (booleanProperties.size() == 1) return booleanProperties.get(0);
         List<CodegenProperty> conventional = new ArrayList<>();
         for (CodegenProperty property : booleanProperties) {
-            String normalized = normalizeIdentifier(property.baseName != null
-                    ? property.baseName : property.name);
+            String normalized = normalizeIdentifier(property.getBaseName() != null
+                    ? property.getBaseName() : property.getName());
             if ("stream".equals(normalized) || "streaming".equals(normalized)
                     || "sse".equals(normalized)) {
                 conventional.add(property);
@@ -536,7 +536,7 @@ final class CppBoostBeastTemplateModelAssembler {
                     continue;
                 }
                 CodegenProperty schema = media.getValue().getSchema();
-                String[] types = {schema.dataType, schema.baseType, schema.complexType};
+                String[] types = {schema.getDataType(), schema.getBaseType(), schema.getComplexType()};
                 for (String type : types) {
                     CodegenModel model = modelForType(type, modelsByName);
                     if (model != null) candidates.add(model);
@@ -585,9 +585,9 @@ final class CppBoostBeastTemplateModelAssembler {
             operation.vendorExtensions.put(X_CODEGEN_CONDITIONAL_SSE, true);
             operation.vendorExtensions.put(
                     X_CODEGEN_SSE_REQUEST_PARAM, operation.bodyParam.paramName);
-            operation.vendorExtensions.put(X_CODEGEN_SSE_REQUEST_GETTER, selector.getter);
-            operation.vendorExtensions.put(X_CODEGEN_SSE_REQUEST_SETTER, selector.setter);
-            String selectorType = selector.dataType == null ? "bool" : selector.dataType;
+            operation.vendorExtensions.put(X_CODEGEN_SSE_REQUEST_GETTER, selector.getGetter());
+            operation.vendorExtensions.put(X_CODEGEN_SSE_REQUEST_SETTER, selector.getSetter());
+            String selectorType = selector.getDataType() == null ? "bool" : selector.getDataType();
             String falseValue = "bool".equals(selectorType)
                     ? "false" : selectorType + "{false}";
             String trueValue = "bool".equals(selectorType)
@@ -960,7 +960,7 @@ final class CppBoostBeastTemplateModelAssembler {
                     CodegenMediaType sseMediaType = response.getContent().get("text/event-stream");
                     if (sseMediaType != null && sseMediaType.getSchema() != null) {
                         CodegenProperty sseSchema = sseMediaType.getSchema();
-                        String rawType = sseSchema.dataType;
+                        String rawType = sseSchema.getDataType();
                         if (rawType != null) {
                             sseReturnType = rawType;
                             // Derive a valid C++ identifier for the fromJsonValue_ converter.
@@ -1195,8 +1195,8 @@ final class CppBoostBeastTemplateModelAssembler {
 
     private boolean isOneOfSchema(CodegenProperty schema) {
         return schema != null
-                && (Boolean.TRUE.equals(schema.vendorExtensions.get("x-cpp-is-oneof"))
-                || isOneOfType(schema.dataType));
+                && (Boolean.TRUE.equals(schema.getExts().get("x-cpp-is-oneof"))
+                || isOneOfType(schema.getDataType()));
     }
 
     private boolean isOneOfType(String dataType) {

@@ -90,8 +90,8 @@ public class PythonFastAPIServerCodegenTest {
     public void testToPythonExampleWithPluralExamples() {
         final TestableFastAPICodegen codegen = new TestableFastAPICodegen();
         CodegenProperty cp = new CodegenProperty();
-        cp.name = "nickname";
-        cp.jsonSchema = "{\"type\": \"string\", \"examples\": [\"buddy\", \"pal\"]}";
+        cp.setName("nickname");
+        cp.setJsonSchema("{\"type\": \"string\", \"examples\": [\"buddy\", \"pal\"]}");
 
         Assert.assertEquals(codegen.exposeToPythonExample(cp), "\"buddy\"");
     }
@@ -100,8 +100,8 @@ public class PythonFastAPIServerCodegenTest {
     public void testToPythonExamplePrefersExampleOverExamples() {
         final TestableFastAPICodegen codegen = new TestableFastAPICodegen();
         CodegenProperty cp = new CodegenProperty();
-        cp.name = "nickname";
-        cp.jsonSchema = "{\"type\": \"string\", \"example\": \"doggie\", \"examples\": [\"buddy\", \"pal\"]}";
+        cp.setName("nickname");
+        cp.setJsonSchema("{\"type\": \"string\", \"example\": \"doggie\", \"examples\": [\"buddy\", \"pal\"]}");
 
         Assert.assertEquals(codegen.exposeToPythonExample(cp), "\"doggie\"");
     }

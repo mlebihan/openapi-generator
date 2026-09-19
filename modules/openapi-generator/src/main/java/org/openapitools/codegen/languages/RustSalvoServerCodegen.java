@@ -543,9 +543,9 @@ public class RustSalvoServerCodegen extends AbstractRustCodegen implements Codeg
         // and keyword-escaped by AbstractRustCodegen.toVarName) differs from the
         // OpenAPI wire name, so JSON contracts stay intact (e.g. `petId` on the
         // wire, `pet_id` in Rust).
-        if (property.baseName != null && property.name != null
-                && !property.name.equals(property.baseName)) {
-            property.vendorExtensions.put("x-salvo-serde-rename", true);
+        if (property.getBaseName() != null && property.getName() != null
+                && !property.getName().equals(property.getBaseName())) {
+            property.getExts().put("x-salvo-serde-rename", true);
         }
     }
 }

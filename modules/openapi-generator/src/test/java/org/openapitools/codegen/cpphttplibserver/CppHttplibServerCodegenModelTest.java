@@ -64,13 +64,13 @@ public class CppHttplibServerCodegenModelTest {
 
         CodegenProperty statusProp = model.vars.get(0);
         // Check that isEnum flag is set
-        Assert.assertTrue(statusProp.isEnum, "isEnum flag should be true for enum properties");
+        Assert.assertTrue(statusProp.getIsEnum(), "isEnum flag should be true for enum properties");
         // Check vendor extensions for enum handling
-        Assert.assertNotNull(statusProp.vendorExtensions, "vendorExtensions should not be null");
-        Assert.assertTrue((boolean) statusProp.vendorExtensions.getOrDefault("isEnum", false), 
+        Assert.assertNotNull(statusProp.getExts(), "vendorExtensions should not be null");
+        Assert.assertTrue((boolean) statusProp.getExts().getOrDefault("isEnum", false),
             "isEnum vendor extension should be true");
         // Check enum values
-        java.util.List<?> enumValues = (java.util.List<?>) statusProp.vendorExtensions.getOrDefault("values", statusProp._enum);
+        java.util.List<?> enumValues = (java.util.List<?>) statusProp.getExts().getOrDefault("values", statusProp.get_enum());
         Assert.assertNotNull(enumValues, "enum values should be present");
         Assert.assertEquals(enumValues.size(), 3);
     }
@@ -97,24 +97,24 @@ public class CppHttplibServerCodegenModelTest {
 
         // Check id property
         CodegenProperty idProp = model.vars.get(0);
-        Assert.assertEquals(idProp.name, "Id");
-        Assert.assertEquals(idProp.baseName, "id");
-        Assert.assertEquals(idProp.dataType, "long");
-        Assert.assertTrue(idProp.required);
+        Assert.assertEquals(idProp.getName(), "Id");
+        Assert.assertEquals(idProp.getBaseName(), "id");
+        Assert.assertEquals(idProp.getDataType(), "long");
+        Assert.assertTrue(idProp.getRequired());
 
         // Check name property
         CodegenProperty nameProp = model.vars.get(1);
-        Assert.assertEquals(nameProp.name, "Name");
-        Assert.assertEquals(nameProp.baseName, "name");
-        Assert.assertEquals(nameProp.dataType, "std::string");
-        Assert.assertTrue(nameProp.required);
+        Assert.assertEquals(nameProp.getName(), "Name");
+        Assert.assertEquals(nameProp.getBaseName(), "name");
+        Assert.assertEquals(nameProp.getDataType(), "std::string");
+        Assert.assertTrue(nameProp.getRequired());
 
         // Check isActive property
         CodegenProperty activeProp = model.vars.get(2);
-        Assert.assertEquals(activeProp.name, "IsActive");
-        Assert.assertEquals(activeProp.baseName, "isActive");
-        Assert.assertEquals(activeProp.dataType, "bool");
-        Assert.assertFalse(activeProp.required);
+        Assert.assertEquals(activeProp.getName(), "IsActive");
+        Assert.assertEquals(activeProp.getBaseName(), "isActive");
+        Assert.assertEquals(activeProp.getDataType(), "bool");
+        Assert.assertFalse(activeProp.getRequired());
     }
 
     @Test(description = "convert model with array property")
@@ -129,11 +129,11 @@ public class CppHttplibServerCodegenModelTest {
 
         Assert.assertEquals(model.vars.size(), 1);
         CodegenProperty arrayProp = model.vars.get(0);
-        Assert.assertEquals(arrayProp.baseName, "tags");
-        Assert.assertEquals(arrayProp.dataType, "std::vector<std::string>");
-        Assert.assertTrue(arrayProp.isArray);
+        Assert.assertEquals(arrayProp.getBaseName(), "tags");
+        Assert.assertEquals(arrayProp.getDataType(), "std::vector<std::string>");
+        Assert.assertTrue(arrayProp.getIsArray());
         // Verify array vendor extensions are set
-        Assert.assertTrue((boolean) arrayProp.vendorExtensions.getOrDefault("isArray", false),
+        Assert.assertTrue((boolean) arrayProp.getExts().getOrDefault("isArray", false),
             "isArray vendor extension should be true");
     }
 
@@ -151,10 +151,10 @@ public class CppHttplibServerCodegenModelTest {
 
         Assert.assertEquals(model.vars.size(), 1);
         CodegenProperty arrayProp = model.vars.get(0);
-        Assert.assertTrue(arrayProp.isArray);
-        Assert.assertTrue((boolean) arrayProp.vendorExtensions.getOrDefault("isArray", false));
+        Assert.assertTrue(arrayProp.getIsArray());
+        Assert.assertTrue((boolean) arrayProp.getExts().getOrDefault("isArray", false));
         // Verify it detects array of enums
-        Assert.assertTrue((boolean) arrayProp.vendorExtensions.getOrDefault("isArrayOfEnum", false),
+        Assert.assertTrue((boolean) arrayProp.getExts().getOrDefault("isArrayOfEnum", false),
             "isArrayOfEnum vendor extension should be true");
     }
 
@@ -179,7 +179,7 @@ public class CppHttplibServerCodegenModelTest {
         CodegenProperty arrayProp = processedModel.vars.get(0);
         // model-header.mustache declares `enum class {{enumName}} { {{items.allowableValues.values}} };`
         // for array-of-enum properties, so items must independently hold valid C++ identifiers.
-        List<?> declaredIdentifiers = (List<?>) arrayProp.items.allowableValues.get("values");
+        List<?> declaredIdentifiers = (List<?>) arrayProp.getItems().getAllowableValues().get("values");
         Assert.assertEquals(declaredIdentifiers, java.util.Arrays.asList("UNSPECIFIED", "RED", "GREEN", "BLUE"));
     }
 
@@ -195,11 +195,11 @@ public class CppHttplibServerCodegenModelTest {
 
         Assert.assertEquals(model.vars.size(), 1);
         CodegenProperty mapProp = model.vars.get(0);
-        Assert.assertEquals(mapProp.name, "Metadata");
-        Assert.assertEquals(mapProp.dataType, "std::map<std::string, std::string>");
-        Assert.assertTrue(mapProp.isMap);
+        Assert.assertEquals(mapProp.getName(), "Metadata");
+        Assert.assertEquals(mapProp.getDataType(), "std::map<std::string, std::string>");
+        Assert.assertTrue(mapProp.getIsMap());
         // Verify map container flag
-        Assert.assertTrue((boolean) mapProp.vendorExtensions.getOrDefault("isContainer", false),
+        Assert.assertTrue((boolean) mapProp.getExts().getOrDefault("isContainer", false),
             "isContainer vendor extension should be true for maps");
     }
 
@@ -215,7 +215,7 @@ public class CppHttplibServerCodegenModelTest {
 
         final CodegenModel model = codegen.fromModel("UserStatusModel", schema);
         Assert.assertEquals(model.vars.size(), 1);
-        Assert.assertTrue(model.vars.get(0).isEnum);
+        Assert.assertTrue(model.vars.get(0).getIsEnum());
 
         // The C++ identifier (numeric prefixing + upper-casing) is only finalized during
         // postProcessAllModels, since that's the single place both the identifier and the
@@ -224,8 +224,8 @@ public class CppHttplibServerCodegenModelTest {
                 wrapForPostProcessAllModels("UserStatusModel", model))
                 .get("UserStatusModel").getModels().get(0).getModel();
         CodegenProperty statusProp = processedModel.vars.get(0);
-        Assert.assertTrue((boolean) statusProp.vendorExtensions.getOrDefault("isEnum", false));
-        List<?> enumValues = (List<?>) statusProp.vendorExtensions.get("values");
+        Assert.assertTrue((boolean) statusProp.getExts().getOrDefault("isEnum", false));
+        List<?> enumValues = (List<?>) statusProp.getExts().get("values");
         Assert.assertNotNull(enumValues);
         // Check that numeric values are properly converted
         Assert.assertTrue(enumValues.stream().anyMatch(v -> v.toString().startsWith("_")),
@@ -249,7 +249,7 @@ public class CppHttplibServerCodegenModelTest {
 
         CodegenProperty statusProp = processedModel.vars.get(0);
         @SuppressWarnings("unchecked")
-        List<Map<String, String>> enumCases = (List<Map<String, String>>) statusProp.vendorExtensions.get("enumCases");
+        List<Map<String, String>> enumCases = (List<Map<String, String>>) statusProp.getExts().get("enumCases");
         Assert.assertNotNull(enumCases);
 
         Map<String, String> availableCase = enumCases.stream()
@@ -300,10 +300,10 @@ public class CppHttplibServerCodegenModelTest {
 
         Assert.assertEquals(model.vars.size(), 1);
         CodegenProperty nullableProp = model.vars.get(0);
-        Assert.assertEquals(nullableProp.name, "OptionalField");
-        Assert.assertTrue(nullableProp.isNullable);
+        Assert.assertEquals(nullableProp.getName(), "OptionalField");
+        Assert.assertTrue(nullableProp.isNullable());
         // Check that isOptional vendor extension is set
-        Assert.assertTrue((boolean) nullableProp.vendorExtensions.getOrDefault("isOptional", false),
+        Assert.assertTrue((boolean) nullableProp.getExts().getOrDefault("isOptional", false),
             "isOptional vendor extension should be true for nullable fields");
     }
 
@@ -323,8 +323,8 @@ public class CppHttplibServerCodegenModelTest {
 
         Assert.assertEquals(model.vars.size(), 1);
         CodegenProperty nestedProp = model.vars.get(0);
-        Assert.assertEquals(nestedProp.name, "User");
-        Assert.assertTrue(nestedProp.isModel);
+        Assert.assertEquals(nestedProp.getName(), "User");
+        Assert.assertTrue(nestedProp.getIsModel());
     }
 
     @Test(description = "convert model with composed schema (allOf)")
@@ -371,7 +371,7 @@ public class CppHttplibServerCodegenModelTest {
         // Verify type mappings
         java.util.Map<String, String> dataTypeMap = new java.util.HashMap<>();
         for (CodegenProperty var : model.vars) {
-            dataTypeMap.put(var.baseName, var.dataType);
+            dataTypeMap.put(var.getBaseName(), var.getDataType());
         }
         
         Assert.assertEquals(dataTypeMap.get("intValue"), "int");

@@ -479,51 +479,51 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
 
         // OAS 3.1: the 'null' type replaces the nullable flag. Convert null-typed properties
         // to a nullable Object so that C# code generation remains consistent.
-        if ("null".equals(property.openApiType)) {
-            property.dataType = typeMapping.get("object");
-            property.datatypeWithEnum = property.dataType;
-            property.baseType = typeMapping.get("object");
-            property.isNullable = true;
+        if ("null".equals(property.getOpenApiType())) {
+            property.setDatatype(typeMapping.get("object"));
+            property.setDatatypeWithEnum(property.getDataType());
+            property.setBaseType(typeMapping.get("object"));
+            property.isNullable(true);
         }
 
-        if (property.isInnerEnum && property.items != null) {
+        if (property.isInnerEnum() && property.getItems() != null) {
             // format maps of inner enums to include the classname eg: Dictionary<string, MapTest.InnerEnum>
-            property.datatypeWithEnum = property.datatypeWithEnum.replace(property.items.datatypeWithEnum, model.classname + "." + property.items.datatypeWithEnum);
-            property.dataType = property.datatypeWithEnum;
+            property.setDatatypeWithEnum(property.getDatatypeWithEnum().replace(property.getItems().getDatatypeWithEnum(), model.classname + "." + property.getItems().getDatatypeWithEnum()));
+            property.setDatatype(property.getDatatypeWithEnum());
         }
 
-        if (property.isEnum && !property.vendorExtensions.containsKey(AbstractCSharpCodegen.zeroBasedEnumVendorExtension)) {
+        if (property.getIsEnum() && !property.getExts().containsKey(AbstractCSharpCodegen.zeroBasedEnumVendorExtension)) {
             if (Boolean.TRUE.equals(this.zeroBasedEnums)) {
-                property.vendorExtensions.put(AbstractCSharpCodegen.zeroBasedEnumVendorExtension, true);
+                property.getExts().put(AbstractCSharpCodegen.zeroBasedEnumVendorExtension, true);
             } else if (!Boolean.FALSE.equals(this.zeroBasedEnums)) {
-                if (hasEnumValues(property.allowableValues)) {
-                    final List<?> allowableValues = getEnumValues(property.allowableValues);
+                if (hasEnumValues(property.getAllowableValues())) {
+                    final List<?> allowableValues = getEnumValues(property.getAllowableValues());
                     boolean isZeroBased = String.valueOf(allowableValues.get(0)).toLowerCase(Locale.ROOT).equals("unknown");
-                    property.vendorExtensions.put(AbstractCSharpCodegen.zeroBasedEnumVendorExtension, isZeroBased);
+                    property.getExts().put(AbstractCSharpCodegen.zeroBasedEnumVendorExtension, isZeroBased);
                 }
             }
         }
 
-        if (property.isMap || property.isContainer) {
+        if (property.getIsMap() || property.isContainer()) {
             // maps of enums will be marked both isMap and isEnum, correct that now
-            property.isEnum = false;
-            property.isInnerEnum = false;
-            property.isString = false;
+            property.setIsEnum(false);
+            property.isInnerEnum(false);
+            property.setIsString(false);
         }
 
-        Double maximum = asDouble(property.maximum);
-        if (property.dataType.equals("int") && maximum != null) {
-            if ((!property.exclusiveMaximum && asInteger(property.maximum) == null) || (property.exclusiveMaximum && asInteger((maximum + 1) + "") == null)) {
-                property.dataType = "long";
-                property.datatypeWithEnum = "long";
+        Double maximum = asDouble(property.getMaximum());
+        if (property.getDataType().equals("int") && maximum != null) {
+            if ((!property.getExclusiveMaximum() && asInteger(property.getMaximum()) == null) || (property.getExclusiveMaximum() && asInteger((maximum + 1) + "") == null)) {
+                property.setDatatype("long");
+                property.setDatatypeWithEnum("long");
             }
         }
 
-        Double minimum = asDouble(property.minimum);
-        if (property.dataType.equals("int") && minimum != null) {
-            if ((!property.exclusiveMinimum && asInteger(property.minimum) == null) || (property.exclusiveMinimum && asInteger((minimum - 1) + "") == null)) {
-                property.dataType = "long";
-                property.datatypeWithEnum = "long";
+        Double minimum = asDouble(property.getMinimum());
+        if (property.getDataType().equals("int") && minimum != null) {
+            if ((!property.getExclusiveMinimum() && asInteger(property.getMinimum()) == null) || (property.getExclusiveMinimum() && asInteger((minimum - 1) + "") == null)) {
+                property.setDatatype("long");
+                property.setDatatypeWithEnum("long");
             }
         }
     }
@@ -566,12 +566,12 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
                 if (oneOf != null) {
                     Set<String> dataTypeSet = new HashSet<>();
                     for (CodegenProperty oneOfProperty : oneOf) {
-                        if (dataTypeSet.contains(oneOfProperty.dataType)) {
+                        if (dataTypeSet.contains(oneOfProperty.getDataType())) {
                             // add "x-duplicated-data-type" to indicate if the dataType already occurs before
                             // in other sub-schemas of allOf/anyOf/oneOf
-                            oneOfProperty.vendorExtensions.putIfAbsent(X_COMPOSED_DATA_TYPE, true);
+                            oneOfProperty.getExts().putIfAbsent(X_COMPOSED_DATA_TYPE, true);
                         } else {
-                            dataTypeSet.add(oneOfProperty.dataType);
+                            dataTypeSet.add(oneOfProperty.getDataType());
                         }
                     }
                 }
@@ -580,12 +580,12 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
                 if (anyOf != null) {
                     Set<String> dataTypeSet = new HashSet<>();
                     for (CodegenProperty anyOfProperty : anyOf) {
-                        if (dataTypeSet.contains(anyOfProperty.dataType)) {
+                        if (dataTypeSet.contains(anyOfProperty.getDataType())) {
                             // add "x-duplicated-data-type" to indicate if the dataType already occurs before
                             // in other sub-schemas of allOf/anyOf/oneOf
-                            anyOfProperty.vendorExtensions.putIfAbsent(X_COMPOSED_DATA_TYPE, true);
+                            anyOfProperty.getExts().putIfAbsent(X_COMPOSED_DATA_TYPE, true);
                         } else {
-                            dataTypeSet.add(anyOfProperty.dataType);
+                            dataTypeSet.add(anyOfProperty.getDataType());
                         }
                     }
                 }
@@ -663,7 +663,7 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
                 if (allOf != null) {
                     for (CodegenProperty property : allOf) {
                         patchProperty(enumRefs, model, property);
-                        property.name = patchPropertyName(model, property, camelize(property.baseType), composedPropertyNames);
+                        property.setName(patchPropertyName(model, property, camelize(property.getBaseType()), composedPropertyNames));
                     }
                 }
 
@@ -672,9 +672,9 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
                     removePropertiesDeclaredInComposedTypes(objs, model, anyOf);
                     for (CodegenProperty property : anyOf) {
                         patchProperty(enumRefs, model, property);
-                        property.name = patchPropertyName(model, property, camelize(property.baseType), composedPropertyNames);
-                        property.isNullable = true;
-                        property.vendorExtensions.put(X_BASE_NAME, model.name.substring(model.name.lastIndexOf('_') + 1));
+                        property.setName(patchPropertyName(model, property, camelize(property.getBaseType()), composedPropertyNames));
+                        property.isNullable(true);
+                        property.getExts().put(X_BASE_NAME, model.name.substring(model.name.lastIndexOf('_') + 1));
                     }
                 }
 
@@ -683,9 +683,9 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
                     removePropertiesDeclaredInComposedTypes(objs, model, oneOf);
                     for (CodegenProperty property : oneOf) {
                         patchProperty(enumRefs, model, property);
-                        property.name = patchPropertyName(model, property, camelize(property.baseType), composedPropertyNames);
-                        property.isNullable = true;
-                        property.vendorExtensions.put(X_BASE_NAME, model.name.substring(model.name.lastIndexOf('_') + 1));
+                        property.setName(patchPropertyName(model, property, camelize(property.getBaseType()), composedPropertyNames));
+                        property.isNullable(true);
+                        property.getExts().put(X_BASE_NAME, model.name.substring(model.name.lastIndexOf('_') + 1));
                     }
                 }
             }
@@ -718,10 +718,10 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
                 patchProperty(enumRefs, model, property);
             }
 
-            List<CodegenProperty> overriddenProperties = model.vars.stream().filter(v -> model.allVars.stream().anyMatch(a -> a.baseName.equals(v.baseName) && a.dataType != v.dataType)).collect(Collectors.toList());
+            List<CodegenProperty> overriddenProperties = model.vars.stream().filter(v -> model.allVars.stream().anyMatch(a -> a.getBaseName().equals(v.getBaseName()) && a.getDataType() != v.getDataType())).collect(Collectors.toList());
             for (CodegenProperty overridden : overriddenProperties) {
                 // if the current model overrides an allOf property, use the overridden property
-                model.allVars.set(model.allVars.indexOf(model.allVars.stream().filter(a -> a.baseName.equals(overridden.baseName)).findFirst().get()), overridden);
+                model.allVars.set(model.allVars.indexOf(model.allVars.stream().filter(a -> a.getBaseName().equals(overridden.getBaseName())).findFirst().get()), overridden);
             }
         }
         return processed;
@@ -808,7 +808,7 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
         if (processed == null) {
             processed = new HashSet<String>();
         }
-        boolean isMutable = model.allVars.stream().anyMatch(v -> !v.isReadOnly);
+        boolean isMutable = model.allVars.stream().anyMatch(v -> !v.isReadOnly());
         if (!isMutable && !processed.contains(model.classname) && model.getDiscriminator() != null && model.getDiscriminator().getMappedModels() != null) {
             processed.add(model.classname);
             isMutable = modelIsMutable(model, processed);
@@ -829,25 +829,25 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
      * @return
      */
     private String setUniquePropertyName(CodegenModel model, CodegenProperty property, String value) {
-        if (property.name.equalsIgnoreCase(property.baseName)) {
+        if (property.getName().equalsIgnoreCase(property.getBaseName())) {
             return value;
         }
 
         Optional<CodegenProperty> alreadyUpdatedProperty = model.allVars.stream()
-                .filter(p -> !p.name.equals(property.name) && p.baseName.equals(property.baseName))
+                .filter(p -> !p.getName().equals(property.getName()) && p.getBaseName().equals(property.getBaseName()))
                 .collect(Collectors.toList())
                 .stream()
                 .findFirst();
 
         if (alreadyUpdatedProperty.isPresent()) {
             // above iterates allVars, which may have already been corrected
-            return alreadyUpdatedProperty.get().name;
+            return alreadyUpdatedProperty.get().getName();
         }
 
         final String tmp = value;
 
         long count = model.allVars.stream()
-                .filter(v -> v.name.equalsIgnoreCase(tmp))
+                .filter(v -> v.getName().equalsIgnoreCase(tmp))
                 .count();
 
         if (count > 1) {
@@ -876,7 +876,7 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
         // we would not calling this method multiple times to result in different values
         if (composedPropertyNames != null) {
             String tmpName = name;
-            long count = model.allVars.stream().map(v -> v.name).filter(n -> n.equals(tmpName)).count() + composedPropertyNames.stream().filter(n -> n.equals(tmpName)).count();
+            long count = model.allVars.stream().map(v -> v.getName()).filter(n -> n.equals(tmpName)).count() + composedPropertyNames.stream().filter(n -> n.equals(tmpName)).count();
 
             if (count > 0) {
                 name = name + count++;
@@ -890,10 +890,10 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
 
     private void patchPropertyVendorExtensions(CodegenProperty property) {
         boolean isValueType = isValueType(property);
-        property.vendorExtensions.put(X_IS_VALUE_TYPE, isValueType);
-        property.vendorExtensions.put(X_IS_REFERENCE_TYPE, !isValueType);
-        property.vendorExtensions.put(X_IS_NULLABLE_TYPE, this.getNullableReferencesTypes() || isValueType);
-        property.vendorExtensions.put(X_IS_BASE_OR_NEW_DISCRIMINATOR, (property.isDiscriminator && !property.isInherited) || (property.isDiscriminator && property.isNew));
+        property.getExts().put(X_IS_VALUE_TYPE, isValueType);
+        property.getExts().put(X_IS_REFERENCE_TYPE, !isValueType);
+        property.getExts().put(X_IS_NULLABLE_TYPE, this.getNullableReferencesTypes() || isValueType);
+        property.getExts().put(X_IS_BASE_OR_NEW_DISCRIMINATOR, (property.getIsDiscriminator() && !property.isInherited()) || (property.getIsDiscriminator() && property.isNew()));
     }
 
     protected void patchPropertyIsInherited(CodegenModel model, CodegenProperty property) {
@@ -901,80 +901,80 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
 
     private void patchNestedMaps(CodegenProperty property) {
         // Process nested types before making any replacements to ensure we have the correct inner type
-        if (property.items != null) {
-            patchNestedMaps(property.items);
+        if (property.getItems() != null) {
+            patchNestedMaps(property.getItems());
         }
 
         String[] nestedTypes = {"List", "Collection", "ICollection", "Dictionary"};
         
-        if (property.datatypeWithEnum != null) {
-            String originalType = property.datatypeWithEnum;
+        if (property.getDatatypeWithEnum() != null) {
+            String originalType = property.getDatatypeWithEnum();
             
             for (String nestedType : nestedTypes) {
                 // fix incorrect data types for maps of maps
-                if (property.items != null) {
-                    if (property.datatypeWithEnum.contains(", " + nestedType + ">")) {
-                        property.datatypeWithEnum = property.datatypeWithEnum.replace(", " + nestedType + ">", ", " + property.items.datatypeWithEnum + ">");
+                if (property.getItems() != null) {
+                    if (property.getDatatypeWithEnum().contains(", " + nestedType + ">")) {
+                        property.setDatatypeWithEnum(property.getDatatypeWithEnum().replace(", " + nestedType + ">", ", " + property.getItems().getDatatypeWithEnum() + ">"));
                     }
 
-                    if (property.datatypeWithEnum.contains("<" + nestedType + ">")) {
-                        property.datatypeWithEnum = property.datatypeWithEnum.replace("<" + nestedType + ">", "<" + property.items.datatypeWithEnum + ">");
+                    if (property.getDatatypeWithEnum().contains("<" + nestedType + ">")) {
+                        property.setDatatypeWithEnum(property.getDatatypeWithEnum().replace("<" + nestedType + ">", "<" + property.getItems().getDatatypeWithEnum() + ">"));
                     }
                 }
             }
 
             // Only update dataType if we actually made changes
-            if (!originalType.equals(property.datatypeWithEnum)) {
-                property.dataType = property.datatypeWithEnum;
+            if (!originalType.equals(property.getDatatypeWithEnum())) {
+                property.setDatatype(property.getDatatypeWithEnum());
             }
         }
     }
 
     protected void patchProperty(Map<String, CodegenModel> enumRefs, CodegenModel model, CodegenProperty property) {
-        if (enumRefs.containsKey(property.dataType)) {
+        if (enumRefs.containsKey(property.getDataType())) {
             // Handle any enum properties referred to by $ref.
             // This is different in C# than most other generators, because enums in C# are compiled to integral types,
             // while enums in many other languages are true objects.
-            CodegenModel refModel = enumRefs.get(property.dataType);
-            property.allowableValues = refModel.allowableValues;
-            property.isEnum = true;
+            CodegenModel refModel = enumRefs.get(property.getDataType());
+            property.setAllowableValues(refModel.allowableValues);
+            property.setIsEnum(true);
 
             // We do these after updateCodegenPropertyEnum to avoid generalities that don't mesh with C#.
-            property.isPrimitiveType = true;
+            property.setIsPrimitiveType(true);
 
             // Propagate numeric type flags from the referenced enum model so templates
             // can branch on isNumeric/isInteger/isLong/isFloat/isDouble/isDecimal.
-            property.isNumeric = refModel.isNumeric;
-            property.isInteger = refModel.isInteger;
-            property.isLong = refModel.isLong;
-            property.isFloat = refModel.isFloat;
-            property.isDouble = refModel.isDouble;
-            property.isDecimal = refModel.isDecimal;
+            property.isNumeric(refModel.isNumeric);
+            property.setIsInteger(refModel.isInteger);
+            property.setIsLong(refModel.isLong);
+            property.setIsFloat(refModel.isFloat);
+            property.setIsDouble(refModel.isDouble);
+            property.setIsDecimal(refModel.isDecimal);
         }
 
         this.patchPropertyIsInherited(model, property);
 
         patchPropertyVendorExtensions(property);
 
-        property.name = patchPropertyName(model, property, property.name, null);
+        property.setName(patchPropertyName(model, property, property.getName(), null));
 
         patchNestedMaps(property);
 
         // HOTFIX: https://github.com/OpenAPITools/openapi-generator/issues/14944
-        if (property.datatypeWithEnum.equals("decimal")) {
-            property.isDecimal = true;
+        if (property.getDatatypeWithEnum().equals("decimal")) {
+            property.setIsDecimal(true);
         }
 
         // Normalize x-setter-visibility:
         //   "public" -> remove extension, set isReadOnly=false (public setter = default, no modifier needed)
         //   any other value -> set isReadOnly=true (template emits "{{.}} set;" using the extension value)
-        Object setterVisibilityObj = property.vendorExtensions.get("x-setter-visibility");
+        Object setterVisibilityObj = property.getExts().get("x-setter-visibility");
         if (setterVisibilityObj instanceof String) {
             if ("public".equals(setterVisibilityObj)) {
-                property.vendorExtensions.remove("x-setter-visibility");
-                property.isReadOnly = false;
+                property.getExts().remove("x-setter-visibility");
+                property.isReadOnly(false);
             } else {
-                property.isReadOnly = true;
+                property.isReadOnly(true);
             }
         }
     }
@@ -1007,31 +1007,31 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
      */
     @Override
     public void updateCodegenPropertyEnum(CodegenProperty var) {
-        if (var.vendorExtensions == null) {
-            var.vendorExtensions = new HashMap<>();
+        if (var.getExts() == null) {
+            var.setVendorExtensions(new HashMap<>());
         }
 
         super.updateCodegenPropertyEnum(var);
 
         // Because C# uses nullable primitives for datatype, and datatype is used in DefaultCodegen for determining enum-ness, guard against weirdness here.
-        if (var.isEnum) {
-            if ("byte".equals(var.dataFormat)) {// C# Actually supports byte and short enums.
-                var.vendorExtensions.put(X_ENUM_BYTE, true);
-                var.isString = false;
-                var.isLong = false;
-                var.isInteger = false;
-            } else if ("int".equals(var.dataType) || "int32".equals(var.dataFormat)) {
-                var.isInteger = true;
-                var.isString = false;
-                var.isLong = false;
-            } else if ("int64".equals(var.dataFormat)) {
-                var.isLong = true;
-                var.isString = false;
-                var.isInteger = false;
+        if (var.getIsEnum()) {
+            if ("byte".equals(var.getDataFormat())) {// C# Actually supports byte and short enums.
+                var.getExts().put(X_ENUM_BYTE, true);
+                var.setIsString(false);
+                var.setIsLong(false);
+                var.setIsInteger(false);
+            } else if ("int".equals(var.getDataType()) || "int32".equals(var.getDataFormat())) {
+                var.setIsInteger(true);
+                var.setIsString(false);
+                var.setIsLong(false);
+            } else if ("int64".equals(var.getDataFormat())) {
+                var.setIsLong(true);
+                var.setIsString(false);
+                var.setIsInteger(false);
             } else {// C# doesn't support non-integral enums, so we need to treat everything else as strings (e.g. to not lose precision or data integrity)
-                var.isString = true;
-                var.isInteger = false;
-                var.isLong = false;
+                var.setIsString(true);
+                var.setIsInteger(false);
+                var.setIsLong(false);
             }
         }
     }
@@ -1096,7 +1096,7 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
                             response.vendorExtensions.put(X_IS_REFERENCE_TYPE, !isValueType);
                         }
 
-                        if (response.headers != null && response.headers.stream().anyMatch(h -> h.baseName.equals("Set-Cookie"))) {
+                        if (response.headers != null && response.headers.stream().anyMatch(h -> h.getBaseName().equals("Set-Cookie"))) {
                             response.vendorExtensions.put(X_SET_COOKIE, true);
                             operation.vendorExtensions.put(X_SET_COOKIE, true);
                         }
@@ -1468,18 +1468,18 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
         String[] nestedTypes = {"List", "Collection", "ICollection", "Dictionary"};
 
         Arrays.stream(nestedTypes).forEach(nestedType -> {
-            if (operation.returnProperty != null && operation.returnType.contains("<" + nestedType + ">") && operation.returnProperty.items != null) {
-                String nestedReturnType = operation.returnProperty.items.dataType;
+            if (operation.returnProperty != null && operation.returnType.contains("<" + nestedType + ">") && operation.returnProperty.getItems() != null) {
+                String nestedReturnType = operation.returnProperty.getItems().getDataType();
                 operation.returnType = operation.returnType.replace("<" + nestedType + ">", "<" + nestedReturnType + ">");
-                operation.returnProperty.dataType = operation.returnType;
-                operation.returnProperty.datatypeWithEnum = operation.returnType;
+                operation.returnProperty.setDatatype(operation.returnType);
+                operation.returnProperty.setDatatypeWithEnum(operation.returnType);
             }
 
-            if (operation.returnProperty != null && operation.returnType.contains(", " + nestedType + ">") && operation.returnProperty.items != null) {
-                String nestedReturnType = operation.returnProperty.items.dataType;
+            if (operation.returnProperty != null && operation.returnType.contains(", " + nestedType + ">") && operation.returnProperty.getItems() != null) {
+                String nestedReturnType = operation.returnProperty.getItems().getDataType();
                 operation.returnType = operation.returnType.replace(", " + nestedType + ">", ", " + nestedReturnType + ">");
-                operation.returnProperty.dataType = operation.returnType;
-                operation.returnProperty.datatypeWithEnum = operation.returnType;
+                operation.returnProperty.setDatatype(operation.returnType);
+                operation.returnProperty.setDatatypeWithEnum(operation.returnType);
             }
         });
     }
@@ -1956,7 +1956,7 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return sanitizeName(camelize(property.name)) + this.enumNameSuffix;
+        return sanitizeName(camelize(property.getName())) + this.enumNameSuffix;
     }
 
     public String testPackageName() {
@@ -1990,7 +1990,7 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
      */
 
     protected boolean isValueType(CodegenProperty var) {
-        return (this.getValueTypes().contains(var.dataType) || var.isEnum);
+        return (this.getValueTypes().contains(var.getDataType()) || var.getIsEnum());
     }
 
     protected boolean useNet60OrLater() {
@@ -2106,22 +2106,22 @@ public abstract class AbstractCSharpCodegen extends DefaultCodegen {
         if (example == null) {
             example = "null";
         } else if (Boolean.TRUE.equals(p.isArray)) {
-            if (p.items.defaultValue != null) {
+            if (p.items.getDefaultValue() != null) {
                 String innerExample;
-                if ("String".equals(p.items.dataType)) {
-                    innerExample = "\"" + p.items.defaultValue + "\"";
+                if ("String".equals(p.items.getDataType())) {
+                    innerExample = "\"" + p.items.getDefaultValue() + "\"";
                 } else {
-                    innerExample = p.items.defaultValue;
+                    innerExample = p.items.getDefaultValue();
                 }
-                example = "new List<" + p.items.dataType + ">({" + innerExample + "})";
+                example = "new List<" + p.items.getDataType() + ">({" + innerExample + "})";
             } else {
-                example = "new List<" + p.items.dataType + ">()";
+                example = "new List<" + p.items.getDataType() + ">()";
             }
         } else if (Boolean.TRUE.equals(p.isModel)) {
             example = "new " + p.dataType + "()";
         } else if (Boolean.TRUE.equals(p.isMap)) {
             if (p.items != null) {
-                example = "new Dictionary<String, " + p.items.dataType + ">";
+                example = "new Dictionary<String, " + p.items.getDataType() + ">";
             } else {
                 // default to String if item is not defined
                 example = "new Dictionary<String, String>";

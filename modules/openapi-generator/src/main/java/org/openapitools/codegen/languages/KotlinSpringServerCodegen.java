@@ -1339,8 +1339,8 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         super.postProcessModelProperty(model, property);
 
-        if ("null".equals(property.example)) {
-            property.example = null;
+        if ("null".equals(property.getExample())) {
+            property.setExample(null);
         }
 
         // Emit @JsonSetter(nulls = ...) for optional, non-nullable properties (and honor a per-property
@@ -1352,8 +1352,8 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
 
         // Scenario 4: optional + nullable with openApiNullable → use JsonNullable<T> = JsonNullable.undefined()
         // so callers can distinguish between a missing key and an explicitly provided null.
-        if (openApiNullable && !property.required && property.isNullable) {
-            property.vendorExtensions.put("x-is-jackson-optional-nullable", true);
+        if (openApiNullable && !property.getRequired() && property.isNullable()) {
+            property.getExts().put("x-is-jackson-optional-nullable", true);
             model.imports.add("JsonNullable");
         }
 
@@ -1463,7 +1463,7 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
             Stream.of(cm.vars, cm.allVars)
                     .filter(Objects::nonNull)
                     .flatMap(List::stream)
-                    .forEach(p -> collectExtraImports(p.vendorExtensions, extraImports));
+                    .forEach(p -> collectExtraImports(p.getExts(), extraImports));
         }
         if (!extraImports.isEmpty()) {
             List<Map<String, String>> imports = objs.getImports();
@@ -1561,21 +1561,21 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
                                          String discriminatorValue, boolean isEnumDiscriminator) {
         Stream.of(model.vars, model.requiredVars, model.optionalVars, model.allVars)
                 .flatMap(List::stream)
-                .filter(p -> baseName.equals(p.baseName))
+                .filter(p -> baseName.equals(p.getBaseName()))
                 .forEach(p -> {
-                    p.isInherited = true;
+                    p.isInherited(true);
                     // Discriminator properties must match the parent interface type (non-null, required)
                     if (dataType != null) {
-                        p.dataType = dataType;
-                        p.datatypeWithEnum = dataType;
-                        p.isNullable = false;
-                        p.required = true;
+                        p.setDatatype(dataType);
+                        p.setDatatypeWithEnum(dataType);
+                        p.isNullable(false);
+                        p.setRequired(true);
                     }
                     if (discriminatorValue != null) {
                         if (isEnumDiscriminator) {
-                            p.defaultValue = dataType + "." + toEnumVarName(discriminatorValue, dataType);
+                            p.setDefaultValue(dataType + "." + toEnumVarName(discriminatorValue, dataType));
                         } else {
-                            p.defaultValue = "\"" + escapeText(discriminatorValue) + "\"";
+                            p.setDefaultValue("\"" + escapeText(discriminatorValue) + "\"");
                         }
                     }
                 });
@@ -1583,7 +1583,7 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
         // Safe to modify optionalVars here — the stream above has fully completed.
         if (dataType != null) {
             model.optionalVars.stream()
-                    .filter(p -> baseName.equals(p.baseName))
+                    .filter(p -> baseName.equals(p.getBaseName()))
                     .findFirst()
                     .ifPresent(p -> {
                         model.optionalVars.remove(p);
@@ -1612,8 +1612,8 @@ public class KotlinSpringServerCodegen extends AbstractKotlinCodegen
                 JsonAnnotationPolicyUtils.resolveJsonSetterNulls(cm, var, generateJsonSetterNullsAnnotations,
                         optionalNonNullPropertyJsonSetterNulls, openApiNullable, true);
                 // Scenario 4: optional + nullable with openApiNullable → use JsonNullable<T>
-                if (openApiNullable && !var.required && var.isNullable) {
-                    var.vendorExtensions.put("x-is-jackson-optional-nullable", true);
+                if (openApiNullable && !var.getRequired() && var.isNullable()) {
+                    var.getExts().put("x-is-jackson-optional-nullable", true);
                 }
                 resolveJsonIncludePolicy(cm, var);
             }

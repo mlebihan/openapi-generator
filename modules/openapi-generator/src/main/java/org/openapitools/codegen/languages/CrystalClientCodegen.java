@@ -600,7 +600,7 @@ public class CrystalClientCodegen extends DefaultCodegen {
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        String enumName = underscore(toModelName(property.name)).toUpperCase(Locale.ROOT);
+        String enumName = underscore(toModelName(property.getName())).toUpperCase(Locale.ROOT);
         enumName = enumName.replaceFirst("^_", "");
         enumName = enumName.replaceFirst("_$", "");
 
@@ -620,7 +620,7 @@ public class CrystalClientCodegen extends DefaultCodegen {
             CodegenModel cm = mo.getModel();
             boolean notJsonSerializable = false;
             for (CodegenProperty p : cm.getAllVars()) {
-                if (p.dataType != null && p.dataType.contains("::File")) {
+                if (p.getDataType() != null && p.getDataType().contains("::File")) {
                     notJsonSerializable = true;
                     break;
                 }
@@ -635,7 +635,7 @@ public class CrystalClientCodegen extends DefaultCodegen {
             // deserialisation of `{}` fail, so the generated spec asserts that only when one exists.
             boolean hasRequiredNonNullable = false;
             for (CodegenProperty p : cm.getRequiredVars()) {
-                if (!p.isNullable) {
+                if (!p.isNullable()) {
                     hasRequiredNonNullable = true;
                     break;
                 }
@@ -648,8 +648,8 @@ public class CrystalClientCodegen extends DefaultCodegen {
         for (ModelMap mo : processed.getModels()) {
             CodegenModel cm = mo.getModel();
             for (CodegenProperty p : cm.vars) {
-                if (p.isEnum || p.hasValidation) {
-                    p.vendorExtensions.put("x-cr-validated", Boolean.TRUE);
+                if (p.getIsEnum() || p.getHasValidation()) {
+                    p.getExts().put("x-cr-validated", Boolean.TRUE);
                 }
             }
 
@@ -661,9 +661,9 @@ public class CrystalClientCodegen extends DefaultCodegen {
                 // guaranteed valid Crystal); and any default rendered as a constant reference
                 // (contains "::", e.g. a referenced enum's `EnumName::CONST` — named enums are
                 // plain aliases here so that constant doesn't exist).
-                if (p.defaultValue != null && !p.isContainer && !p.isDate && !p.isDateTime
-                        && !p.isEnum && !p.defaultValue.contains("::")) {
-                    p.vendorExtensions.put("x-cr-default", p.defaultValue);
+                if (p.getDefaultValue() != null && !p.isContainer() && !p.getIsDate() && !p.getIsDateTime()
+                        && !p.getIsEnum() && !p.getDefaultValue().contains("::")) {
+                    p.getExts().put("x-cr-default", p.getDefaultValue());
                 }
             }
 
@@ -714,21 +714,21 @@ public class CrystalClientCodegen extends DefaultCodegen {
             // JSON::Serializable inherits the parent's fields, so a child must NOT re-declare
             // inherited properties. Mark them so the template skips their declaration/validation.
             Set<String> inheritedBaseNames = new HashSet<>();
-            for (CodegenProperty pp : parent.getAllVars()) inheritedBaseNames.add(pp.baseName);
+            for (CodegenProperty pp : parent.getAllVars()) inheritedBaseNames.add(pp.getBaseName());
 
             List<CodegenProperty> all = new ArrayList<>(cm.vars);
             all.addAll(cm.requiredVars);
             all.addAll(cm.optionalVars);
             for (CodegenProperty p : all) {
-                p.vendorExtensions.put("x-cr-inherited", inheritedBaseNames.contains(p.baseName));
+                p.getExts().put("x-cr-inherited", inheritedBaseNames.contains(p.getBaseName()));
             }
 
             // Arguments passed to `super(...)` from the child constructor, in the parent's own
             // constructor order (required vars then optional vars). The child accepts these as
             // plain (non-@) params with the same names.
             List<String> superArgs = new ArrayList<>();
-            for (CodegenProperty pp : parent.requiredVars) superArgs.add(pp.name);
-            for (CodegenProperty pp : parent.optionalVars) superArgs.add(pp.name);
+            for (CodegenProperty pp : parent.requiredVars) superArgs.add(pp.getName());
+            for (CodegenProperty pp : parent.optionalVars) superArgs.add(pp.getName());
             cm.vendorExtensions.put("x-cr-parent-args", String.join(", ", superArgs));
         }
 
@@ -1020,64 +1020,64 @@ public class CrystalClientCodegen extends DefaultCodegen {
     }
 
     private String constructExampleCode(CodegenProperty codegenProperty, HashMap<String, CodegenModel> modelMaps, HashMap<String, Integer> processedModelMap) {
-        if (codegenProperty.isArray) { // array
-            return "[" + constructExampleCode(codegenProperty.items, modelMaps, processedModelMap) + "]";
-        } else if (codegenProperty.isMap) {
-            if (codegenProperty.items != null) {
-                return "{ key: " + constructExampleCode(codegenProperty.items, modelMaps, processedModelMap) + "}";
+        if (codegenProperty.getIsArray()) { // array
+            return "[" + constructExampleCode(codegenProperty.getItems(), modelMaps, processedModelMap) + "]";
+        } else if (codegenProperty.getIsMap()) {
+            if (codegenProperty.getItems() != null) {
+                return "{ key: " + constructExampleCode(codegenProperty.getItems(), modelMaps, processedModelMap) + "}";
             } else {
                 return "{ ... }";
             }
-        } else if (codegenProperty.isPrimitiveType) { // primitive type
-            if (codegenProperty.isEnum) {
+        } else if (codegenProperty.getIsPrimitiveType()) { // primitive type
+            if (codegenProperty.getIsEnum()) {
                 // When inline enum, set example to first allowable value
-                List<Object> values = getEnumValues(codegenProperty.allowableValues);
-                codegenProperty.example = String.valueOf(values.get(0));
+                List<Object> values = getEnumValues(codegenProperty.getAllowableValues());
+                codegenProperty.setExample(String.valueOf(values.get(0)));
             }
-            if (codegenProperty.isString || "String".equalsIgnoreCase(codegenProperty.baseType)) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return "'" + codegenProperty.example + "'";
+            if (codegenProperty.getIsString() || "String".equalsIgnoreCase(codegenProperty.getBaseType())) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return "'" + codegenProperty.getExample() + "'";
                 } else {
-                    return "'" + codegenProperty.name + "_example'";
+                    return "'" + codegenProperty.getName() + "_example'";
                 }
-            } else if (codegenProperty.isBoolean) { // boolean
-                if (Boolean.parseBoolean(codegenProperty.example)) {
+            } else if (codegenProperty.getIsBoolean()) { // boolean
+                if (Boolean.parseBoolean(codegenProperty.getExample())) {
                     return "true";
                 } else {
                     return "false";
                 }
-            } else if (codegenProperty.isUri) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return "'" + codegenProperty.example + "'";
+            } else if (codegenProperty.isUri()) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return "'" + codegenProperty.getExample() + "'";
                 }
                 return "'https://example.com'";
-            } else if (codegenProperty.isDateTime) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return "Time.parse('" + codegenProperty.example + "')";
+            } else if (codegenProperty.getIsDateTime()) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return "Time.parse('" + codegenProperty.getExample() + "')";
                 }
                 return "Time.now";
-            } else if (codegenProperty.isDate) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return "Date.parse('" + codegenProperty.example + "')";
+            } else if (codegenProperty.getIsDate()) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return "Date.parse('" + codegenProperty.getExample() + "')";
                 }
                 return "Date.today";
-            } else if (codegenProperty.isFile) {
+            } else if (codegenProperty.isFile()) {
                 return "File.new('/path/to/some/file')";
-            } else if (codegenProperty.isInteger) {
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return codegenProperty.example;
+            } else if (codegenProperty.getIsInteger()) {
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return codegenProperty.getExample();
                 }
                 return "37";
             } else { // number
-                if (!StringUtils.isEmpty(codegenProperty.example) && !"null".equals(codegenProperty.example)) {
-                    return codegenProperty.example;
+                if (!StringUtils.isEmpty(codegenProperty.getExample()) && !"null".equals(codegenProperty.getExample())) {
+                    return codegenProperty.getExample();
                 }
                 return "3.56";
             }
         } else { // model
             // look up the model
-            if (modelMaps.containsKey(codegenProperty.dataType)) {
-                return constructExampleCode(modelMaps.get(codegenProperty.dataType), modelMaps, processedModelMap);
+            if (modelMaps.containsKey(codegenProperty.getDataType())) {
+                return constructExampleCode(modelMaps.get(codegenProperty.getDataType()), modelMaps, processedModelMap);
             } else {
                 // LOGGER.error("Error in constructing examples. Failed to look up the model " +
                 // codegenParameter.dataType);
@@ -1128,7 +1128,7 @@ public class CrystalClientCodegen extends DefaultCodegen {
         List<String> propertyExamples = new ArrayList<>();
         for (CodegenProperty codegenProperty : codegenModel.requiredVars) {
             propertyExamples.add(
-                    codegenProperty.name + ": " + constructExampleCode(codegenProperty, modelMaps, processedModelMap));
+                    codegenProperty.getName() + ": " + constructExampleCode(codegenProperty, modelMaps, processedModelMap));
         }
         String example = moduleName + "::" + toModelName(model) + ".new";
         if (!propertyExamples.isEmpty()) {

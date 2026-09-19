@@ -79,23 +79,23 @@ public class JavascriptClientCodegenTest {
 
         // category (property)
         final CodegenProperty property1 = cm.vars.get(1);
-        Assert.assertEquals(property1.baseName, "category");
-        Assert.assertEquals(property1.dataType, "Category");
-        Assert.assertEquals(property1.name, "category");
-        Assert.assertEquals(property1.baseType, "Category");
-        Assert.assertEquals(property1.defaultValueWithParam, " = Category.constructFromObject(data['category']);");
-        Assert.assertFalse(property1.required);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "category");
+        Assert.assertEquals(property1.getDataType(), "Category");
+        Assert.assertEquals(property1.getName(), "category");
+        Assert.assertEquals(property1.getBaseType(), "Category");
+        Assert.assertEquals(property1.getDefaultValueWithParam(), " = Category.constructFromObject(data['category']);");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertFalse(property1.isContainer());
 
         // name (property)
         final CodegenProperty property2 = cm.vars.get(2);
-        Assert.assertEquals(property2.baseName, "name");
-        Assert.assertEquals(property2.dataType, "String");
-        Assert.assertEquals(property2.name, "name");
-        Assert.assertEquals(property2.baseType, "String");
-        Assert.assertEquals(property2.defaultValueWithParam, " = ApiClient.convertToType(data['name'], 'String');");
-        Assert.assertTrue(property2.required); // test required
-        Assert.assertFalse(property2.isContainer);
+        Assert.assertEquals(property2.getBaseName(), "name");
+        Assert.assertEquals(property2.getDataType(), "String");
+        Assert.assertEquals(property2.getName(), "name");
+        Assert.assertEquals(property2.getBaseType(), "String");
+        Assert.assertEquals(property2.getDefaultValueWithParam(), " = ApiClient.convertToType(data['name'], 'String');");
+        Assert.assertTrue(property2.getRequired()); // test required
+        Assert.assertFalse(property2.isContainer());
     }
 
     @Test(description = "test isDefault in the response")

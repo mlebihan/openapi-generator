@@ -384,7 +384,7 @@ public abstract class AbstractRustCodegen extends DefaultCodegen implements Code
     @Override
     public String toEnumName(CodegenProperty property) {
         // Note: Strangely this function is only used for inline enums, schema enums go through the toModelName function
-        String name = property.baseName;
+        String name = property.getBaseName();
         if (!Strings.isNullOrEmpty(enumSuffix)) {
             name = name + "_" + enumSuffix;
         }

@@ -114,9 +114,9 @@ public class TypeScriptAureliaClientCodegen extends AbstractTypeScriptClientCode
             cm.imports = new TreeSet<>(cm.imports);
             for (CodegenProperty var : cm.vars) {
                 // name enum with model name, e.g. StatusEnum => PetStatusEnum
-                if (Boolean.TRUE.equals(var.isEnum)) {
-                    var.datatypeWithEnum = var.datatypeWithEnum.replace(var.enumName, cm.classname + var.enumName);
-                    var.enumName = cm.classname + var.enumName;
+                if (Boolean.TRUE.equals(var.getIsEnum())) {
+                    var.setDatatypeWithEnum(var.getDatatypeWithEnum().replace(var.getEnumName(), cm.classname + var.getEnumName()));
+                    var.setEnumName(cm.classname + var.getEnumName());
                 }
             }
         }

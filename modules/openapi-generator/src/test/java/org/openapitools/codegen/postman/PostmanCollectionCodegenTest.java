@@ -573,7 +573,7 @@ public class PostmanCollectionCodegenTest {
     @Test
     public void getPostmanTypeNumber() {
         CodegenProperty codegenProperty = new CodegenProperty();
-        codegenProperty.isNumeric = true;
+        codegenProperty.isNumeric(true);
 
         assertEquals("number", new PostmanCollectionCodegen().getPostmanType(codegenProperty));
     }
@@ -581,7 +581,7 @@ public class PostmanCollectionCodegenTest {
     @Test
     public void getPostmanTypeDate() {
         CodegenProperty codegenProperty = new CodegenProperty();
-        codegenProperty.isDate = true;
+        codegenProperty.setIsDate(true);
 
         assertEquals("date", new PostmanCollectionCodegen().getPostmanType(codegenProperty));
     }
@@ -589,7 +589,7 @@ public class PostmanCollectionCodegenTest {
     @Test
     public void getPostmanTypeString() {
         CodegenProperty codegenProperty = new CodegenProperty();
-        codegenProperty.isString = true;
+        codegenProperty.setIsString(true);
 
         assertEquals("string", new PostmanCollectionCodegen().getPostmanType(codegenProperty));
     }
@@ -600,20 +600,20 @@ public class PostmanCollectionCodegenTest {
 
         CodegenParameter codegenParameter = new CodegenParameter();
         codegenParameter.vars.add(new CodegenProperty() {{
-            baseName = "firstname";
-            isString = true;
+            setBaseName("firstname");
+            setIsString(true);
         }});
         codegenParameter.vars.add(new CodegenProperty() {{
-            baseName = "lastname";
-            isString = true;
+            setBaseName("lastname");
+            setIsString(true);
         }});
         codegenParameter.vars.add(new CodegenProperty() {{
-            baseName = "age";
-            isNumeric = true;
+            setBaseName("age");
+            isNumeric(true);
         }});
         codegenParameter.vars.add(new CodegenProperty() {{
-            baseName = "birthDate";
-            isDate = true;
+            setBaseName("birthDate");
+            setIsDate(true);
         }});
 
         assertEquals(EXPECTED, new PostmanCollectionCodegen().getJsonFromSchema(codegenParameter));

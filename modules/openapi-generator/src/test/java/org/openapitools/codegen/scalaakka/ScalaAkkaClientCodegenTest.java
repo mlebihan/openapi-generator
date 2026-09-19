@@ -60,37 +60,37 @@ public class ScalaAkkaClientCodegenTest {
         Assert.assertEquals(cm.vars.size(), 3);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "id");
-        Assert.assertEquals(property1.getter, "getId");
-        Assert.assertEquals(property1.setter, "setId");
-        Assert.assertEquals(property1.dataType, "Long");
-        Assert.assertEquals(property1.name, "id");
-        Assert.assertNull(property1.defaultValue);
-        Assert.assertEquals(property1.baseType, "Long");
-        Assert.assertTrue(property1.required);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "id");
+        Assert.assertEquals(property1.getGetter(), "getId");
+        Assert.assertEquals(property1.getSetter(), "setId");
+        Assert.assertEquals(property1.getDataType(), "Long");
+        Assert.assertEquals(property1.getName(), "id");
+        Assert.assertNull(property1.getDefaultValue());
+        Assert.assertEquals(property1.getBaseType(), "Long");
+        Assert.assertTrue(property1.getRequired());
+        Assert.assertFalse(property1.isContainer());
 
         final CodegenProperty property2 = cm.vars.get(1);
-        Assert.assertEquals(property2.baseName, "name");
-        Assert.assertEquals(property2.getter, "getName");
-        Assert.assertEquals(property2.setter, "setName");
-        Assert.assertEquals(property2.dataType, "String");
-        Assert.assertEquals(property2.name, "name");
-        Assert.assertNull(property2.defaultValue);
-        Assert.assertEquals(property2.baseType, "String");
-        Assert.assertTrue(property2.required);
-        Assert.assertFalse(property2.isContainer);
+        Assert.assertEquals(property2.getBaseName(), "name");
+        Assert.assertEquals(property2.getGetter(), "getName");
+        Assert.assertEquals(property2.getSetter(), "setName");
+        Assert.assertEquals(property2.getDataType(), "String");
+        Assert.assertEquals(property2.getName(), "name");
+        Assert.assertNull(property2.getDefaultValue());
+        Assert.assertEquals(property2.getBaseType(), "String");
+        Assert.assertTrue(property2.getRequired());
+        Assert.assertFalse(property2.isContainer());
 
         final CodegenProperty property3 = cm.vars.get(2);
-        Assert.assertEquals(property3.baseName, "createdAt");
-        Assert.assertEquals(property3.getter, "getCreatedAt");
-        Assert.assertEquals(property3.setter, "setCreatedAt");
-        Assert.assertEquals(property3.dataType, "DateTime");
-        Assert.assertEquals(property3.name, "createdAt");
-        Assert.assertNull(property3.defaultValue);
-        Assert.assertEquals(property3.baseType, "DateTime");
-        Assert.assertFalse(property3.required);
-        Assert.assertFalse(property3.isContainer);
+        Assert.assertEquals(property3.getBaseName(), "createdAt");
+        Assert.assertEquals(property3.getGetter(), "getCreatedAt");
+        Assert.assertEquals(property3.getSetter(), "setCreatedAt");
+        Assert.assertEquals(property3.getDataType(), "DateTime");
+        Assert.assertEquals(property3.getName(), "createdAt");
+        Assert.assertNull(property3.getDefaultValue());
+        Assert.assertEquals(property3.getBaseType(), "DateTime");
+        Assert.assertFalse(property3.getRequired());
+        Assert.assertFalse(property3.isContainer());
     }
 
     @Test(description = "convert a model with list property")
@@ -112,16 +112,16 @@ public class ScalaAkkaClientCodegenTest {
         //Assert.assertEquals(cm.vars.size(), 2);
 
         final CodegenProperty property1 = cm.vars.get(1);
-        Assert.assertEquals(property1.baseName, "urls");
-        Assert.assertEquals(property1.getter, "getUrls");
-        Assert.assertEquals(property1.setter, "setUrls");
-        Assert.assertEquals(property1.dataType, "Seq[String]");
-        Assert.assertEquals(property1.name, "urls");
-        Assert.assertEquals(property1.defaultValue, "Seq[String].empty ");
-        Assert.assertEquals(property1.baseType, "Seq");
-        Assert.assertEquals(property1.containerType, "array");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "urls");
+        Assert.assertEquals(property1.getGetter(), "getUrls");
+        Assert.assertEquals(property1.getSetter(), "setUrls");
+        Assert.assertEquals(property1.getDataType(), "Seq[String]");
+        Assert.assertEquals(property1.getName(), "urls");
+        Assert.assertEquals(property1.getDefaultValue(), "Seq[String].empty ");
+        Assert.assertEquals(property1.getBaseType(), "Seq");
+        Assert.assertEquals(property1.getContainerType(), "array");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert a model with a map property")
@@ -142,16 +142,16 @@ public class ScalaAkkaClientCodegenTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "translations");
-        Assert.assertEquals(property1.getter, "getTranslations");
-        Assert.assertEquals(property1.setter, "setTranslations");
-        Assert.assertEquals(property1.dataType, "Map[String, String]");
-        Assert.assertEquals(property1.name, "translations");
-        Assert.assertEquals(property1.defaultValue, "Map[String, String].empty ");
-        Assert.assertEquals(property1.baseType, "Map");
-        Assert.assertEquals(property1.containerType, "map");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "translations");
+        Assert.assertEquals(property1.getGetter(), "getTranslations");
+        Assert.assertEquals(property1.getSetter(), "setTranslations");
+        Assert.assertEquals(property1.getDataType(), "Map[String, String]");
+        Assert.assertEquals(property1.getName(), "translations");
+        Assert.assertEquals(property1.getDefaultValue(), "Map[String, String].empty ");
+        Assert.assertEquals(property1.getBaseType(), "Map");
+        Assert.assertEquals(property1.getContainerType(), "map");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert a model with complex properties")
@@ -170,15 +170,15 @@ public class ScalaAkkaClientCodegenTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.getter, "getChildren");
-        Assert.assertEquals(property1.setter, "setChildren");
-        Assert.assertEquals(property1.dataType, "Children");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertNull(property1.defaultValue);
-        Assert.assertEquals(property1.baseType, "Children");
-        Assert.assertFalse(property1.required);
-        Assert.assertFalse(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getGetter(), "getChildren");
+        Assert.assertEquals(property1.getSetter(), "setChildren");
+        Assert.assertEquals(property1.getDataType(), "Children");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertNull(property1.getDefaultValue());
+        Assert.assertEquals(property1.getBaseType(), "Children");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertFalse(property1.isContainer());
     }
 
     @Test(description = "convert a model with complex list property")
@@ -198,17 +198,17 @@ public class ScalaAkkaClientCodegenTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.complexType, "Children");
-        Assert.assertEquals(property1.getter, "getChildren");
-        Assert.assertEquals(property1.setter, "setChildren");
-        Assert.assertEquals(property1.dataType, "Seq[Children]");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.defaultValue, "Seq[Children].empty ");
-        Assert.assertEquals(property1.baseType, "Seq");
-        Assert.assertEquals(property1.containerType, "array");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getComplexType(), "Children");
+        Assert.assertEquals(property1.getGetter(), "getChildren");
+        Assert.assertEquals(property1.getSetter(), "setChildren");
+        Assert.assertEquals(property1.getDataType(), "Seq[Children]");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getDefaultValue(), "Seq[Children].empty ");
+        Assert.assertEquals(property1.getBaseType(), "Seq");
+        Assert.assertEquals(property1.getContainerType(), "array");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert a model with set (unique array) property")
@@ -229,17 +229,17 @@ public class ScalaAkkaClientCodegenTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.complexType, "Children");
-        Assert.assertEquals(property1.getter, "getChildren");
-        Assert.assertEquals(property1.setter, "setChildren");
-        Assert.assertEquals(property1.dataType, "Set[Children]");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.defaultValue, "Set[Children].empty ");
-        Assert.assertEquals(property1.baseType, "Set");
-        Assert.assertEquals(property1.containerType, "set");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getComplexType(), "Children");
+        Assert.assertEquals(property1.getGetter(), "getChildren");
+        Assert.assertEquals(property1.getSetter(), "setChildren");
+        Assert.assertEquals(property1.getDataType(), "Set[Children]");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getDefaultValue(), "Set[Children].empty ");
+        Assert.assertEquals(property1.getBaseType(), "Set");
+        Assert.assertEquals(property1.getContainerType(), "set");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert a model with complex map property")
@@ -260,17 +260,17 @@ public class ScalaAkkaClientCodegenTest {
         Assert.assertEquals(Sets.intersection(cm.imports, Sets.newHashSet("Children")).size(), 1);
 
         final CodegenProperty property1 = cm.vars.get(0);
-        Assert.assertEquals(property1.baseName, "children");
-        Assert.assertEquals(property1.complexType, "Children");
-        Assert.assertEquals(property1.getter, "getChildren");
-        Assert.assertEquals(property1.setter, "setChildren");
-        Assert.assertEquals(property1.dataType, "Map[String, Children]");
-        Assert.assertEquals(property1.name, "children");
-        Assert.assertEquals(property1.defaultValue, "Map[String, Children].empty ");
-        Assert.assertEquals(property1.baseType, "Map");
-        Assert.assertEquals(property1.containerType, "map");
-        Assert.assertFalse(property1.required);
-        Assert.assertTrue(property1.isContainer);
+        Assert.assertEquals(property1.getBaseName(), "children");
+        Assert.assertEquals(property1.getComplexType(), "Children");
+        Assert.assertEquals(property1.getGetter(), "getChildren");
+        Assert.assertEquals(property1.getSetter(), "setChildren");
+        Assert.assertEquals(property1.getDataType(), "Map[String, Children]");
+        Assert.assertEquals(property1.getName(), "children");
+        Assert.assertEquals(property1.getDefaultValue(), "Map[String, Children].empty ");
+        Assert.assertEquals(property1.getBaseType(), "Map");
+        Assert.assertEquals(property1.getContainerType(), "map");
+        Assert.assertFalse(property1.getRequired());
+        Assert.assertTrue(property1.isContainer());
     }
 
     @Test(description = "convert an array model")

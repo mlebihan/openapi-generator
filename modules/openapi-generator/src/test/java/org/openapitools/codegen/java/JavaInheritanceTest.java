@@ -105,27 +105,27 @@ public class JavaInheritanceTest {
         final CodegenModel pm = codegen
                 .fromModel("Parent", parent);
         final CodegenProperty propertyPA = pm.allVars.get(0);
-        Assert.assertEquals(propertyPA.name, "a");
-        Assert.assertTrue(propertyPA.required);
+        Assert.assertEquals(propertyPA.getName(), "a");
+        Assert.assertTrue(propertyPA.getRequired());
         final CodegenProperty propertyPB = pm.allVars.get(1);
-        Assert.assertEquals(propertyPB.name, "b");
-        Assert.assertFalse(propertyPB.required);
+        Assert.assertEquals(propertyPB.getName(), "b");
+        Assert.assertFalse(propertyPB.getRequired());
         Assert.assertEquals(pm.requiredVars.size() + pm.optionalVars.size(), pm.allVars.size());
 
         final CodegenModel cm = codegen
                 .fromModel("Child", child);
         final CodegenProperty propertyCA = cm.allVars.get(0);
-        Assert.assertEquals(propertyCA.name, "a");
-        Assert.assertTrue(propertyCA.required);
+        Assert.assertEquals(propertyCA.getName(), "a");
+        Assert.assertTrue(propertyCA.getRequired());
         final CodegenProperty propertyCB = cm.allVars.get(1);
-        Assert.assertEquals(propertyCB.name, "b");
-        Assert.assertFalse(propertyCB.required);
+        Assert.assertEquals(propertyCB.getName(), "b");
+        Assert.assertFalse(propertyCB.getRequired());
         final CodegenProperty propertyCC = cm.allVars.get(2);
-        Assert.assertEquals(propertyCC.name, "c");
-        Assert.assertTrue(propertyCC.required);
+        Assert.assertEquals(propertyCC.getName(), "c");
+        Assert.assertTrue(propertyCC.getRequired());
         final CodegenProperty propertyCD = cm.allVars.get(3);
-        Assert.assertEquals(propertyCD.name, "d");
-        Assert.assertFalse(propertyCD.required);
+        Assert.assertEquals(propertyCD.getName(), "d");
+        Assert.assertFalse(propertyCD.getRequired());
         Assert.assertEquals(cm.requiredVars.size() + cm.optionalVars.size(), cm.allVars.size());
     }
 
@@ -154,27 +154,27 @@ public class JavaInheritanceTest {
         final CodegenModel pm = codegen
                 .fromModel("Parent", parent);
         final CodegenProperty propertyPA = pm.allVars.get(0);
-        Assert.assertEquals(propertyPA.name, "a");
-        Assert.assertTrue(propertyPA.required);
+        Assert.assertEquals(propertyPA.getName(), "a");
+        Assert.assertTrue(propertyPA.getRequired());
         final CodegenProperty propertyPB = pm.allVars.get(1);
-        Assert.assertEquals(propertyPB.name, "b");
-        Assert.assertFalse(propertyPB.required);
+        Assert.assertEquals(propertyPB.getName(), "b");
+        Assert.assertFalse(propertyPB.getRequired());
         Assert.assertEquals(pm.requiredVars.size() + pm.optionalVars.size(), pm.allVars.size());
 
         final CodegenModel cm = codegen
                 .fromModel("Child", child);
         final CodegenProperty propertyCA = cm.allVars.get(0);
-        Assert.assertEquals(propertyCA.name, "a");
-        Assert.assertTrue(propertyCA.required);
+        Assert.assertEquals(propertyCA.getName(), "a");
+        Assert.assertTrue(propertyCA.getRequired());
         final CodegenProperty propertyCB = cm.allVars.get(1);
-        Assert.assertEquals(propertyCB.name, "b");
-        Assert.assertFalse(propertyCB.required);
+        Assert.assertEquals(propertyCB.getName(), "b");
+        Assert.assertFalse(propertyCB.getRequired());
         final CodegenProperty propertyCC = cm.allVars.get(2);
-        Assert.assertEquals(propertyCC.name, "c");
-        Assert.assertTrue(propertyCC.required);
+        Assert.assertEquals(propertyCC.getName(), "c");
+        Assert.assertTrue(propertyCC.getRequired());
         final CodegenProperty propertyCD = cm.allVars.get(3);
-        Assert.assertEquals(propertyCD.name, "d");
-        Assert.assertFalse(propertyCD.required);
+        Assert.assertEquals(propertyCD.getName(), "d");
+        Assert.assertFalse(propertyCD.getRequired());
         Assert.assertEquals(cm.requiredVars.size() + cm.optionalVars.size(), cm.allVars.size());
     }
 

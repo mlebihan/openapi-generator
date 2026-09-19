@@ -109,9 +109,9 @@ public class CSharpModelEnumTest {
         final Schema petSchema = openAPI.getComponents().getSchemas().get("Pet");
         final CodegenModel cm = codegen.fromModel("Pet", petSchema);
         final CodegenProperty statusProperty = cm.vars.get(5);
-        Assert.assertEquals(statusProperty.name, "Status");
-        Assert.assertTrue(statusProperty.isEnum);
-        Assert.assertEquals(statusProperty.datatypeWithEnum, "StatusEnumName");
+        Assert.assertEquals(statusProperty.getName(), "Status");
+        Assert.assertTrue(statusProperty.getIsEnum());
+        Assert.assertEquals(statusProperty.getDatatypeWithEnum(), "StatusEnumName");
 
         Assert.assertEquals(codegen.toEnumVarName("Aaaa", ""), "AaaaEnumValue");
     }
@@ -126,9 +126,9 @@ public class CSharpModelEnumTest {
         final Schema petSchema = openAPI.getComponents().getSchemas().get("Pet");
         final CodegenModel cm = codegen.fromModel("Pet", petSchema);
         final CodegenProperty statusProperty = cm.vars.get(5);
-        Assert.assertEquals(statusProperty.name, "Status");
-        Assert.assertTrue(statusProperty.isEnum);
-        Assert.assertEquals(statusProperty.datatypeWithEnum, "StatusEnum");
+        Assert.assertEquals(statusProperty.getName(), "Status");
+        Assert.assertTrue(statusProperty.getIsEnum());
+        Assert.assertEquals(statusProperty.getDatatypeWithEnum(), "StatusEnum");
 
         Assert.assertEquals(codegen.toEnumVarName("Aaaa", ""), "AaaaEnum");
     }
@@ -145,9 +145,9 @@ public class CSharpModelEnumTest {
         final Schema petSchema = openAPI.getComponents().getSchemas().get("Pet");
         final CodegenModel cm = codegen.fromModel("Pet", petSchema);
         final CodegenProperty statusProperty = cm.vars.get(5);
-        Assert.assertEquals(statusProperty.name, "Status");
-        Assert.assertTrue(statusProperty.isEnum);
-        Assert.assertEquals(statusProperty.datatypeWithEnum, "Status");
+        Assert.assertEquals(statusProperty.getName(), "Status");
+        Assert.assertTrue(statusProperty.getIsEnum());
+        Assert.assertEquals(statusProperty.getDatatypeWithEnum(), "Status");
 
         Assert.assertEquals(codegen.toEnumVarName("Aaaa", ""), "Aaaa");
     }

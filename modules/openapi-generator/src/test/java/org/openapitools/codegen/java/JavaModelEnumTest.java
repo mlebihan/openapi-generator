@@ -48,13 +48,13 @@ public class JavaModelEnumTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty enumVar = cm.vars.get(0);
-        Assert.assertEquals(enumVar.baseName, "name");
-        Assert.assertEquals(enumVar.dataType, "String");
-        Assert.assertEquals(enumVar.datatypeWithEnum, "NameEnum");
-        Assert.assertEquals(enumVar.name, "name");
-        Assert.assertNull(enumVar.defaultValue);
-        Assert.assertEquals(enumVar.baseType, "String");
-        Assert.assertTrue(enumVar.isEnum);
+        Assert.assertEquals(enumVar.getBaseName(), "name");
+        Assert.assertEquals(enumVar.getDataType(), "String");
+        Assert.assertEquals(enumVar.getDatatypeWithEnum(), "NameEnum");
+        Assert.assertEquals(enumVar.getName(), "name");
+        Assert.assertNull(enumVar.getDefaultValue());
+        Assert.assertEquals(enumVar.getBaseType(), "String");
+        Assert.assertTrue(enumVar.getIsEnum());
     }
 
     @Test(description = "convert a java model with an enum inside a list")
@@ -71,22 +71,22 @@ public class JavaModelEnumTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty enumVar = cm.vars.get(0);
-        Assert.assertEquals(enumVar.baseName, "name");
-        Assert.assertEquals(enumVar.dataType, "List<String>");
-        Assert.assertEquals(enumVar.datatypeWithEnum, "List<NameEnum>");
-        Assert.assertEquals(enumVar.name, "name");
-        Assert.assertEquals(enumVar.defaultValue, "new ArrayList<>()");
-        Assert.assertEquals(enumVar.baseType, "List");
-        Assert.assertTrue(enumVar.isEnum);
+        Assert.assertEquals(enumVar.getBaseName(), "name");
+        Assert.assertEquals(enumVar.getDataType(), "List<String>");
+        Assert.assertEquals(enumVar.getDatatypeWithEnum(), "List<NameEnum>");
+        Assert.assertEquals(enumVar.getName(), "name");
+        Assert.assertEquals(enumVar.getDefaultValue(), "new ArrayList<>()");
+        Assert.assertEquals(enumVar.getBaseType(), "List");
+        Assert.assertTrue(enumVar.getIsEnum());
 
-        Assert.assertEquals(enumVar.mostInnerItems.baseName, "name");
-        Assert.assertEquals(enumVar.mostInnerItems.dataType, "String");
-        Assert.assertEquals(enumVar.mostInnerItems.datatypeWithEnum, "NameEnum");
-        Assert.assertEquals(enumVar.mostInnerItems.name, "name");
-        Assert.assertNull(enumVar.mostInnerItems.defaultValue);
-        Assert.assertEquals(enumVar.mostInnerItems.baseType, "String");
+        Assert.assertEquals(enumVar.getMostInnerItems().getBaseName(), "name");
+        Assert.assertEquals(enumVar.getMostInnerItems().getDataType(), "String");
+        Assert.assertEquals(enumVar.getMostInnerItems().getDatatypeWithEnum(), "NameEnum");
+        Assert.assertEquals(enumVar.getMostInnerItems().getName(), "name");
+        Assert.assertNull(enumVar.getMostInnerItems().getDefaultValue());
+        Assert.assertEquals(enumVar.getMostInnerItems().getBaseType(), "String");
 
-        Assert.assertEquals(enumVar.mostInnerItems.baseType, enumVar.items.baseType);
+        Assert.assertEquals(enumVar.getMostInnerItems().getBaseType(), enumVar.getItems().getBaseType());
     }
 
     @Test(description = "convert a java model with an enum inside a list")
@@ -104,22 +104,22 @@ public class JavaModelEnumTest {
         Assert.assertEquals(cm.vars.size(), 1);
 
         final CodegenProperty enumVar = cm.vars.get(0);
-        Assert.assertEquals(enumVar.baseName, "name");
-        Assert.assertEquals(enumVar.dataType, "List<List<String>>");
-        Assert.assertEquals(enumVar.datatypeWithEnum, "List<List<NameEnum>>");
-        Assert.assertEquals(enumVar.name, "name");
-        Assert.assertEquals(enumVar.defaultValue, "new ArrayList<>()");
-        Assert.assertEquals(enumVar.baseType, "List");
-        Assert.assertTrue(enumVar.isEnum);
+        Assert.assertEquals(enumVar.getBaseName(), "name");
+        Assert.assertEquals(enumVar.getDataType(), "List<List<String>>");
+        Assert.assertEquals(enumVar.getDatatypeWithEnum(), "List<List<NameEnum>>");
+        Assert.assertEquals(enumVar.getName(), "name");
+        Assert.assertEquals(enumVar.getDefaultValue(), "new ArrayList<>()");
+        Assert.assertEquals(enumVar.getBaseType(), "List");
+        Assert.assertTrue(enumVar.getIsEnum());
 
-        Assert.assertEquals(enumVar.mostInnerItems.baseName, "name");
-        Assert.assertEquals(enumVar.mostInnerItems.dataType, "String");
-        Assert.assertEquals(enumVar.mostInnerItems.datatypeWithEnum, "NameEnum");
-        Assert.assertEquals(enumVar.mostInnerItems.name, "name");
-        Assert.assertNull(enumVar.mostInnerItems.defaultValue);
-        Assert.assertEquals(enumVar.mostInnerItems.baseType, "String");
+        Assert.assertEquals(enumVar.getMostInnerItems().getBaseName(), "name");
+        Assert.assertEquals(enumVar.getMostInnerItems().getDataType(), "String");
+        Assert.assertEquals(enumVar.getMostInnerItems().getDatatypeWithEnum(), "NameEnum");
+        Assert.assertEquals(enumVar.getMostInnerItems().getName(), "name");
+        Assert.assertNull(enumVar.getMostInnerItems().getDefaultValue());
+        Assert.assertEquals(enumVar.getMostInnerItems().getBaseType(), "String");
 
-        Assert.assertEquals(enumVar.mostInnerItems.baseType, enumVar.items.items.baseType);
+        Assert.assertEquals(enumVar.getMostInnerItems().getBaseType(), enumVar.getItems().getItems().getBaseType());
     }
 
     @Test(description = "not override identical parent enums")
@@ -178,20 +178,20 @@ public class JavaModelEnumTest {
 
         Assert.assertEquals(cm.getVars().size(), 8);
         CodegenProperty cp0 = cm.getVars().get(0);
-        Assert.assertEquals(cp0.dataType, "String");
+        Assert.assertEquals(cp0.getDataType(), "String");
         CodegenProperty cp1 = cm.getVars().get(1);
-        Assert.assertEquals(cp1.dataType, "String");
+        Assert.assertEquals(cp1.getDataType(), "String");
         CodegenProperty cp2 = cm.getVars().get(2);
-        Assert.assertEquals(cp2.dataType, "Integer");
+        Assert.assertEquals(cp2.getDataType(), "Integer");
         CodegenProperty cp3 = cm.getVars().get(3);
-        Assert.assertEquals(cp3.dataType, "Double");
+        Assert.assertEquals(cp3.getDataType(), "Double");
         CodegenProperty cp4 = cm.getVars().get(4);
-        Assert.assertEquals(cp4.dataType, "OuterEnum");
+        Assert.assertEquals(cp4.getDataType(), "OuterEnum");
         CodegenProperty cp5 = cm.getVars().get(5);
-        Assert.assertEquals(cp5.dataType, "OuterEnumInteger");
+        Assert.assertEquals(cp5.getDataType(), "OuterEnumInteger");
         CodegenProperty cp6 = cm.getVars().get(6);
-        Assert.assertEquals(cp6.dataType, "OuterEnumDefaultValue");
+        Assert.assertEquals(cp6.getDataType(), "OuterEnumDefaultValue");
         CodegenProperty cp7 = cm.getVars().get(7);
-        Assert.assertEquals(cp7.dataType, "OuterEnumIntegerDefaultValue");
+        Assert.assertEquals(cp7.getDataType(), "OuterEnumIntegerDefaultValue");
     }
 }

@@ -223,7 +223,7 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return toModelName(property.name);
+        return toModelName(property.getName());
     }
 
     @Override
@@ -283,7 +283,7 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         if (property.getAllowableValues() != null && !property.getAllowableValues().isEmpty()) {
-            property.isModel = true;
+            property.setIsModel(true);
         }
     }
 
@@ -309,8 +309,8 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
                 cr.isModel = true;
             }
             cr.simpleType = false;
-            cr.containerType = cp.containerType;
-            cr.containerTypeMapped = cp.containerTypeMapped;
+            cr.containerType = cp.getContainerType();
+            cr.containerTypeMapped = cp.getContainerTypeMapped();
             addVarsRequiredVarsAdditionalProps(responseSchema, cr);
         }
 
@@ -333,16 +333,16 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
                     final CodegenModel model = obj.getModel();
                     // circular references
                     model.vars.forEach(var -> {
-                        var.isCircularReference = model.allVars.stream()
-                                .filter(v -> var.baseName.equals(v.baseName))
-                                .map(v -> v.isCircularReference)
-                                .findAny()
-                                .orElse(false);
-                        CodegenProperty items = var.items;
+                        var.isCircularReference(model.allVars.stream()
+                           .filter(v -> var.getBaseName().equals(v.getBaseName()))
+                           .map(v -> v.isCircularReference())
+                           .findAny()
+                           .orElse(false));
+                        CodegenProperty items = var.getItems();
                         while (items != null) {
-                            items.isCircularReference = var.isCircularReference;
-                            items.required = true;
-                            items = items.items;
+                            items.isCircularReference(var.isCircularReference());
+                            items.setRequired(true);
+                            items = items.getItems();
                         }
                     });
                     // discriminators
@@ -363,8 +363,8 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
                 })
                 .collect(Collectors.toList());
 
-        final boolean includeTime = anyVarMatches(models, prop -> prop.isDate || prop.isDateTime);
-        final boolean includeUuid = anyVarMatches(models, prop -> prop.isUuid);
+        final boolean includeTime = anyVarMatches(models, prop -> prop.getIsDate() || prop.getIsDateTime());
+        final boolean includeUuid = anyVarMatches(models, prop -> prop.getIsUuid());
 
         dataObj.setModels(models);
         dataObj.put("includeTime", includeTime);
@@ -382,7 +382,7 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
                         if (predicate.test(prop)) {
                             return true;
                         }
-                        prop = prop.items;
+                        prop = prop.getItems();
                     }
                     return false;
                 });
@@ -424,11 +424,11 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
         });
 
         final boolean includeTime = anyOperationResponse(ops, response -> response.isDate || response.isDateTime) ||
-                anyOperationParam(ops, param -> (param.isDate || param.isDateTime) || itemsIncludesType(param.items, p -> p.isDate || p.isDateTime));
+                anyOperationParam(ops, param -> (param.isDate || param.isDateTime) || itemsIncludesType(param.items, p -> p.getIsDate() || p.getIsDateTime()));
         final boolean includeUuid = anyOperationResponse(ops, response -> response.isUuid) ||
-                anyOperationParam(ops, param -> param.isUuid || itemsIncludesType(param.items, p -> p.isUuid));
+                anyOperationParam(ops, param -> param.isUuid || itemsIncludesType(param.items, p -> p.getIsUuid()));
         final boolean includeFile = anyOperationResponse(ops, response -> response.isFile) ||
-                anyOperationParam(ops, param -> param.isFile || itemsIncludesType(param.items, p -> p.isFile));
+                anyOperationParam(ops, param -> param.isFile || itemsIncludesType(param.items, p -> p.isFile()));
 
         operations.put("includeTime", includeTime);
         operations.put("includeUuid", includeUuid);
@@ -441,8 +441,8 @@ public class ElmClientCodegen extends DefaultCodegen implements CodegenConfig {
         if (p == null)
             return false;
 
-        if (p.items != null)
-            return itemsIncludesType(p.items, condition);
+        if (p.getItems() != null)
+            return itemsIncludesType(p.getItems(), condition);
 
         return condition.test(p);
     }

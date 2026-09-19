@@ -316,11 +316,11 @@ public class ScalaSttpClientCodegen extends AbstractScalaCodegen implements Code
         allModels.values().stream()
                 .flatMap(m -> m.vars.stream())
                 .forEach(prop -> {
-                    if (prop.dataType != null && allModels.containsKey(prop.dataType)) {
-                        counts.merge(prop.dataType, 1, Integer::sum);
+                    if (prop.getDataType() != null && allModels.containsKey(prop.getDataType())) {
+                        counts.merge(prop.getDataType(), 1, Integer::sum);
                     }
-                    if (prop.complexType != null && allModels.containsKey(prop.complexType)) {
-                        counts.merge(prop.complexType, 1, Integer::sum);
+                    if (prop.getComplexType() != null && allModels.containsKey(prop.getComplexType())) {
+                        counts.merge(prop.getComplexType(), 1, Integer::sum);
                     }
                 });
 
@@ -602,7 +602,7 @@ public class ScalaSttpClientCodegen extends AbstractScalaCodegen implements Code
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return formatIdentifier(property.baseName, true);
+        return formatIdentifier(property.getBaseName(), true);
     }
 
     @Override
@@ -644,18 +644,18 @@ public class ScalaSttpClientCodegen extends AbstractScalaCodegen implements Code
      */
     @Override
     protected void updateDataTypeWithEnumForArray(CodegenProperty property) {
-        CodegenProperty baseItem = property.items;
-        while (baseItem != null && (Boolean.TRUE.equals(baseItem.isMap)
-                || Boolean.TRUE.equals(baseItem.isArray))) {
-            baseItem = baseItem.items;
+        CodegenProperty baseItem = property.getItems();
+        while (baseItem != null && (Boolean.TRUE.equals(baseItem.getIsMap())
+                || Boolean.TRUE.equals(baseItem.getIsArray()))) {
+            baseItem = baseItem.getItems();
         }
         if (baseItem != null) {
             // set datetypeWithEnum as only the inner type is enum
-            property.datatypeWithEnum = toEnumName(baseItem);
+            property.setDatatypeWithEnum(toEnumName(baseItem));
             // naming the enum with respect to the language enum naming convention
             // e.g. remove [], {} from array/map of enum
-            property.enumName = toEnumName(property);
-            property._enum = baseItem._enum;
+            property.setEnumName(toEnumName(property));
+            property.set_enum(baseItem.get_enum());
 
             updateCodegenPropertyEnum(property);
         }

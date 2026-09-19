@@ -308,7 +308,7 @@ public abstract class JavaHelidonCommonCodegen extends AbstractJavaCodegen
         }
         result.vendorExtensions.put(X_ALL_RESPONSE_PROPS, allResponseProps);
         for (CodegenProperty responseProp : allResponseProps) {
-            if (responseProp.required) {
+            if (responseProp.getRequired()) {
                 requiredResponseProps.add(responseProp);
             } else {
                 optionalResponseProps.add(responseProp);

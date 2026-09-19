@@ -315,7 +315,7 @@ public class JetbrainsHttpClientClientCodegen extends DefaultCodegen implements 
         int counter = 1;
 
         for (CodegenProperty codegenProperty : codegenParameter.vars) {
-            ret = ret + JSON_ESCAPE_DOUBLE_QUOTE + codegenProperty.baseName + JSON_ESCAPE_DOUBLE_QUOTE + ": " +
+            ret = ret + JSON_ESCAPE_DOUBLE_QUOTE + codegenProperty.getBaseName() + JSON_ESCAPE_DOUBLE_QUOTE + ": " +
                     JSON_ESCAPE_DOUBLE_QUOTE + "<" + getType(codegenProperty) + ">" + JSON_ESCAPE_DOUBLE_QUOTE;
 
             if (counter < numVars) {
@@ -332,9 +332,9 @@ public class JetbrainsHttpClientClientCodegen extends DefaultCodegen implements 
     }
 
     public String getType(CodegenProperty codegenProperty) {
-        if (codegenProperty.isNumeric) {
+        if (codegenProperty.isNumeric()) {
             return "number";
-        } else if (codegenProperty.isDate) {
+        } else if (codegenProperty.getIsDate()) {
             return "date";
         } else {
             return "string";

@@ -157,24 +157,24 @@ public class CSharpClientCodegenTest {
         Assert.assertEquals(cm1.getClassname(), "FormatTest");
 
         final CodegenProperty property1 = cm1.allVars.get(2);
-        Assert.assertEquals(property1.baseName, "unsigned_integer");
-        Assert.assertEquals(property1.dataType, "uint");
-        Assert.assertEquals(property1.vendorExtensions.get("x-unsigned"), Boolean.TRUE);
-        Assert.assertTrue(property1.isPrimitiveType);
-        Assert.assertTrue(property1.isInteger);
-        Assert.assertFalse(property1.isContainer);
-        Assert.assertFalse(property1.isFreeFormObject);
-        Assert.assertFalse(property1.isAnyType);
+        Assert.assertEquals(property1.getBaseName(), "unsigned_integer");
+        Assert.assertEquals(property1.getDataType(), "uint");
+        Assert.assertEquals(property1.getExts().get("x-unsigned"), Boolean.TRUE);
+        Assert.assertTrue(property1.getIsPrimitiveType());
+        Assert.assertTrue(property1.getIsInteger());
+        Assert.assertFalse(property1.isContainer());
+        Assert.assertFalse(property1.getIsFreeFormObject());
+        Assert.assertFalse(property1.getIsAnyType());
 
         final CodegenProperty property2 = cm1.allVars.get(4);
-        Assert.assertEquals(property2.baseName, "unsigned_long");
-        Assert.assertEquals(property2.dataType, "ulong");
-        Assert.assertEquals(property2.vendorExtensions.get("x-unsigned"), Boolean.TRUE);
-        Assert.assertTrue(property2.isPrimitiveType);
-        Assert.assertTrue(property2.isLong);
-        Assert.assertFalse(property2.isContainer);
-        Assert.assertFalse(property2.isFreeFormObject);
-        Assert.assertFalse(property2.isAnyType);
+        Assert.assertEquals(property2.getBaseName(), "unsigned_long");
+        Assert.assertEquals(property2.getDataType(), "ulong");
+        Assert.assertEquals(property2.getExts().get("x-unsigned"), Boolean.TRUE);
+        Assert.assertTrue(property2.getIsPrimitiveType());
+        Assert.assertTrue(property2.getIsLong());
+        Assert.assertFalse(property2.isContainer());
+        Assert.assertFalse(property2.getIsFreeFormObject());
+        Assert.assertFalse(property2.getIsAnyType());
     }
 
     @Test
@@ -344,7 +344,7 @@ public class CSharpClientCodegenTest {
 
     private List<String> getNames(List<CodegenProperty> props) {
         if (props == null) return null;
-        return props.stream().map(v -> v.name).collect(Collectors.toList());
+        return props.stream().map(v -> v.getName()).collect(Collectors.toList());
     }
 
     @Test

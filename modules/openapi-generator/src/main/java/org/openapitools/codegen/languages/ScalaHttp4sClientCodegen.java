@@ -589,7 +589,7 @@ public class ScalaHttp4sClientCodegen extends AbstractScalaCodegen implements Co
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        return formatIdentifier(property.baseName, true);
+        return formatIdentifier(property.getBaseName(), true);
     }
 
     @Override

@@ -609,9 +609,9 @@ public class N4jsClientCodegen extends DefaultCodegen implements CodegenConfig {
 
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
-        if (property.unescapedDescription != null && property.unescapedDescription.contains("\n")) {
-            property.description = escapeTextWhileAllowingNewLines(property.unescapedDescription.trim()).replace("\n",
-                    "\n     * ");
+        if (property.getUnescapedDescription() != null && property.getUnescapedDescription().contains("\n")) {
+            property.setDescription(escapeTextWhileAllowingNewLines(property.getUnescapedDescription().trim()).replace("\n",
+               "\n     * "));
         }
     }
 

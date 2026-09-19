@@ -319,7 +319,7 @@ public class CppRestSdkClientCodegen extends AbstractCppCodegen {
                 if (response != null) {
                     CodegenProperty cm = fromProperty("response", response, false);
                     op.vendorExtensions.put("x-codegen-response", cm);
-                    if ("std::shared_ptr<HttpContent>".equals(cm.dataType)) {
+                    if ("std::shared_ptr<HttpContent>".equals(cm.getDataType())) {
                         op.vendorExtensions.put("x-codegen-response-ishttpcontent", true);
                     }
                 }
@@ -332,7 +332,7 @@ public class CppRestSdkClientCodegen extends AbstractCppCodegen {
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         if (isFileSchema(property)) {
-            property.vendorExtensions.put("x-codegen-file", true);
+            property.getExts().put("x-codegen-file", true);
         }
 
         if (!isNullOrEmpty(model.parent)) {
@@ -361,7 +361,7 @@ public class CppRestSdkClientCodegen extends AbstractCppCodegen {
     }
 
     protected boolean isFileSchema(CodegenProperty property) {
-        return property.baseType.equals("HttpContent");
+        return property.getBaseType().equals("HttpContent");
     }
 
     @Override
@@ -543,15 +543,15 @@ public class CppRestSdkClientCodegen extends AbstractCppCodegen {
         final Map<String, CodegenProperty> childPropertiesByName = new HashMap<>(child.vars.size());
         if (child != null && child.vars != null && !child.vars.isEmpty()) {
             for (final CodegenProperty childSchema : child.vars) {
-                childPropertiesByName.put(childSchema.name, childSchema);
+                childPropertiesByName.put(childSchema.getName(), childSchema);
             }
         }
 
         if (parent != null && parent.vars != null && !parent.vars.isEmpty()) {
             for (final CodegenProperty parentSchema : parent.vars) {
-                final CodegenProperty duplicatedByParent = childPropertiesByName.get(parentSchema.name);
+                final CodegenProperty duplicatedByParent = childPropertiesByName.get(parentSchema.getName());
                 if (duplicatedByParent != null) {
-                    duplicatedByParent.isInherited = true;
+                    duplicatedByParent.isInherited(true);
                 }
             }
         }

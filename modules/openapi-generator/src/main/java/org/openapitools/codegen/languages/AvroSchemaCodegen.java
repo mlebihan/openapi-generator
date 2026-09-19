@@ -234,8 +234,8 @@ public class AvroSchemaCodegen extends DefaultCodegen implements CodegenConfig {
     @Override
     protected void setNonArrayMapProperty(CodegenProperty property, String type) {
         super.setNonArrayMapProperty(property, type);
-        if (property.isModel) {
-            property.dataType = camelize(modelNamePrefix + property.dataType + modelNameSuffix);
+        if (property.getIsModel()) {
+            property.setDatatype(camelize(modelNamePrefix + property.getDataType() + modelNameSuffix));
         }
     }
 

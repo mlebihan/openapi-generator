@@ -629,8 +629,8 @@ public class AspNetServerCodegen extends AbstractCSharpCodegen {
     protected void patchProperty(Map<String, CodegenModel> enumRefs, CodegenModel model, CodegenProperty property) {
         super.patchProperty(enumRefs, model, property);
 
-        if (!property.isContainer && (this.getNullableTypes().contains(property.dataType) || property.isEnum)) {
-            property.vendorExtensions.put(X_CSHARP_VALUE_TYPE, true);
+        if (!property.isContainer() && (this.getNullableTypes().contains(property.getDataType()) || property.getIsEnum())) {
+            property.getExts().put(X_CSHARP_VALUE_TYPE, true);
         }
     }
 
